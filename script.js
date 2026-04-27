@@ -361,10 +361,12 @@ function triggerRescue() {
     currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5).slice(0, 1);
     currentQuestionIndex = 0; 
     isProcessingAnswer = false;
+    
+    // Start tracking real time spent on the question
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
-    document.getElementById('trivia-status').innerText = "Answer correctly to repair! Miss = -1 Repair.";
+    document.getElementById('trivia-status').innerText = "Answer to resume. (Time keeps ticking!)";
     document.getElementById('trivia-status').style.color = '#ffcc00';
     document.getElementById('trivia-screen').classList.remove('hidden');
     loadQuestion();
@@ -437,11 +439,12 @@ function checkAnswer(selected, correct) {
     if (triviaMode === 'RESCUE') {
         isProcessingAnswer = true;
         
+        // Calculate real time spent on the question
         let timeSpent = Date.now() - triviaStartTime;
         let framesSpent = Math.floor((timeSpent / 1000) * 60);
         
         if (selected === correct) {
-            levelFrames += framesSpent; // Only deduct the time once they succeed
+            levelFrames += framesSpent; // ONLY deduct the time once they succeed
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
             setTimeout(() => {
