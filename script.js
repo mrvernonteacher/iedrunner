@@ -738,13 +738,13 @@ function updateRunner() {
         player.dy += player.gravity; // Normal gravity
     }
     
-    // Mr. V Ground Run Power
-    if (character === 'Mr. V' && player.grounded) {
+    // Mr. V Air Strafe Power
+    if (character === 'Mr. V' && !player.grounded) {
         if (keys.left) player.x -= 6;
         if (keys.right) player.x += 6;
     }
     
-    // Hard boundaries for Mr. V so he doesn't run off screen
+    // Hard boundaries so he doesn't run off screen
     if (player.x < 10) player.x = 10;
     if (player.x > 750) player.x = 750;
     
@@ -755,6 +755,13 @@ function updateRunner() {
         player.dy = 0; 
         player.grounded = true; 
         player.floatTimer = 0;
+        
+        // Drift Mr. V back to default position on the ground
+        if (character === 'Mr. V') {
+            if (player.x > 50) player.x -= 2;
+            if (player.x < 50) player.x += 2;
+            if (Math.abs(player.x - 50) < 2) player.x = 50;
+        }
     }
 
     for (let i = 0; i < gears.length; i++) {
