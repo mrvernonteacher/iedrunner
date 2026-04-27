@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.addEventListener('keydown', e => { 
         if (e.code === 'Space') {
-            if (!keys.action) handleAction(); // Fire only on initial press
+            if (!keys.action) handleAction(); 
             keys.action = true; 
         }
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -147,6 +147,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
         if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
     });
+    
+    // Force HUD to the absolute front
+    const hudEl = document.getElementById('hud');
+    const bossHudEl = document.getElementById('boss-hud');
+    if (hudEl) hudEl.style.zIndex = '100';
+    if (bossHudEl) bossHudEl.style.zIndex = '100';
     
     updateLeaderboardUI();
     drawCanvasPreview('preview-v', 'Mr. V');
@@ -249,12 +255,12 @@ function startGame(selectedChar) {
         score = 300; 
         resetLevelState(true);
         triggerBossTrivia();
-        gameLoop();
+        gameLoop(); 
         return;
     }
     
     resetLevelState(false);
-    gameLoop();
+    gameLoop(); 
 }
 
 function nextLevel() {
@@ -283,16 +289,12 @@ function resetLevelState(isBossTest) {
     levelFrames = 0;
     isProcessingAnswer = false;
     
-    // Force HUD to the front so it can't be hidden by the trivia overlay
-    document.getElementById('hud').style.zIndex = "20";
-    document.getElementById('boss-hud').style.zIndex = "20";
-    
     document.getElementById('boss-hud').classList.add('hidden');
     document.getElementById('hud').classList.remove('hidden');
     
     gameState = 'RUNNING';
     updateHUD();
-    updateClockDisplay();
+    updateClockDisplay(levelFrames);
     
     const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b'];
     if(gameWrapper) gameWrapper.style.backgroundColor = bgColors[level - 1];
@@ -307,17 +309,9 @@ function updateHUD() {
     document.getElementById('swing-time-display').innerText = (swingTimerFrames / 60).toFixed(1);
 }
 
-function updateClockDisplay() {
-    let displayFrames = levelFrames;
-    
-    // Actively add the time spent in the trivia menu to the clock calculation
-    if (gameState === 'TRIVIA' && triviaMode === 'RESCUE') {
-        let timeSpent = Date.now() - triviaStartTime;
-        displayFrames += Math.floor((timeSpent / 1000) * 60);
-    }
-    
+function updateClockDisplay(framesToUse) {
     let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
-    let remainingSeconds = Math.ceil((targetFrames - displayFrames) / 60);
+    let remainingSeconds = Math.ceil((targetFrames - framesToUse) / 60);
     if (remainingSeconds < 0) remainingSeconds = 0;
     
     let minutes = Math.floor(remainingSeconds / 60);
@@ -480,23 +474,38 @@ function checkAnswer(selected, correct) {
         
         let timeSpent = Date.now() - triviaStartTime;
         let framesSpent = Math.floor((timeSpent / 1000) * 60);
-        levelFrames += framesSpent; // Make the time penalty official
         
         if (selected === correct) {
+            levelFrames += framesSpent; // Officially add the elapsed time
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
+            
+            setTimeout(() => {
+                document.getElementById('trivia-screen').classList.add('hidden');
+                gears = []; 
+                gameState = 'RUNNING';
+            }, 1000);
         } else {
-            document.getElementById('trivia-status').innerText = "INCORRECT! Resuming anyway...";
-            document.getElementById('trivia-status').style.color = '#ff5555';
+            levelFrames += framesSpent; // Still deduct time
+            if (repairs > 0) {
+                repairs--; updateHUD();
+                document.getElementById('trivia-status').innerText = "INCORRECT! -1 Repair. Try another specification.";
+                document.getElementById('trivia-status').style.color = '#ff5555';
+                setTimeout(() => {
+                    isProcessingAnswer = false;
+                    currentQuestionIndex++; 
+                    triviaStartTime = Date.now(); // Restart real-world timer
+                    loadQuestion(); 
+                }, 1500);
+            } else {
+                document.getElementById('trivia-status').innerText = "CRITICAL FAILURE! Out of repairs.";
+                document.getElementById('trivia-status').style.color = '#ff5555';
+                setTimeout(() => {
+                    document.getElementById('trivia-screen').classList.add('hidden');
+                    triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
+                }, 1500);
+            }
         }
-        
-        setTimeout(() => {
-            document.getElementById('trivia-screen').classList.add('hidden');
-            gears = []; 
-            gameState = 'RUNNING';
-            updateClockDisplay();
-        }, 1000);
-        
     } else if (triviaMode === 'BOSS') {
         isProcessingAnswer = true;
         if (selected === correct) {
@@ -729,12 +738,15 @@ function updateRunner() {
         player.dy += player.gravity; // Normal gravity
     }
     
-    if (character === 'Mr. V' && !player.grounded) {
+    // Mr. V Ground Run Power
+    if (character === 'Mr. V' && player.grounded) {
         if (keys.left) player.x -= 6;
         if (keys.right) player.x += 6;
-        if (player.x < 10) player.x = 10;
-        if (player.x > 750) player.x = 750;
     }
+    
+    // Hard boundaries for Mr. V so he doesn't run off screen
+    if (player.x < 10) player.x = 10;
+    if (player.x > 750) player.x = 750;
     
     player.y += player.dy;
     
@@ -743,13 +755,6 @@ function updateRunner() {
         player.dy = 0; 
         player.grounded = true; 
         player.floatTimer = 0;
-        
-        // Drift Mr. V back to default position
-        if (character === 'Mr. V') {
-            if (player.x > 50) player.x -= 2;
-            if (player.x < 50) player.x += 2;
-            if (Math.abs(player.x - 50) < 2) player.x = 50;
-        }
     }
 
     for (let i = 0; i < gears.length; i++) {
@@ -778,7 +783,7 @@ function updateRunner() {
     levelFrames++;
     if (frameCount % 10 === 0) { score++; updateHUD(); }
     
-    if (frameCount % 60 === 0) { updateClockDisplay(); }
+    if (frameCount % 60 === 0) { updateClockDisplay(levelFrames); }
 
     let spawnRate = Math.max(35, 80 - (level * 6));
     if (frameCount % (Math.floor(Math.random() * spawnRate) + spawnRate) === 0 && gears.length < 5) {
@@ -824,7 +829,11 @@ function gameLoop() {
         frameCount++; updateBossFight(); drawFirstPersonBoss(ctx);
     } else if (gameState === 'TRIVIA') {
         if (triviaMode === 'RESCUE' && !isProcessingAnswer) {
-            let remaining = updateClockDisplay();
+            let timeSpent = Date.now() - triviaStartTime;
+            let framesSpent = Math.floor((timeSpent / 1000) * 60);
+            let displayFrames = levelFrames + framesSpent;
+            
+            let remaining = updateClockDisplay(displayFrames);
             
             // If they burn through all their time reading the repair question!
             if (remaining <= 0) {
@@ -832,8 +841,7 @@ function gameLoop() {
                 document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
                 document.getElementById('trivia-status').style.color = '#ff5555';
                 
-                let timeSpent = Date.now() - triviaStartTime;
-                levelFrames += Math.floor((timeSpent / 1000) * 60);
+                levelFrames += framesSpent;
                 
                 setTimeout(() => {
                     document.getElementById('trivia-screen').classList.add('hidden');
