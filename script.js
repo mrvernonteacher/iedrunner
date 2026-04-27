@@ -1,99 +1,13 @@
-// --- DECLARE GLOBAL VARIABLES ---
-let canvas, ctx, gameWrapper;
-let audioCtx;
-
-// Game State
-let gameState = 'START'; 
-let pendingMode = 'ADVENTURE'; 
-let activeMode = 'ADVENTURE'; 
-let character = '';
-let score = 0; 
-let level = 1; 
-let repairs = 5;
-let animationId; 
-let frameCount = 0; 
-let levelFrames = 0; 
-let isProcessingAnswer = false; 
-
-// Player & Obstacles
-const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false };
-let gears = []; 
-let gearSpeedBase = 5;
-
-// Boss Battle Variables
-let playerHP = 5;
-let bossHP = 3;
-let bossX = 400; let bossSpeed = 4; let bossDirection = 1; let bossHitFlash = 0;
-let playerHitFlash = 0;
-let caliperAngle = 0; let isSwinging = false; let swingFrame = 0;
-let swingTimerFrames = 0; 
-let bossAttacked = false;
-
-let currentTriviaSet = [];
-let currentQuestionIndex = 0;
-let swingsEarned = 0;
-let triviaMode = 'BOSS'; 
-
-const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
-
-// --- SAFE LOCAL STORAGE INITIALIZATION ---
-let adventureScores = [
-    { name: "MRV", score: 1500 }, { name: "IED", score: 1000 }, { name: "ENG", score: 500 }
-];
-let practiceScores = {};
-for(let i=1; i<=8; i++) { practiceScores[i] = []; }
-
-try {
-    let savedAdv = JSON.parse(localStorage.getItem('waltonAdventureScores'));
-    if (savedAdv) adventureScores = savedAdv;
-    
-    let savedPrac = JSON.parse(localStorage.getItem('waltonPracticeScores'));
-    if (savedPrac) {
-        practiceScores = savedPrac;
-        for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
-    }
-} catch (e) {
-    console.warn("Local storage is restricted or unavailable in this environment. High scores will not persist.");
-}
-
-
-// --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof pltwBanks === 'undefined') {
-        console.error("ERROR: questions.js failed to load. Ensure the file is in the same folder and linked in your HTML.");
-    }
-
-    canvas = document.getElementById('mainCanvas');
-    if (canvas) {
-        ctx = canvas.getContext('2d');
-        canvas.addEventListener('mousedown', handleAction);
-    }
-    gameWrapper = document.getElementById('game-wrapper');
-    
-    document.addEventListener('keydown', e => { if (e.code === 'Space') handleAction(); });
-    
-    updateLeaderboardUI();
-    drawCanvasPreview('preview-v', 'Mr. V');
-    drawCanvasPreview('preview-g', 'Mrs. G');
-});
-
-
-// --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
-window.navToMainMenu = navToMainMenu;
-window.navToLevelSelect = navToLevelSelect;
-window.navToCharSelect = navToCharSelect;
-window.startGame = startGame;
-window.initBossFight = initBossFight;
-window.nextLevel = nextLevel;
-window.submitHighScore = submitHighScore;
-
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const gameWrapper = document.getElementById('game-wrapper');
 
 // --- RETRO AUDIO ENGINE ---
+const AudioContext = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
 function initAudio() {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) return; // Fail gracefully if browser doesn't support audio
-    
-    if (!audioCtx) audioCtx = new AudioContextClass();
+    if (!audioCtx) audioCtx = new AudioContext();
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
@@ -149,6 +63,83 @@ function playBossRoar() {
     osc.start(); lfo.start();
     osc.stop(audioCtx.currentTime + duration); lfo.stop(audioCtx.currentTime + duration);
 }
+
+// --- GAME SYSTEM STATE ---
+let gameState = 'START'; 
+let pendingMode = 'ADVENTURE'; 
+let activeMode = 'ADVENTURE'; 
+let character = '';
+let score = 0; let level = 1; let repairs = 5;
+let animationId; let frameCount = 0; let levelFrames = 0; 
+let isProcessingAnswer = false; 
+
+// Player & Obstacles
+const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false };
+let gears = []; let gearSpeedBase = 5;
+
+// Boss Battle Variables
+let playerHP = 5;
+let bossHP = 3;
+let bossX = 400; let bossSpeed = 4; let bossDirection = 1; let bossHitFlash = 0;
+let playerHitFlash = 0;
+let caliperAngle = 0; let isSwinging = false; let swingFrame = 0;
+let swingTimerFrames = 0; 
+let bossAttacked = false;
+
+let currentTriviaSet = [];
+let currentQuestionIndex = 0;
+let swingsEarned = 0;
+let triviaMode = 'BOSS'; 
+
+const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
+
+// --- SAFE LOCAL STORAGE INITIALIZATION ---
+let adventureScores = [
+    { name: "MRV", score: 1500 }, { name: "IED", score: 1000 }, { name: "ENG", score: 500 }
+];
+let practiceScores = {};
+for(let i=1; i<=8; i++) { practiceScores[i] = []; }
+
+try {
+    let savedAdv = JSON.parse(localStorage.getItem('waltonAdventureScores'));
+    if (savedAdv) adventureScores = savedAdv;
+    
+    let savedPrac = JSON.parse(localStorage.getItem('waltonPracticeScores'));
+    if (savedPrac) {
+        practiceScores = savedPrac;
+        for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
+    }
+} catch (e) {
+    console.warn("Local storage is restricted or unavailable in this environment. High scores will not persist.");
+}
+
+// --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof pltwBanks === 'undefined') {
+        console.error("ERROR: questions.js failed to load. Ensure the file is in the same folder and linked in your HTML.");
+    }
+
+    if (canvas) {
+        canvas.addEventListener('mousedown', handleAction);
+    }
+    
+    document.addEventListener('keydown', e => { if (e.code === 'Space') handleAction(); });
+    
+    updateLeaderboardUI();
+    drawCanvasPreview('preview-v', 'Mr. V');
+    drawCanvasPreview('preview-g', 'Mrs. G');
+});
+
+
+// --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
+window.navToMainMenu = navToMainMenu;
+window.navToLevelSelect = navToLevelSelect;
+window.navToCharSelect = navToCharSelect;
+window.startGame = startGame;
+window.initBossFight = initBossFight;
+window.nextLevel = nextLevel;
+window.submitHighScore = submitHighScore;
+
 
 // --- CONTROLS ---
 function handleAction() {
@@ -571,6 +562,12 @@ function updateBossFight() {
                 if (playerHP <= 0) {
                     triggerGameOver("DEFEATED!", bossNames[level-1] + " dismantled you!");
                 } else if (bossHP <= 0) {
+                    
+                    // --- APPLY BONUS POINTS FOR WINNING ---
+                    let bonus = (Math.max(0, repairs) * 100) + (Math.max(0, playerHP) * 100);
+                    score += bonus;
+                    updateHUD();
+
                     gameState = 'STAGE_CLEAR';
                     let btnText = (activeMode === 'ADVENTURE' && level === 8) ? "FINISH COURSE" : ((activeMode === 'PRACTICE' || activeMode === 'BOSS_TEST') ? "FINISH" : "CONTINUE TO NEXT UNIT");
                     document.getElementById('btn-next-level').innerText = btnText;
@@ -585,6 +582,7 @@ function updateBossFight() {
 
 // --- DRAWING FUNCTIONS ---
 function drawFirstPersonBoss(ctxRef) {
+    if (!ctxRef) return;
     ctxRef.fillStyle = '#222'; ctxRef.fillRect(0, 0, 800, 400);
     
     ctxRef.strokeStyle = '#333'; ctxRef.lineWidth = 2; ctxRef.beginPath();
@@ -711,7 +709,8 @@ function updateRunner() {
         gears.push({ x: 800, y: 310, radius: 18, speed: gearSpeedBase + (Math.random() * 2), rotation: 0 });
     }
 
-    let targetFrames = activeMode === 'PRACTICE' ? 1800 : (1800 + ((level - 1) * 300));
+    // Practice mode gets the 3-minute timer (10,800 frames). Adventure mode scales up.
+    let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
     if (levelFrames >= targetFrames) {
         triggerBossTrivia(); 
     }
