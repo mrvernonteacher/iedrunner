@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walton IED Runner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1 class="main-title">Walton IED Runner</h1>
+    
+    <div id="game-wrapper">
+        <div id="hud">
+            <div>Unit: <span id="level-display">1</span></div>
+            <div>Score: <span id="score">0</span></div>
+            <div id="repairs-hud" style="color: #55ff55;">Repairs: <span id="repairs-display">5</span></div>
+        </div>
+        
+        <div id="boss-hud" class="hidden">
+            <div style="color:#55ff55;">Player HP: <span id="player-hp-display">5</span></div>
+            <div style="color:#ffcc00;">Time: <span id="swing-time-display">0.0</span></div>
+            <div style="color:#ff5555;">Boss Armor: <span id="boss-health">3</span></div>
+        </div>
+        
+        <canvas id="mainCanvas" width="800" height="400"></canvas>
+
+        <div id="main-menu" class="overlay">
+            <h2 class="menu-title">MAIN MENU</h2>
+            <div class="leaderboard">
+                <div style="text-align: center; color:#ffcc00; margin-bottom:10px;">WALTON HIGH SCORES</div>
+                <div id="lb-1">1. --- 0000</div>
+                <div id="lb-2">2. --- 0000</div>
+                <div id="lb-3">3. --- 0000</div>
+            </div>
+            <div style="display: flex;">
+                <button onclick="navToLevelSelect('ADVENTURE')" style="background:#8B0000;">ADVENTURE MODE</button>
+                <button onclick="navToLevelSelect('PRACTICE')" style="background:#2E8B57;">PRACTICE MODE</button>
+                <button onclick="navToLevelSelect('BOSS_TEST')" style="background:#b8860b;">BOSS TEST</button>
+            </div>
+            <div class="warning">*** DANGER *** NEVER USE A DIAL CALIPER AS A WEAPON!</div>
+        </div>
+
+        <div id="level-select-screen" class="overlay hidden">
+            <h2 id="level-select-title" style="color: #fff; margin-bottom: 20px;">SELECT UNIT</h2>
+            <div class="grid-container">
+                <button id="btn-prac-1" class="level-btn" data-title="1. Design Proc." onclick="navToCharSelect(1)">1. Design Proc.</button>
+                <button id="btn-prac-2" class="level-btn" data-title="2. Tech Sketch" onclick="navToCharSelect(2)">2. Tech Sketch</button>
+                <button id="btn-prac-3" class="level-btn" data-title="3. Measurement" onclick="navToCharSelect(3)">3. Measurement</button>
+                <button id="btn-prac-4" class="level-btn" data-title="4. Intro to CAD" onclick="navToCharSelect(4)">4. Intro to CAD</button>
+                <button id="btn-prac-5" class="level-btn" data-title="5. Reverse Eng." onclick="navToCharSelect(5)">5. Reverse Eng.</button>
+                <button id="btn-prac-6" class="level-btn" data-title="6. Dimensioning" onclick="navToCharSelect(6)">6. Dimensioning</button>
+                <button id="btn-prac-7" class="level-btn" data-title="7. Properties" onclick="navToCharSelect(7)">7. Properties</button>
+                <button id="btn-prac-8" class="level-btn" data-title="8. Cams & Friction" onclick="navToCharSelect(8)">8. Cams & Friction</button>
+            </div>
+            <button onclick="navToMainMenu()" style="background:#555; margin-top:30px;">BACK</button>
+        </div>
+
+        <div id="char-select-screen" class="overlay hidden">
+            <h2 style="color: #fff; margin-bottom: 30px;">CHOOSE ENGINEER</h2>
+            <div style="display: flex; gap: 20px;">
+                <button class="char-btn" onclick="startGame('Mr. V')">
+                    <canvas id="preview-v" width="40" height="60"></canvas>
+                    <div style="margin-top:10px;">MR. V</div>
+                </button>
+                <button class="char-btn" onclick="startGame('Mrs. G')">
+                    <canvas id="preview-g" width="40" height="60"></canvas>
+                    <div style="margin-top:10px;">MRS. G</div>
+                </button>
+            </div>
+            <button onclick="navToMainMenu()" style="background:#555; margin-top:30px;">CANCEL</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay hidden">
+            <h1 id="game-over-title" style="color: #ff5555; text-shadow: 3px 3px 0 #000;">WORKSHOP HAZARD!</h1>
+            <p id="game-over-desc" style="margin-bottom: 20px;">You ran out of repairs.</p>
+            <p style="color: #fff; margin-bottom: 20px;">Final Score: <span id="final-score-display" style="color:#ffcc00;">0</span></p>
+            
+            <div id="highscore-entry" class="hidden highscore-box">
+                <h3 style="color:#55ff55; margin:0;">NEW HIGH SCORE!</h3>
+                <input type="text" id="hs-initials" class="arcade-input" maxlength="3" placeholder="AAA" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '')">
+                <button onclick="submitHighScore()" style="background:#2E8B57;">SAVE SCORE</button>
+            </div>
+            
+            <button id="btn-return-menu" onclick="navToMainMenu()">MAIN MENU</button>
+        </div>
+
+        <div id="trivia-screen" class="overlay hidden">
+            <div id="trivia-container">
+                <h3 id="trivia-header" style="color: #ffcc00; margin-top: 0;"></h3>
+                <div id="question-text">Question</div>
+                <div id="answers-container"></div>
+                <p id="trivia-status" style="color: #55ff55; font-size: 12px; margin-top: 20px; height: 15px;"></p>
+            </div>
+        </div>
+
+        <div id="boss-intro-screen" class="overlay hidden">
+            <h1 id="boss-title" style="color: #ffaa00; text-shadow: 3px 3px 0 #550000;">BOSS APPROACHES</h1>
+            <p style="margin-bottom: 30px; font-size: 12px;">Earn swings by answering questions. You have 5 seconds to swing!</p>
+            <button style="background: #8B0000;" onclick="initBossFight()">START ENCOUNTER</button>
+        </div>
+        
+        <div id="stage-clear-screen" class="overlay hidden">
+            <h1 style="color: #55ff55; text-shadow: 3px 3px 0 #000;">BOSS DISMANTLED!</h1>
+            <button id="btn-next-level" style="background: #2E8B57;" onclick="nextLevel()">CONTINUE TO NEXT UNIT</button>
+        </div>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
