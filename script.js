@@ -1,13 +1,99 @@
-const canvas = document.getElementById('mainCanvas');
-const ctx = canvas.getContext('2d');
-const gameWrapper = document.getElementById('game-wrapper');
-
-// --- RETRO AUDIO ENGINE ---
-const AudioContext = window.AudioContext || window.webkitAudioContext;
+// --- DECLARE GLOBAL VARIABLES ---
+let canvas, ctx, gameWrapper;
 let audioCtx;
 
+// Game State
+let gameState = 'START'; 
+let pendingMode = 'ADVENTURE'; 
+let activeMode = 'ADVENTURE'; 
+let character = '';
+let score = 0; 
+let level = 1; 
+let repairs = 5;
+let animationId; 
+let frameCount = 0; 
+let levelFrames = 0; 
+let isProcessingAnswer = false; 
+
+// Player & Obstacles
+const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false };
+let gears = []; 
+let gearSpeedBase = 5;
+
+// Boss Battle Variables
+let playerHP = 5;
+let bossHP = 3;
+let bossX = 400; let bossSpeed = 4; let bossDirection = 1; let bossHitFlash = 0;
+let playerHitFlash = 0;
+let caliperAngle = 0; let isSwinging = false; let swingFrame = 0;
+let swingTimerFrames = 0; 
+let bossAttacked = false;
+
+let currentTriviaSet = [];
+let currentQuestionIndex = 0;
+let swingsEarned = 0;
+let triviaMode = 'BOSS'; 
+
+const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
+
+// --- SAFE LOCAL STORAGE INITIALIZATION ---
+let adventureScores = [
+    { name: "MRV", score: 1500 }, { name: "IED", score: 1000 }, { name: "ENG", score: 500 }
+];
+let practiceScores = {};
+for(let i=1; i<=8; i++) { practiceScores[i] = []; }
+
+try {
+    let savedAdv = JSON.parse(localStorage.getItem('waltonAdventureScores'));
+    if (savedAdv) adventureScores = savedAdv;
+    
+    let savedPrac = JSON.parse(localStorage.getItem('waltonPracticeScores'));
+    if (savedPrac) {
+        practiceScores = savedPrac;
+        for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
+    }
+} catch (e) {
+    console.warn("Local storage is restricted or unavailable in this environment. High scores will not persist.");
+}
+
+
+// --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof pltwBanks === 'undefined') {
+        console.error("ERROR: questions.js failed to load. Ensure the file is in the same folder and linked in your HTML.");
+    }
+
+    canvas = document.getElementById('mainCanvas');
+    if (canvas) {
+        ctx = canvas.getContext('2d');
+        canvas.addEventListener('mousedown', handleAction);
+    }
+    gameWrapper = document.getElementById('game-wrapper');
+    
+    document.addEventListener('keydown', e => { if (e.code === 'Space') handleAction(); });
+    
+    updateLeaderboardUI();
+    drawCanvasPreview('preview-v', 'Mr. V');
+    drawCanvasPreview('preview-g', 'Mrs. G');
+});
+
+
+// --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
+window.navToMainMenu = navToMainMenu;
+window.navToLevelSelect = navToLevelSelect;
+window.navToCharSelect = navToCharSelect;
+window.startGame = startGame;
+window.initBossFight = initBossFight;
+window.nextLevel = nextLevel;
+window.submitHighScore = submitHighScore;
+
+
+// --- RETRO AUDIO ENGINE ---
 function initAudio() {
-    if (!audioCtx) audioCtx = new AudioContext();
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return; // Fail gracefully if browser doesn't support audio
+    
+    if (!audioCtx) audioCtx = new AudioContextClass();
     if (audioCtx.state === 'suspended') audioCtx.resume();
 }
 
@@ -64,45 +150,7 @@ function playBossRoar() {
     osc.stop(audioCtx.currentTime + duration); lfo.stop(audioCtx.currentTime + duration);
 }
 
-// --- GAME SYSTEM STATE ---
-let gameState = 'START'; 
-let pendingMode = 'ADVENTURE'; 
-let activeMode = 'ADVENTURE'; 
-let character = '';
-let score = 0; let level = 1; let repairs = 5;
-let animationId; let frameCount = 0; let levelFrames = 0; 
-let isProcessingAnswer = false; 
-
-// Player & Obstacles
-const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false };
-let gears = []; let gearSpeedBase = 5;
-
-// Boss Battle Variables
-let playerHP = 5;
-let bossHP = 3;
-let bossX = 400; let bossSpeed = 4; let bossDirection = 1; let bossHitFlash = 0;
-let playerHitFlash = 0;
-let caliperAngle = 0; let isSwinging = false; let swingFrame = 0;
-let swingTimerFrames = 0; 
-let bossAttacked = false;
-
-let currentTriviaSet = [];
-let currentQuestionIndex = 0;
-let swingsEarned = 0;
-let triviaMode = 'BOSS'; 
-
-const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
-
-let adventureScores = JSON.parse(localStorage.getItem('waltonAdventureScores')) || [
-    { name: "MRV", score: 1500 }, { name: "IED", score: 1000 }, { name: "ENG", score: 500 }
-];
-let practiceScores = JSON.parse(localStorage.getItem('waltonPracticeScores')) || {};
-for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
-
 // --- CONTROLS ---
-document.addEventListener('keydown', e => { if (e.code === 'Space') handleAction(); });
-canvas.addEventListener('mousedown', handleAction);
-
 function handleAction() {
     initAudio(); 
     if (gameState === 'RUNNING' && player.grounded) {
@@ -113,15 +161,10 @@ function handleAction() {
     }
 }
 
-// --- NAVIGATION & UI INIT ---
-window.onload = () => {
-    updateLeaderboardUI();
-    drawCanvasPreview('preview-v', 'Mr. V');
-    drawCanvasPreview('preview-g', 'Mrs. G');
-};
-
+// --- NAVIGATION & UI ---
 function drawCanvasPreview(canvasId, charName) {
     const c = document.getElementById(canvasId);
+    if (!c) return;
     const cx = c.getContext('2d');
     cx.clearRect(0, 0, 40, 60);
     if(charName === 'Mr. V') drawMrV(cx, 0, 5);
@@ -131,7 +174,8 @@ function drawCanvasPreview(canvasId, charName) {
 function updateLeaderboardUI() {
     for(let i=0; i<3; i++) {
         let entry = adventureScores[i] || {name: "---", score: 0};
-        document.getElementById(`lb-${i+1}`).innerText = `${i+1}. ${entry.name} ... ${entry.score}`;
+        const el = document.getElementById(`lb-${i+1}`);
+        if(el) el.innerText = `${i+1}. ${entry.name} ... ${entry.score}`;
     }
 }
 
@@ -155,6 +199,7 @@ function navToLevelSelect(mode) {
     
     for(let i=1; i<=8; i++) {
         let btn = document.getElementById('btn-prac-' + i);
+        if(!btn) continue;
         let unitScores = practiceScores[i] || [];
         let topScore = unitScores.length > 0 ? unitScores[0].score : 0;
         let topName = unitScores.length > 0 ? unitScores[0].name : "---";
@@ -230,7 +275,7 @@ function resetLevelState(isBossTest) {
     updateHUD();
     
     const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b'];
-    gameWrapper.style.backgroundColor = bgColors[level - 1];
+    if(gameWrapper) gameWrapper.style.backgroundColor = bgColors[level - 1];
 }
 
 function updateHUD() {
@@ -286,13 +331,13 @@ function submitHighScore() {
         adventureScores.push({ name: initials, score: score });
         adventureScores.sort((a,b) => b.score - a.score);
         adventureScores = adventureScores.slice(0, 3);
-        localStorage.setItem('waltonAdventureScores', JSON.stringify(adventureScores));
+        try { localStorage.setItem('waltonAdventureScores', JSON.stringify(adventureScores)); } catch(e){}
     } else {
         if(!practiceScores[level]) practiceScores[level] = [];
         practiceScores[level].push({ name: initials, score: score });
         practiceScores[level].sort((a,b) => b.score - a.score);
         practiceScores[level] = practiceScores[level].slice(0, 3);
-        localStorage.setItem('waltonPracticeScores', JSON.stringify(practiceScores));
+        try { localStorage.setItem('waltonPracticeScores', JSON.stringify(practiceScores)); } catch(e){}
     }
     
     document.getElementById('highscore-entry').classList.add('hidden');
@@ -306,7 +351,11 @@ function triggerRescue() {
     gameState = 'TRIVIA'; triviaMode = 'RESCUE';
     cancelAnimationFrame(animationId);
     
-    // Note: Depends on pltwBanks being loaded via questions.js
+    if (typeof pltwBanks === 'undefined') {
+        alert("Question bank missing! Cannot continue.");
+        return;
+    }
+
     currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5).slice(0, 1);
     currentQuestionIndex = 0; 
     isProcessingAnswer = false;
@@ -325,7 +374,9 @@ function triggerBossTrivia() {
     playerHP = 5;
     bossHP = level + 2;
     
-    currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5);
+    if (typeof pltwBanks !== 'undefined') {
+        currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5);
+    }
     currentQuestionIndex = 0;
     swingsEarned = 0;
     isProcessingAnswer = false;
@@ -625,6 +676,7 @@ function drawMrsG(c, px, py) {
 }
 
 function updateRunner() {
+    if (!ctx) return;
     player.dy += player.gravity; player.y += player.dy;
     if (player.y + player.height > 340) { player.y = 340 - player.height; player.dy = 0; player.grounded = true; }
 
@@ -666,6 +718,7 @@ function updateRunner() {
 }
 
 function drawRunner(c) {
+    if (!c) return;
     c.clearRect(0, 0, 800, 400);
 
     c.fillStyle = '#333'; c.fillRect(0, 340, 800, 60);
@@ -682,7 +735,7 @@ function drawRunner(c) {
         c.save(); c.translate(g.x, g.y); c.rotate(g.rotation);
         c.fillStyle = '#555'; c.beginPath(); c.arc(0, 0, g.radius, 0, Math.PI * 2); c.fill();
         c.fillStyle = '#444'; for (let i = 0; i < 8; i++) { c.rotate(Math.PI / 4); c.fillRect(-4, -g.radius - 4, 8, 8); }
-        c.fillStyle = gameWrapper.style.backgroundColor; c.beginPath(); c.arc(0, 0, g.radius * 0.5, 0, Math.PI * 2); c.fill();
+        c.fillStyle = gameWrapper ? gameWrapper.style.backgroundColor : '#87CEEB'; c.beginPath(); c.arc(0, 0, g.radius * 0.5, 0, Math.PI * 2); c.fill();
         c.fillStyle = '#222'; c.beginPath(); c.arc(0, 0, g.radius * 0.2, 0, Math.PI * 2); c.fill();
         c.restore();
     });
