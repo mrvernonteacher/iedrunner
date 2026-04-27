@@ -57,7 +57,6 @@ function playDefeatSound() {
     gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
     gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
 
-    // Play a quick victory arpeggio
     [300, 400, 500, 600, 800].forEach((freq, i) => {
         const osc = audioCtx.createOscillator();
         osc.connect(gainNode);
@@ -130,7 +129,9 @@ const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg
 
 // --- SAFE LOCAL STORAGE INITIALIZATION ---
 let adventureScores = [
-    { name: "MRV", score: 1500 }, { name: "IED", score: 1000 }, { name: "ENG", score: 500 }
+    { name: "MRV", score: 1500, char: "Mr. V" }, 
+    { name: "IED", score: 1000, char: "Mrs. G" }, 
+    { name: "ENG", score: 500, char: "Mr. V" }
 ];
 let practiceScores = {};
 for(let i=1; i<=8; i++) { practiceScores[i] = []; }
@@ -222,9 +223,12 @@ function drawCanvasPreview(canvasId, charName) {
 
 function updateLeaderboardUI() {
     for(let i=0; i<3; i++) {
-        let entry = adventureScores[i] || {name: "---", score: 0};
+        let entry = adventureScores[i] || {name: "---", score: 0, char: ""};
         const el = document.getElementById(`lb-${i+1}`);
-        if(el) el.innerText = `${i+1}. ${entry.name} ... ${entry.score}`;
+        if(el) {
+            let charStr = entry.char ? ` (${entry.char})` : "";
+            el.innerText = `${i+1}. ${entry.name}${charStr} ... ${entry.score}`;
+        }
     }
 }
 
@@ -252,8 +256,9 @@ function navToLevelSelect(mode) {
         let unitScores = practiceScores[i] || [];
         let topScore = unitScores.length > 0 ? unitScores[0].score : 0;
         let topName = unitScores.length > 0 ? unitScores[0].name : "---";
+        let topChar = (unitScores.length > 0 && unitScores[0].char) ? ` (${unitScores[0].char})` : "";
         let title = btn.getAttribute('data-title');
-        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Top: ${topName} ${topScore}</span>`;
+        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Top: ${topName}${topChar} ${topScore}</span>`;
     }
     document.getElementById('level-select-screen').classList.remove('hidden');
 }
@@ -391,13 +396,13 @@ function submitHighScore() {
     }
     
     if (activeMode === 'ADVENTURE') {
-        adventureScores.push({ name: initials, score: score });
+        adventureScores.push({ name: initials, score: score, char: character });
         adventureScores.sort((a,b) => b.score - a.score);
         adventureScores = adventureScores.slice(0, 3);
         try { localStorage.setItem('waltonAdventureScores', JSON.stringify(adventureScores)); } catch(e){}
     } else {
         if(!practiceScores[level]) practiceScores[level] = [];
-        practiceScores[level].push({ name: initials, score: score });
+        practiceScores[level].push({ name: initials, score: score, char: character });
         practiceScores[level].sort((a,b) => b.score - a.score);
         practiceScores[level] = practiceScores[level].slice(0, 3);
         try { localStorage.setItem('waltonPracticeScores', JSON.stringify(practiceScores)); } catch(e){}
@@ -577,7 +582,6 @@ function startBossSwingPhase() {
     gameState = 'BOSS_FIGHT';
     bossX = 400; 
     
-    // Completely randomize boss speed based on level
     let baseSpeed = 3 + level;
     let randomVariance = Math.random() * (level * 1.5);
     bossSpeed = baseSpeed + randomVariance;
@@ -654,7 +658,6 @@ function updateBossFight() {
                     
                     playDefeatSound();
                     
-                    // --- APPLY BONUS POINTS FOR WINNING ---
                     let bonus = (Math.max(0, repairs) * 25) + (Math.max(0, playerHP) * 25);
                     score += bonus;
                     updateHUD();
@@ -772,7 +775,7 @@ function updateRunner() {
     // Character Specific Powers
     if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
         player.dy = 0; // Float!
-        player.power -= 20; // Drains to 0 in 30 frames (0.5s)
+        player.power -= 40; 
         isUsingPower = true;
     } else {
         player.dy += player.gravity; // Normal gravity
@@ -780,15 +783,17 @@ function updateRunner() {
     
     // Mr. V Air Strafe Power
     if (character === 'Mr. V' && !player.grounded && player.power > 0) {
-        if (keys.left) { player.x -= 6; player.power -= 10; isUsingPower = true; }
-        else if (keys.right) { player.x += 6; player.power -= 10; isUsingPower = true; }
+        if (keys.left) { player.x -= 6; player.power -= 20; isUsingPower = true; }
+        else if (keys.right) { player.x += 6; player.power -= 20; isUsingPower = true; }
     }
+    
+    // Clamp power strictly to 0
+    if (player.power < 0) player.power = 0;
     
     // Recharge power when NOT in use
     if (!isUsingPower && player.power < 600) {
         player.power += 1; 
     }
-    if (player.power < 0) player.power = 0;
     
     // Hard boundaries so he doesn't fly off screen
     if (player.x < 10) player.x = 10;
@@ -894,7 +899,6 @@ function gameLoop() {
             
             let remaining = updateClockDisplay(displayFrames);
             
-            // If they burn through all their time reading the repair question!
             if (remaining <= 0) {
                 isProcessingAnswer = true;
                 document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
