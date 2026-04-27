@@ -72,7 +72,7 @@ let character = '';
 let score = 0; let level = 1; let repairs = 5;
 let animationId; let frameCount = 0; let levelFrames = 0; 
 let isProcessingAnswer = false; 
-let triviaStartTime = 0; // Tracks real time spent answering
+let triviaStartTime = 0; 
 
 // Player & Obstacles
 const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false };
@@ -361,12 +361,10 @@ function triggerRescue() {
     currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5).slice(0, 1);
     currentQuestionIndex = 0; 
     isProcessingAnswer = false;
-    
-    // Start tracking real time
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
-    document.getElementById('trivia-status').innerText = "Answer to resume. (Time keeps ticking!)";
+    document.getElementById('trivia-status').innerText = "Answer correctly to repair! Miss = -1 Repair.";
     document.getElementById('trivia-status').style.color = '#ffcc00';
     document.getElementById('trivia-screen').classList.remove('hidden');
     loadQuestion();
@@ -387,7 +385,7 @@ function triggerBossTrivia() {
     isProcessingAnswer = false;
     
     document.getElementById('trivia-header').innerText = "UNIT ASSESSMENT";
-    document.getElementById('trivia-status').innerText = `Answer to earn a swing!`;
+    document.getElementById('trivia-status').innerText = `Earn swings by answering correctly!`;
     document.getElementById('trivia-status').style.color = '#55ff55';
     
     document.getElementById('boss-title').innerText = bossNames[level-1].toUpperCase() + " APPROACHES";
@@ -439,27 +437,39 @@ function checkAnswer(selected, correct) {
     if (triviaMode === 'RESCUE') {
         isProcessingAnswer = true;
         
-        // Calculate time spent and advance the clock
         let timeSpent = Date.now() - triviaStartTime;
         let framesSpent = Math.floor((timeSpent / 1000) * 60);
-        levelFrames += framesSpent;
         
         if (selected === correct) {
+            levelFrames += framesSpent; // Only deduct the time once they succeed
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
+            setTimeout(() => {
+                document.getElementById('trivia-screen').classList.add('hidden');
+                gears = []; 
+                gameState = 'RUNNING';
+                updateClockDisplay();
+                requestAnimationFrame(gameLoop);
+            }, 1000);
         } else {
-            document.getElementById('trivia-status').innerText = "INCORRECT! Resuming anyway...";
-            document.getElementById('trivia-status').style.color = '#ff5555';
+            if (repairs > 0) {
+                repairs--; updateHUD();
+                document.getElementById('trivia-status').innerText = "INCORRECT! -1 Repair. Try another specification.";
+                document.getElementById('trivia-status').style.color = '#ff5555';
+                setTimeout(() => {
+                    isProcessingAnswer = false;
+                    currentQuestionIndex++; 
+                    loadQuestion(); 
+                }, 1500);
+            } else {
+                document.getElementById('trivia-status').innerText = "CRITICAL FAILURE! Out of repairs.";
+                document.getElementById('trivia-status').style.color = '#ff5555';
+                setTimeout(() => {
+                    document.getElementById('trivia-screen').classList.add('hidden');
+                    triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
+                }, 1500);
+            }
         }
-        
-        setTimeout(() => {
-            document.getElementById('trivia-screen').classList.add('hidden');
-            gears = []; 
-            gameState = 'RUNNING';
-            updateClockDisplay();
-            requestAnimationFrame(gameLoop);
-        }, 1000);
-        
     } else if (triviaMode === 'BOSS') {
         isProcessingAnswer = true;
         if (selected === correct) {
