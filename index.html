@@ -11,7 +11,7 @@
     <h1 class="main-title">Walton IED Runner</h1>
     
     <div id="game-wrapper">
-        <div id="hud">
+        <div id="hud" class="hidden">
             <div>Unit: <span id="level-display">1</span></div>
             <div>Score: <span id="score">0</span></div>
             <div id="repairs-hud" style="color: #55ff55;">Repairs: <span id="repairs-display">5</span></div>
@@ -33,7 +33,7 @@
                 <div id="lb-2">2. --- 0000</div>
                 <div id="lb-3">3. --- 0000</div>
             </div>
-            <div style="display: flex;">
+            <div class="menu-buttons">
                 <button onclick="navToLevelSelect('ADVENTURE')" style="background:#8B0000;">ADVENTURE MODE</button>
                 <button onclick="navToLevelSelect('PRACTICE')" style="background:#2E8B57;">PRACTICE MODE</button>
                 <button onclick="navToLevelSelect('BOSS_TEST')" style="background:#b8860b;">BOSS TEST</button>
@@ -96,7 +96,7 @@
 
         <div id="boss-intro-screen" class="overlay hidden">
             <h1 id="boss-title" style="color: #ffaa00; text-shadow: 3px 3px 0 #550000;">BOSS APPROACHES</h1>
-            <p style="margin-bottom: 30px; font-size: 12px;">Earn swings by answering questions. You have 5 seconds to swing!</p>
+            <p style="margin-bottom: 30px; font-size: 12px; line-height: 1.5;">Earn swings by answering questions.<br>You have 5 seconds to strike!</p>
             <button style="background: #8B0000;" onclick="initBossFight()">START ENCOUNTER</button>
         </div>
         
