@@ -225,11 +225,12 @@ function startGame(selectedChar) {
         score = 300; 
         resetLevelState(true);
         triggerBossTrivia();
+        gameLoop(); // Start continuous loop
         return;
     }
     
     resetLevelState(false);
-    gameLoop();
+    gameLoop(); // Start continuous loop
 }
 
 function nextLevel() {
@@ -250,7 +251,7 @@ function nextLevel() {
     repairs += 5; 
     
     resetLevelState(false);
-    requestAnimationFrame(gameLoop);
+    // Game loop runs continuously, no need to trigger it again
 }
 
 function resetLevelState(isBossTest) {
@@ -291,7 +292,6 @@ function updateClockDisplay() {
 
 function triggerGameOver(title, desc) {
     gameState = 'GAMEOVER';
-    cancelAnimationFrame(animationId);
     document.getElementById('game-over-title').innerText = title;
     document.getElementById('game-over-desc').innerText = desc;
     document.getElementById('final-score-display').innerText = score;
@@ -351,7 +351,6 @@ function submitHighScore() {
 // --- TRIVIA LOGIC ---
 function triggerRescue() {
     gameState = 'TRIVIA'; triviaMode = 'RESCUE';
-    cancelAnimationFrame(animationId);
     
     if (typeof pltwBanks === 'undefined') {
         alert("Question bank missing! Cannot continue.");
@@ -361,8 +360,6 @@ function triggerRescue() {
     currentTriviaSet = [...pltwBanks[level]].sort(() => Math.random() - 0.5).slice(0, 1);
     currentQuestionIndex = 0; 
     isProcessingAnswer = false;
-    
-    // Start tracking real time spent on the question
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
@@ -374,7 +371,6 @@ function triggerRescue() {
 
 function triggerBossTrivia() {
     gameState = 'TRIVIA'; triviaMode = 'BOSS';
-    cancelAnimationFrame(animationId);
     
     playerHP = 5;
     bossHP = level + 2;
@@ -385,6 +381,10 @@ function triggerBossTrivia() {
     currentQuestionIndex = 0;
     swingsEarned = 0;
     isProcessingAnswer = false;
+    
+    // Switch HUDs
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('boss-hud').classList.remove('hidden');
     
     document.getElementById('trivia-header').innerText = "UNIT ASSESSMENT";
     document.getElementById('trivia-status').innerText = `Earn swings by answering correctly!`;
@@ -399,8 +399,11 @@ function askBossQuestion() {
     gameState = 'TRIVIA';
     triviaMode = 'BOSS';
     isProcessingAnswer = false;
-    document.getElementById('boss-hud').classList.add('hidden');
-    document.getElementById('hud').classList.remove('hidden');
+    
+    // Ensure Boss HUD stays active
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('boss-hud').classList.remove('hidden');
+    
     document.getElementById('trivia-status').innerText = `Answer to earn a swing!`;
     document.getElementById('trivia-status').style.color = '#55ff55';
     document.getElementById('trivia-screen').classList.remove('hidden');
@@ -439,12 +442,11 @@ function checkAnswer(selected, correct) {
     if (triviaMode === 'RESCUE') {
         isProcessingAnswer = true;
         
-        // Calculate real time spent on the question
         let timeSpent = Date.now() - triviaStartTime;
         let framesSpent = Math.floor((timeSpent / 1000) * 60);
+        levelFrames += framesSpent; // Add the time penalty permanently
         
         if (selected === correct) {
-            levelFrames += framesSpent; // ONLY deduct the time once they succeed
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
             setTimeout(() => {
@@ -452,7 +454,6 @@ function checkAnswer(selected, correct) {
                 gears = []; 
                 gameState = 'RUNNING';
                 updateClockDisplay();
-                requestAnimationFrame(gameLoop);
             }, 1000);
         } else {
             if (repairs > 0) {
@@ -462,6 +463,7 @@ function checkAnswer(selected, correct) {
                 setTimeout(() => {
                     isProcessingAnswer = false;
                     currentQuestionIndex++; 
+                    triviaStartTime = Date.now(); // Restart timer for next question
                     loadQuestion(); 
                 }, 1500);
             } else {
@@ -523,7 +525,6 @@ function startBossSwingPhase() {
     document.getElementById('hud').classList.add('hidden');
     document.getElementById('boss-hud').classList.remove('hidden');
     updateHUD();
-    gameLoop();
 }
 
 function attemptSwing() {
@@ -726,6 +727,7 @@ function updateRunner() {
     levelFrames++;
     if (frameCount % 10 === 0) { score++; updateHUD(); }
     
+    // Update the clock regularly (but without interfering with levelFrames logic)
     if (frameCount % 60 === 0) { updateClockDisplay(); }
 
     let spawnRate = Math.max(35, 80 - (level * 6));
@@ -764,11 +766,44 @@ function drawRunner(c) {
 }
 
 function gameLoop() {
+    if (gameState === 'GAMEOVER') return;
+
     if (gameState === 'RUNNING') {
         updateRunner(); drawRunner(ctx);
-        animationId = requestAnimationFrame(gameLoop);
     } else if (gameState === 'BOSS_FIGHT') {
         frameCount++; updateBossFight(); drawFirstPersonBoss(ctx);
-        if(gameState === 'BOSS_FIGHT' || gameState === 'STAGE_CLEAR') animationId = requestAnimationFrame(gameLoop);
+    } else if (gameState === 'TRIVIA') {
+        if (triviaMode === 'RESCUE' && !isProcessingAnswer) {
+            // Actively calculate the time being burned reading the question
+            let timeSpent = Date.now() - triviaStartTime;
+            let framesSpent = Math.floor((timeSpent / 1000) * 60);
+            let displayFrames = levelFrames + framesSpent;
+            
+            let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
+            let remainingSeconds = Math.ceil((targetFrames - displayFrames) / 60);
+            if (remainingSeconds < 0) remainingSeconds = 0;
+            
+            let minutes = Math.floor(remainingSeconds / 60);
+            let seconds = remainingSeconds % 60;
+            let timeDisplay = document.getElementById('time-display');
+            if (timeDisplay) timeDisplay.innerText = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            
+            // If they burn through all their time reading the repair question!
+            if (remainingSeconds <= 0) {
+                isProcessingAnswer = true;
+                document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
+                document.getElementById('trivia-status').style.color = '#ff5555';
+                
+                // Keep the time synced up
+                levelFrames += framesSpent;
+                
+                setTimeout(() => {
+                    document.getElementById('trivia-screen').classList.add('hidden');
+                    triggerBossTrivia(); 
+                }, 1500);
+            }
+        }
     }
+    
+    animationId = requestAnimationFrame(gameLoop);
 }
