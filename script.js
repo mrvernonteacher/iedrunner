@@ -731,7 +731,7 @@ function updateRunner() {
     if (!ctx) return;
     
     // Character Specific Powers
-    if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.floatTimer < 60) {
+    if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.floatTimer < 30) {
         player.dy = 0; // Float!
         player.floatTimer++;
     } else {
@@ -744,24 +744,25 @@ function updateRunner() {
         if (keys.right) player.x += 6;
     }
     
-    // Hard boundaries so he doesn't run off screen
+    // Hard boundaries so he doesn't fly off screen
     if (player.x < 10) player.x = 10;
     if (player.x > 750) player.x = 750;
     
     player.y += player.dy;
     
-    if (player.y + player.height > 340) { 
+    // Ground Collision
+    if (player.y + player.height >= 340) { 
         player.y = 340 - player.height; 
         player.dy = 0; 
         player.grounded = true; 
         player.floatTimer = 0;
-        
-        // Drift Mr. V back to default position on the ground
-        if (character === 'Mr. V') {
-            if (player.x > 50) player.x -= 2;
-            if (player.x < 50) player.x += 2;
-            if (Math.abs(player.x - 50) < 2) player.x = 50;
-        }
+    }
+
+    // CONTINUOUS drift back to start if on ground
+    if (character === 'Mr. V' && player.grounded) {
+        if (player.x > 50) player.x -= 4;
+        if (player.x < 50) player.x += 4;
+        if (Math.abs(player.x - 50) <= 4) player.x = 50;
     }
 
     for (let i = 0; i < gears.length; i++) {
