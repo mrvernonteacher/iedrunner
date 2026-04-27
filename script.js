@@ -136,6 +136,8 @@ let adventureScores = [
 let practiceScores = {};
 for(let i=1; i<=8; i++) { practiceScores[i] = []; }
 
+let unlockedPowers = { 'Mr. V': [], 'Mrs. G': [] };
+
 try {
     let savedAdv = JSON.parse(localStorage.getItem('waltonAdventureScores'));
     if (savedAdv) adventureScores = savedAdv;
@@ -145,8 +147,11 @@ try {
         practiceScores = savedPrac;
         for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
     }
+    
+    let savedUnlocks = JSON.parse(localStorage.getItem('waltonUnlocks'));
+    if (savedUnlocks) unlockedPowers = savedUnlocks;
 } catch (e) {
-    console.warn("Local storage is restricted or unavailable in this environment. High scores will not persist.");
+    console.warn("Local storage is restricted or unavailable in this environment. High scores and unlocks will not persist.");
 }
 
 // --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
@@ -658,6 +663,20 @@ function updateBossFight() {
                     
                     playDefeatSound();
                     
+                    // --- SAVE CHARACTER ABILITY UNLOCK ---
+                    let stageClearHeader = document.querySelector('#stage-clear-screen h1');
+                    
+                    if (!unlockedPowers[character]) unlockedPowers[character] = [];
+                    if (!unlockedPowers[character].includes(level)) {
+                        unlockedPowers[character].push(level);
+                        try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
+                        
+                        stageClearHeader.innerHTML = `BOSS DISMANTLED!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR UNIT ${level}!</span>`;
+                    } else {
+                        stageClearHeader.innerHTML = "BOSS DISMANTLED!";
+                    }
+                    
+                    // --- APPLY BONUS POINTS FOR WINNING ---
                     let bonus = (Math.max(0, repairs) * 25) + (Math.max(0, playerHP) * 25);
                     score += bonus;
                     updateHUD();
@@ -771,9 +790,10 @@ function updateRunner() {
     if (!ctx) return;
     
     let isUsingPower = false;
+    let hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
     
-    // Character Specific Powers
-    if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
+    // Character Specific Powers (ONLY IF UNLOCKED)
+    if (character === 'Mrs. G' && hasPowerUnlocked && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
         player.dy = 0; // Float!
         player.power -= 40; 
         isUsingPower = true;
@@ -781,21 +801,18 @@ function updateRunner() {
         player.dy += player.gravity; // Normal gravity
     }
     
-    // Mr. V Air Strafe Power
-    if (character === 'Mr. V' && !player.grounded && player.power > 0) {
+    if (character === 'Mr. V' && hasPowerUnlocked && !player.grounded && player.power > 0) {
         if (keys.left) { player.x -= 6; player.power -= 20; isUsingPower = true; }
         else if (keys.right) { player.x += 6; player.power -= 20; isUsingPower = true; }
     }
     
-    // Clamp power strictly to 0
     if (player.power < 0) player.power = 0;
     
-    // Recharge power when NOT in use
     if (!isUsingPower && player.power < 600) {
         player.power += 1; 
     }
     
-    // Hard boundaries so he doesn't fly off screen
+    // Hard boundaries
     if (player.x < 10) player.x = 10;
     if (player.x > 750) player.x = 750;
     
@@ -868,11 +885,13 @@ function drawRunner(c) {
     if (character === 'Mr. V') drawMrV(c, player.x, player.y);
     else drawMrsG(c, player.x, player.y);
     
-    // Draw Power Meter HUD Above Character
-    c.fillStyle = '#fff';
-    c.fillRect(player.x - 10, player.y - 15, 56, 6);
-    c.fillStyle = player.power === 600 ? '#55ff55' : '#ffcc00';
-    c.fillRect(player.x - 8, player.y - 13, 52 * (player.power / 600), 2);
+    let hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    if (hasPowerUnlocked) {
+        c.fillStyle = '#fff';
+        c.fillRect(player.x - 10, player.y - 15, 56, 6);
+        c.fillStyle = player.power === 600 ? '#55ff55' : '#ffcc00';
+        c.fillRect(player.x - 8, player.y - 13, 52 * (player.power / 600), 2);
+    }
 
     gears.forEach(g => {
         c.save(); c.translate(g.x, g.y); c.rotate(g.rotation);
