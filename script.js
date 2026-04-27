@@ -839,15 +839,11 @@ function updateRunner() {
         let distY = Math.abs(g.y - (player.y + player.height / 2));
 
         if (distX < (player.width / 2 + g.radius - 6) && distY < (player.height / 2 + g.radius - 6)) {
-            if (level === 1) {
-                triggerGameOver("WORKSHOP HAZARD!", "You hit a gear on Level 1!");
+            repairs--; updateHUD();
+            if (repairs < 0) {
+                triggerGameOver("WORKSHOP HAZARD!", "You ran out of repairs!");
             } else {
-                repairs--; updateHUD();
-                if (repairs < 0) {
-                    triggerGameOver("WORKSHOP HAZARD!", "You ran out of repairs!");
-                } else {
-                    triggerRescue();
-                }
+                triggerRescue();
             }
             return;
         }
