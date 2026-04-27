@@ -514,8 +514,11 @@ function checkAnswer(selected, correct) {
         let timeSpent = Date.now() - triviaStartTime;
         let framesSpent = Math.floor((timeSpent / 1000) * 60);
         
+        // Anti-AFK limit: Penalty maxes out at 10 seconds (600 frames)
+        if (framesSpent > 600) framesSpent = 600; 
+        
         if (selected === correct) {
-            levelFrames += framesSpent; // Officially add the elapsed time
+            levelFrames += framesSpent; 
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
             
@@ -525,7 +528,7 @@ function checkAnswer(selected, correct) {
                 gameState = 'RUNNING';
             }, 1000);
         } else {
-            levelFrames += framesSpent; // Still deduct time
+            levelFrames += framesSpent; 
             if (repairs > 0) {
                 repairs--; updateHUD();
                 document.getElementById('trivia-status').innerText = "INCORRECT! -1 Repair. Try another specification.";
@@ -533,7 +536,7 @@ function checkAnswer(selected, correct) {
                 setTimeout(() => {
                     isProcessingAnswer = false;
                     currentQuestionIndex++; 
-                    triviaStartTime = Date.now(); // Restart real-world timer
+                    triviaStartTime = Date.now(); 
                     loadQuestion(); 
                 }, 1500);
             } else {
@@ -863,6 +866,10 @@ function updateRunner() {
 
     let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
     if (levelFrames >= targetFrames) {
+        if (activeMode === 'PRACTICE' && score < 500) {
+            triggerGameOver("NOT WORTHY!", `You must score 500+ points to face ${bossNames[level-1].toUpperCase()}!`);
+            return;
+        }
         triggerBossTrivia(); 
     }
 }
@@ -910,21 +917,32 @@ function gameLoop() {
         if (triviaMode === 'RESCUE' && !isProcessingAnswer) {
             let timeSpent = Date.now() - triviaStartTime;
             let framesSpent = Math.floor((timeSpent / 1000) * 60);
-            let displayFrames = levelFrames + framesSpent;
             
+            // Limit the penalty to 10 seconds (600 frames) so they can't AFK the game
+            if (framesSpent > 600) framesSpent = 600; 
+            
+            let displayFrames = levelFrames + framesSpent;
             let remaining = updateClockDisplay(displayFrames);
             
             if (remaining <= 0) {
                 isProcessingAnswer = true;
-                document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
-                document.getElementById('trivia-status').style.color = '#ff5555';
-                
                 levelFrames += framesSpent;
                 
-                setTimeout(() => {
-                    document.getElementById('trivia-screen').classList.add('hidden');
-                    triggerBossTrivia(); 
-                }, 1500);
+                if (activeMode === 'PRACTICE' && score < 500) {
+                    document.getElementById('trivia-status').innerText = "TIME OUT!";
+                    document.getElementById('trivia-status').style.color = '#ff5555';
+                    setTimeout(() => {
+                        document.getElementById('trivia-screen').classList.add('hidden');
+                        triggerGameOver("NOT WORTHY!", `You must score 500+ points to face ${bossNames[level-1].toUpperCase()}!`);
+                    }, 1500);
+                } else {
+                    document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
+                    document.getElementById('trivia-status').style.color = '#ff5555';
+                    setTimeout(() => {
+                        document.getElementById('trivia-screen').classList.add('hidden');
+                        triggerBossTrivia(); 
+                    }, 1500);
+                }
             }
         }
     }
