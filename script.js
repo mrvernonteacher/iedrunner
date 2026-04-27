@@ -113,6 +113,7 @@ try {
     console.warn("Local storage is restricted or unavailable in this environment. High scores will not persist.");
 }
 
+
 // --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof pltwBanks === 'undefined') {
@@ -264,6 +265,7 @@ function resetLevelState(isBossTest) {
     
     gameState = 'RUNNING';
     updateHUD();
+    updateClockDisplay(); // Force initial clock update
     
     const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b'];
     if(gameWrapper) gameWrapper.style.backgroundColor = bgColors[level - 1];
@@ -276,6 +278,18 @@ function updateHUD() {
     document.getElementById('player-hp-display').innerText = playerHP;
     document.getElementById('boss-health').innerText = bossHP;
     document.getElementById('swing-time-display').innerText = (swingTimerFrames / 60).toFixed(1);
+}
+
+// Separate function for the countdown clock so it's smooth
+function updateClockDisplay() {
+    let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
+    let remainingSeconds = Math.ceil((targetFrames - levelFrames) / 60);
+    if (remainingSeconds < 0) remainingSeconds = 0;
+    
+    let minutes = Math.floor(remainingSeconds / 60);
+    let seconds = remainingSeconds % 60;
+    let timeDisplay = document.getElementById('time-display');
+    if (timeDisplay) timeDisplay.innerText = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 }
 
 function triggerGameOver(title, desc) {
@@ -703,13 +717,14 @@ function updateRunner() {
     frameCount++;
     levelFrames++;
     if (frameCount % 10 === 0) { score++; updateHUD(); }
+    
+    if (frameCount % 60 === 0) { updateClockDisplay(); }
 
     let spawnRate = Math.max(35, 80 - (level * 6));
     if (frameCount % (Math.floor(Math.random() * spawnRate) + spawnRate) === 0 && gears.length < 5) {
         gears.push({ x: 800, y: 310, radius: 18, speed: gearSpeedBase + (Math.random() * 2), rotation: 0 });
     }
 
-    // Practice mode gets the 3-minute timer (10,800 frames). Adventure mode scales up.
     let targetFrames = activeMode === 'PRACTICE' ? 10800 : (1800 + ((level - 1) * 300));
     if (levelFrames >= targetFrames) {
         triggerBossTrivia(); 
