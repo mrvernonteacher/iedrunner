@@ -37,6 +37,37 @@ function playSwingSound() {
     osc.start(); osc.stop(audioCtx.currentTime + 0.15);
 }
 
+function playStrikeSound() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+    osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.15);
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+}
+
+function playDefeatSound() {
+    if (!audioCtx) return;
+    const gainNode = audioCtx.createGain();
+    gainNode.connect(audioCtx.destination);
+    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.5);
+
+    // Play a quick victory arpeggio
+    [300, 400, 500, 600, 800].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        osc.connect(gainNode);
+        osc.type = 'square';
+        osc.frequency.value = freq;
+        osc.start(audioCtx.currentTime + (i * 0.1));
+        osc.stop(audioCtx.currentTime + (i * 0.1) + 0.2);
+    });
+}
+
 function playBossRoar() {
     if (!audioCtx) return;
     const duration = 0.8;
@@ -78,7 +109,7 @@ let triviaStartTime = 0;
 const keys = { action: false, left: false, right: false };
 
 // Player & Obstacles
-const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false, floatTimer: 0 };
+const player = { x: 50, y: 300, width: 36, height: 50, dy: 0, gravity: 0.6, jumpPower: -12.5, grounded: false, power: 600 };
 let gears = []; let gearSpeedBase = 5;
 
 // Boss Battle Variables
@@ -148,7 +179,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
     });
     
-    // Force HUD to the absolute front
     const hudEl = document.getElementById('hud');
     const bossHudEl = document.getElementById('boss-hud');
     if (hudEl) hudEl.style.zIndex = '100';
@@ -174,7 +204,6 @@ function handleAction() {
     if (gameState === 'RUNNING' && player.grounded) {
         player.dy = player.jumpPower; 
         player.grounded = false;
-        player.floatTimer = 0; 
         playJumpSound();
     } else if (gameState === 'BOSS_FIGHT') {
         attemptSwing();
@@ -285,7 +314,7 @@ function nextLevel() {
 
 function resetLevelState(isBossTest) {
     gears = []; 
-    player.x = 50; player.y = 300; player.dy = 0; player.grounded = false; player.floatTimer = 0;
+    player.x = 50; player.y = 300; player.dy = 0; player.grounded = false; player.power = 600;
     levelFrames = 0;
     isProcessingAnswer = false;
     
@@ -547,7 +576,12 @@ function initBossFight() {
 function startBossSwingPhase() {
     gameState = 'BOSS_FIGHT';
     bossX = 400; 
-    bossSpeed = 4 + (level * 2); 
+    
+    // Completely randomize boss speed based on level
+    let baseSpeed = 3 + level;
+    let randomVariance = Math.random() * (level * 1.5);
+    bossSpeed = baseSpeed + randomVariance;
+    
     caliperAngle = 0; 
     isSwinging = false;
     bossAttacked = false;
@@ -600,6 +634,7 @@ function updateBossFight() {
             if (distFromCenter < 120) { 
                 bossHP--; bossHitFlash = 10;
                 score += 50; 
+                playStrikeSound();
                 updateHUD();
             } else {
                 playerHP--;
@@ -616,6 +651,8 @@ function updateBossFight() {
                 if (playerHP <= 0) {
                     triggerGameOver("DEFEATED!", bossNames[level-1] + " dismantled you!");
                 } else if (bossHP <= 0) {
+                    
+                    playDefeatSound();
                     
                     // --- APPLY BONUS POINTS FOR WINNING ---
                     let bonus = (Math.max(0, repairs) * 25) + (Math.max(0, playerHP) * 25);
@@ -730,19 +767,28 @@ function drawMrsG(c, px, py) {
 function updateRunner() {
     if (!ctx) return;
     
+    let isUsingPower = false;
+    
     // Character Specific Powers
-    if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.floatTimer < 30) {
+    if (character === 'Mrs. G' && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
         player.dy = 0; // Float!
-        player.floatTimer++;
+        player.power -= 20; // Drains to 0 in 30 frames (0.5s)
+        isUsingPower = true;
     } else {
         player.dy += player.gravity; // Normal gravity
     }
     
     // Mr. V Air Strafe Power
-    if (character === 'Mr. V' && !player.grounded) {
-        if (keys.left) player.x -= 6;
-        if (keys.right) player.x += 6;
+    if (character === 'Mr. V' && !player.grounded && player.power > 0) {
+        if (keys.left) { player.x -= 6; player.power -= 10; isUsingPower = true; }
+        else if (keys.right) { player.x += 6; player.power -= 10; isUsingPower = true; }
     }
+    
+    // Recharge power when NOT in use
+    if (!isUsingPower && player.power < 600) {
+        player.power += 1; 
+    }
+    if (player.power < 0) player.power = 0;
     
     // Hard boundaries so he doesn't fly off screen
     if (player.x < 10) player.x = 10;
@@ -755,7 +801,6 @@ function updateRunner() {
         player.y = 340 - player.height; 
         player.dy = 0; 
         player.grounded = true; 
-        player.floatTimer = 0;
     }
 
     // CONTINUOUS drift back to start if on ground
@@ -817,6 +862,12 @@ function drawRunner(c) {
 
     if (character === 'Mr. V') drawMrV(c, player.x, player.y);
     else drawMrsG(c, player.x, player.y);
+    
+    // Draw Power Meter HUD Above Character
+    c.fillStyle = '#fff';
+    c.fillRect(player.x - 10, player.y - 15, 56, 6);
+    c.fillStyle = player.power === 600 ? '#55ff55' : '#ffcc00';
+    c.fillRect(player.x - 8, player.y - 13, 52 * (player.power / 600), 2);
 
     gears.forEach(g => {
         c.save(); c.translate(g.x, g.y); c.rotate(g.rotation);
