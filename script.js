@@ -294,7 +294,40 @@ function drawCanvasPreview(canvasId, charName) {
     else drawMrsG(cx, 0, 5);
 }
 
+// New function to draw just the cropped face/shoulders for the leaderboards
+function drawFacePreview(canvasId, charName, isSmall = false) {
+    const c = document.getElementById(canvasId);
+    if (!c) return;
+    const cx = c.getContext('2d');
+    cx.clearRect(0, 0, c.width, c.height);
+    cx.save();
+
+    // Scale and shift coordinates to frame the head perfectly
+    if (isSmall) {
+        cx.scale(0.7, 0.7);
+        cx.translate(-3, 1);
+    } else {
+        cx.translate(-4, 2);
+    }
+
+    if(charName.includes('V')) drawMrV(cx, 0, 0);
+    else drawMrsG(cx, 0, 0);
+
+    cx.restore();
+}
+
 function updateLeaderboardUI() {
+    // Attempt to automatically rename the main menu title
+    const mainMenuDiv = document.getElementById('main-menu');
+    if (mainMenuDiv) {
+        const headings = mainMenuDiv.querySelectorAll('h1, h2, h3');
+        headings.forEach(h => {
+            if (h.innerText.toUpperCase().includes("HIGH SCORES") || h.innerText.toUpperCase().includes("LEADERBOARD")) {
+                h.innerText = "ADVENTURE MODE HIGH SCORES";
+            }
+        });
+    }
+
     let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
     
     for(let i=0; i<3; i++) {
@@ -304,8 +337,22 @@ function updateLeaderboardUI() {
                 el.innerText = `${i+1}. LOADING...`;
             } else if (advScores[i]) {
                 let entry = advScores[i];
-                let charStr = entry.char ? ` (${entry.char})` : "";
-                el.innerText = `${i+1}. ${entry.name}${charStr} ... ${entry.score}`;
+                let canvasId = `lb-canvas-${i}`;
+                let charFace = "";
+                
+                // Inject a tiny canvas element for the face instead of text
+                if (entry.char) {
+                    charFace = `<canvas id="${canvasId}" width="26" height="24" style="vertical-align: middle; margin: 0 8px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
+                }
+                
+                el.innerHTML = `${i+1}. ${charFace} ${entry.name} ... ${entry.score}`;
+                
+                // Draw the face a split second after the HTML is injected
+                if (entry.char) {
+                    setTimeout(() => {
+                        drawFacePreview(canvasId, entry.char);
+                    }, 10);
+                }
             } else {
                 el.innerText = `${i+1}. --- ... 0`;
             }
@@ -345,9 +392,20 @@ function navToLevelSelect(mode) {
         let unitScores = globalScores.filter(s => s.mode === 'PRACTICE' && parseInt(s.unit) === i).sort((a,b) => b.score - a.score);
         let topScore = unitScores.length > 0 ? unitScores[0].score : 0;
         let topName = unitScores.length > 0 ? unitScores[0].name : "---";
-        let topChar = (unitScores.length > 0 && unitScores[0].char) ? ` (${unitScores[0].char})` : "";
         
-        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Top: ${topName}${topChar} ${topScore}</span>`;
+        let topCharCanvas = "";
+        let topCharId = `prac-canvas-${i}`;
+        
+        // Inject a smaller face canvas for the Practice Buttons
+        if (unitScores.length > 0 && unitScores[0].char) {
+            topCharCanvas = `<canvas id="${topCharId}" width="20" height="20" style="vertical-align: middle; margin: 0 4px; border-radius: 3px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
+        }
+        
+        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:flex; align-items:center; justify-content:center;">Top: ${topCharCanvas} ${topName} ${topScore}</span>`;
+        
+        if (unitScores.length > 0 && unitScores[0].char) {
+            setTimeout(() => drawFacePreview(topCharId, unitScores[0].char, true), 10);
+        }
     }
     document.getElementById('level-select-screen').classList.remove('hidden');
 }
