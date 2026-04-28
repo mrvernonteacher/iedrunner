@@ -152,7 +152,7 @@ function triggerLockdown(ip) {
         <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate;">
             <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
             <p style="color: white; font-size: 3vw; font-family: 'Courier New', Courier, monospace; font-weight: bold; background: black; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
-                IP Address ${ip} has been recorded<br>and flagged for review.
+                IP Address ${ip} has been recorded<br>and banned!
             </p>
         </div>
         <style>
