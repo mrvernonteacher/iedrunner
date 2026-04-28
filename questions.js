@@ -229,7 +229,7 @@ pltwBanks[7] = [
         exp: "Ultimate Tensile Strength (UTS) is the absolute highest point reached on the stress-strain curve.",
         src: "Properties of Engineering Materials Worksheet"
     }
-],
+];
     8: [ 
         { q: "The formula for Mechanical Advantage is:", opts: ["Output Force / Input Force", "Work / Time", "Force * Distance", "Mass * Acceleration"], ans: "Output Force / Input Force" },
         { q: "A mechanism consisting of a rotating profile and a follower is a:", opts: ["Cam and Follower", "Rack and Pinion", "Gear Train", "Lever"], ans: "Cam and Follower" },
