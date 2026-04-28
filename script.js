@@ -293,7 +293,6 @@ function navToCharSelect(selectedLevel) {
         if (vUnlocked) container.innerHTML += createCharButton('Super V', 'preview-sv');
         if (gUnlocked) container.innerHTML += createCharButton('Super G', 'preview-sg');
         
-        // Draw Previews
         setTimeout(() => {
             drawCanvasPreview('preview-v', 'Mr. V');
             drawCanvasPreview('preview-g', 'Mrs. G');
@@ -347,7 +346,7 @@ function nextLevel() {
     }
     score += 100; 
     gearSpeedBase += 0.5;
-    repairs = 5; // Reset repairs to 5 for Adventure Mode
+    repairs = 5; 
     
     resetLevelState(false);
 }
@@ -464,7 +463,7 @@ function triggerRescue() {
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
-    document.getElementById('trivia-status').innerText = "Answer to resume.";
+    document.getElementById('trivia-status').innerText = "Answer to resume. (Time penalty capped at 10s)";
     document.getElementById('trivia-status').style.color = '#ffcc00';
     document.getElementById('trivia-screen').classList.remove('hidden');
     loadQuestion();
@@ -540,16 +539,15 @@ function checkAnswer(selected, correct) {
     if (isProcessingAnswer) return; 
     isProcessingAnswer = true;
 
-    // Cap the penalty at 10 seconds (600 frames)
+    // Apply the 10-second penalty cap to the run time permanently
     let timeSpent = Date.now() - triviaStartTime;
     let framesSpent = Math.floor((timeSpent / 1000) * 60);
     if (framesSpent > 600) framesSpent = 600; 
+    levelFrames += framesSpent;
 
     const q = currentTriviaSet[currentQuestionIndex];
 
     if (triviaMode === 'RESCUE') {
-        levelFrames += framesSpent; // Make the time penalty official
-
         if (selected === correct) {
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
@@ -560,8 +558,7 @@ function checkAnswer(selected, correct) {
                 gameState = 'RUNNING';
             }, 1000);
         } else {
-            repairs--; updateHUD();
-            
+            // Display Incorrect Learning Module
             let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
             let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
             
@@ -574,8 +571,8 @@ function checkAnswer(selected, correct) {
                 <button class="answer-btn" style="background:#ff5555; color:#000;" onclick="resumeAfterIncorrect()">CONTINUE</button>
             `;
             
-            document.getElementById('trivia-status').innerText = repairs < 0 ? "CRITICAL FAILURE!" : "GEAR JAMMED!";
-            document.getElementById('trivia-status').style.color = '#ff5555';
+            document.getElementById('trivia-status').innerText = "Read the explanation, then click CONTINUE.";
+            document.getElementById('trivia-status').style.color = '#ffcc00';
         }
     } else if (triviaMode === 'BOSS') {
         if (selected === correct) {
@@ -588,9 +585,7 @@ function checkAnswer(selected, correct) {
                 startBossSwingPhase();
             }, 1000);
         } else {
-            playerHP--;
-            updateHUD();
-            
+            // Display Incorrect Learning Module
             let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
             let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
             
@@ -603,15 +598,16 @@ function checkAnswer(selected, correct) {
                 <button class="answer-btn" style="background:#ff5555; color:#000;" onclick="resumeAfterIncorrect()">CONTINUE</button>
             `;
             
-            document.getElementById('trivia-status').innerText = playerHP <= 0 ? "ARMOR DEPLETED!" : "BOSS ATTACKS!";
-            document.getElementById('trivia-status').style.color = '#ff5555';
-            playBossRoar();
+            document.getElementById('trivia-status').innerText = "Read the explanation, then click CONTINUE.";
+            document.getElementById('trivia-status').style.color = '#ffcc00';
         }
     }
 }
 
+// Fired ONLY after they read the explanation and click "CONTINUE"
 function resumeAfterIncorrect() {
     if (triviaMode === 'RESCUE') {
+        repairs--; updateHUD();
         if (repairs < 0) {
             document.getElementById('trivia-screen').classList.add('hidden');
             triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
@@ -622,10 +618,12 @@ function resumeAfterIncorrect() {
             loadQuestion(); 
         }
     } else if (triviaMode === 'BOSS') {
+        playerHP--; updateHUD();
         if (playerHP <= 0) {
             document.getElementById('trivia-screen').classList.add('hidden');
             triggerGameOver("DEFEATED", bossNames[level-1] + " dismantled you!");
         } else {
+            playBossRoar();
             isProcessingAnswer = false;
             currentQuestionIndex++; 
             askBossQuestion(); 
@@ -995,21 +993,23 @@ function gameLoop() {
         frameCount++; updateBossFight(); drawFirstPersonBoss(ctx);
     } else if (gameState === 'TRIVIA') {
         if (!isProcessingAnswer) {
-            // Watch the clock literally drain their run time while reading!
+            
             let timeSpent = Date.now() - triviaStartTime;
             let framesSpent = Math.floor((timeSpent / 1000) * 60);
             
             if (framesSpent > 600) {
-                framesSpent = 600; // Hard cap the penalty at 10 seconds visually
+                framesSpent = 600; 
                 document.getElementById('trivia-status').innerText = "Time Penalty Capped. Game Paused.";
                 document.getElementById('trivia-status').style.color = '#ffcc00';
             } else {
-                document.getElementById('trivia-status').innerText = `Answer to resume. (Penalty: -${Math.floor(framesSpent/60)}s / 10s)`;
+                let secondsDeducted = Math.floor(framesSpent/60);
+                document.getElementById('trivia-status').innerText = `Answer to resume. (Penalty: -${secondsDeducted}s / 10s)`;
                 document.getElementById('trivia-status').style.color = '#ffcc00';
             }
             
             let displayFrames = levelFrames + framesSpent;
             updateClockDisplay(displayFrames);
+            
         }
     }
     
