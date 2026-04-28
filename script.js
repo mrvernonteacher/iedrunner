@@ -16,7 +16,7 @@ async function getIP() {
         const data = await response.json();
         return data.ip;
     } catch (e) {
-        return "Hidden/VPN";
+        return "Unknown";
     }
 }
 
@@ -112,6 +112,67 @@ function playBossRoar() {
     osc.stop(audioCtx.currentTime + duration); lfo.stop(audioCtx.currentTime + duration);
 }
 
+// --- NUCLEAR DETERRENT SIREN ---
+function playSiren() {
+    if (!audioCtx) audioCtx = new AudioContext();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    const osc = audioCtx.createOscillator();
+    const lfo = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    
+    osc.type = 'sawtooth';
+    lfo.type = 'square';
+    lfo.frequency.value = 5; // Fast siren modulation
+    
+    const modGain = audioCtx.createGain();
+    modGain.gain.value = 300;
+    lfo.connect(modGain);
+    modGain.connect(osc.frequency);
+    
+    osc.frequency.value = 600;
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    // Obnoxiously loud
+    gain.gain.value = 0.4;
+    
+    osc.start();
+    lfo.start();
+    
+    // Auto-kills the siren after 5 seconds to prevent permanent ear damage
+    osc.stop(audioCtx.currentTime + 5);
+    lfo.stop(audioCtx.currentTime + 5);
+}
+
+function triggerLockdown(ip) {
+    playSiren();
+    
+    // Create the masked IP for the screen display
+    let maskedIP = "192.168.XXX.XX";
+    if (ip !== "Unknown" && ip.includes('.')) {
+        let parts = ip.split('.');
+        maskedIP = parts[0] + "." + parts[1] + ".XXX.XX";
+    }
+
+    // Completely overwrite the document body
+    document.body.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate;">
+            <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
+            <p style="color: white; font-size: 3vw; font-family: 'Courier New', Courier, monospace; font-weight: bold; background: black; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
+                IP Address ${maskedIP} has been recorded<br>and flagged for review.
+            </p>
+        </div>
+        <style>
+            @keyframes flash {
+                0% { background-color: #ff0000; }
+                100% { background-color: #ffff00; }
+            }
+        </style>
+    `;
+}
+
 // --- GAME SYSTEM STATE ---
 let gameState = 'START'; 
 let pendingMode = 'ADVENTURE'; 
@@ -162,7 +223,6 @@ async function fetchGlobalScores() {
         globalScores = await response.json();
         scoresLoaded = true;
         
-        // Refresh UI if we are on screens that display scores
         updateLeaderboardUI();
         if (!document.getElementById('level-select-screen').classList.contains('hidden') && pendingMode === 'PRACTICE') {
             navToLevelSelect('PRACTICE'); 
@@ -175,6 +235,7 @@ async function fetchGlobalScores() {
 async function submitHighScore() {
     const initialsInput = document.getElementById('hs-initials');
     let initials = initialsInput.value.toUpperCase().trim();
+    const submitBtn = document.querySelector('#highscore-entry button');
     
     // 1. BLOCK NUMBERS
     if (/\d/.test(initials)) {
@@ -182,28 +243,45 @@ async function submitHighScore() {
         initialsInput.value = "";
         return;
     }
+    
+    if (submitBtn) {
+        submitBtn.innerText = "VERIFYING...";
+        submitBtn.disabled = true;
+    }
 
-    // 2. BLOCK BANNED WORDS
+    const userIP = await getIP();
+
+    // 2. CHECK FOR BANNED WORDS & NUCLEAR LOCKDOWN
     if (BANNED_INITIALS.includes(initials)) {
-        alert("Inappropriate initials detected. Your IP has been flagged for review.");
-        initialsInput.value = "";
-        return;
+        
+        // Silently send the bad entry to the Google Sheet with the banned flag
+        const badPayload = {
+            name: initials,
+            score: score,
+            char: character,
+            mode: activeMode,
+            unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
+            ip: userIP,
+            banned: true // Triggers the shadow ban in Apps Script
+        };
+        fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(badPayload) }); 
+
+        // Trigger the flashing siren screen of doom
+        triggerLockdown(userIP);
+        return; 
     }
     
     if (initials.length !== 3) {
         alert("Please enter exactly 3 letters.");
+        if (submitBtn) {
+            submitBtn.innerText = "SUBMIT";
+            submitBtn.disabled = false;
+        }
         return;
     }
     
-    // UI Loading State
-    const submitBtn = document.querySelector('#highscore-entry button');
-    if(submitBtn) {
-        submitBtn.innerText = "LOGGING IP & SAVING...";
-        submitBtn.disabled = true;
-    }
-    
-    // 3. RECORD REAL IP
-    const userIP = await getIP();
+    // 3. SUBMIT CLEAN SCORE
+    if (submitBtn) submitBtn.innerText = "SAVING...";
     
     const payload = {
         name: initials,
@@ -211,7 +289,8 @@ async function submitHighScore() {
         char: character,
         mode: activeMode,
         unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
-        ip: userIP
+        ip: userIP,
+        banned: false
     };
     
     try {
@@ -224,7 +303,6 @@ async function submitHighScore() {
         console.error("Error saving score:", e);
     }
     
-    // Reset UI
     if(submitBtn) {
         submitBtn.innerText = "SUBMIT";
         submitBtn.disabled = false;
@@ -233,26 +311,14 @@ async function submitHighScore() {
     document.getElementById('highscore-entry').classList.add('hidden');
     document.getElementById('btn-return-menu').classList.remove('hidden');
     
-    // Pull the fresh data and return to menu
     await fetchGlobalScores();
     navToMainMenu();
 }
 
-// --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
+// --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof pltwBanks === 'undefined') {
         console.error("ERROR: questions.js failed to load. Ensure the file is in the same folder and linked in your HTML.");
-    }
-
-    // Update the highscore entry UI with a warning
-    const hsEntry = document.getElementById('highscore-entry');
-    if (hsEntry) {
-        const warning = document.createElement('p');
-        warning.style.color = '#ff5555';
-        warning.style.fontSize = '9px';
-        warning.style.marginBottom = '8px';
-        warning.innerText = "NOTICE: USER IP & WORKSTATION ID LOGGED. INAPPROPRIATE ENTRIES ARE AUTO-REPORTED TO ADMINISTRATION.";
-        hsEntry.insertBefore(warning, hsEntry.firstChild);
     }
 
     if (canvas) {
@@ -285,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hudEl) hudEl.style.zIndex = '100';
     if (bossHudEl) bossHudEl.style.zIndex = '100';
     
-    // Set loading state and fetch
     for(let i=1; i<=3; i++) {
         let el = document.getElementById(`lb-${i}`);
         if(el) el.innerHTML = `<div style="display: flex; align-items: center;">${i}. LOADING...</div>`;
@@ -293,7 +358,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchGlobalScores();
 });
 
-// --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
+// --- EXPOSE FUNCTIONS ---
 window.navToMainMenu = navToMainMenu;
 window.navToLevelSelect = navToLevelSelect;
 window.navToCharSelect = navToCharSelect;
@@ -336,7 +401,6 @@ function drawCanvasPreview(canvasId, charName) {
     else drawMrsG(cx, 0, 5);
 }
 
-// Draws just the cropped face/shoulders for the leaderboards
 function drawFacePreview(canvasId, charName, isSmall = false) {
     const c = document.getElementById(canvasId);
     if (!c) return;
@@ -360,7 +424,6 @@ function drawFacePreview(canvasId, charName, isSmall = false) {
 }
 
 function updateLeaderboardUI() {
-    // Attempt to automatically rename the main menu title
     const mainMenuDiv = document.getElementById('main-menu');
     if (mainMenuDiv) {
         const headings = mainMenuDiv.querySelectorAll('h1, h2, h3');
@@ -383,7 +446,6 @@ function updateLeaderboardUI() {
                 let canvasId = `lb-canvas-${i}`;
                 let charFace = "";
                 
-                // Inject a tiny canvas element for the face. Flexbox keeps it inline.
                 if (entry.char) {
                     charFace = `<canvas id="${canvasId}" width="26" height="24" style="flex-shrink: 0; margin: 0 8px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
                 }
@@ -438,7 +500,6 @@ function navToLevelSelect(mode) {
         let topCharCanvas = "";
         let topCharId = `prac-canvas-${i}`;
         
-        // Practice buttons also get the flexbox treatment
         if (unitScores.length > 0 && unitScores[0].char) {
             topCharCanvas = `<canvas id="${topCharId}" width="20" height="20" style="flex-shrink: 0; margin: 0 4px; border-radius: 3px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
         }
@@ -567,7 +628,6 @@ function updateClockDisplay(framesToUse) {
 function triggerGameOver(title, desc) {
     gameState = 'GAMEOVER';
     
-    // Explicitly hide trivia overlays to prevent the freeze bug
     document.getElementById('trivia-screen').classList.add('hidden');
     document.getElementById('boss-hud').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden');
@@ -582,7 +642,6 @@ function triggerGameOver(title, desc) {
     hsDiv.classList.add('hidden');
     returnBtn.classList.remove('hidden');
 
-    // Dynamic global check
     let isHighScore = false;
     if (activeMode === 'ADVENTURE') {
         let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
@@ -697,7 +756,6 @@ function checkAnswer(selected, correct) {
     if (isProcessingAnswer) return; 
     isProcessingAnswer = true;
 
-    // Apply the 10-second penalty cap to the run time permanently
     let timeSpent = Date.now() - triviaStartTime;
     let framesSpent = Math.floor((timeSpent / 1000) * 60);
     if (framesSpent > 600) framesSpent = 600; 
@@ -724,7 +782,6 @@ function checkAnswer(selected, correct) {
         }, 1000);
         
     } else {
-        // Display the Educational "Incorrect" Screen
         const answersDiv = document.getElementById('answers-container');
         answersDiv.innerHTML = `
             <div style="color: #ff5555; font-weight: bold; margin-bottom: 10px; font-size:18px;">INCORRECT</div>
@@ -755,7 +812,6 @@ function resumeAfterIncorrect() {
             currentQuestionIndex++; 
             triviaStartTime = Date.now(); 
             
-            // Reset the status display for the new question
             document.getElementById('trivia-status').innerText = "Answer to resume. (Time penalty capped at 10s)";
             document.getElementById('trivia-status').style.color = '#ffcc00';
             
@@ -861,7 +917,6 @@ function updateBossFight() {
                     
                     playDefeatSound();
                     
-                    // --- SAVE CHARACTER ABILITY UNLOCK ---
                     let stageClearHeader = document.querySelector('#stage-clear-screen h1');
                     let baseChar = character.replace('Super ', '');
                     if (!unlockedPowers[baseChar]) unlockedPowers[baseChar] = [];
@@ -878,7 +933,7 @@ function updateBossFight() {
                         } else {
                             stageClearHeader.innerHTML = "BOSS DISMANTLED!";
                         }
-                    } else { // Practice or Boss Test
+                    } else { 
                         if (!unlockedPowers[baseChar].includes(level)) {
                             unlockedPowers[baseChar].push(level);
                             try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
@@ -888,7 +943,6 @@ function updateBossFight() {
                         }
                     }
                     
-                    // --- APPLY BONUS POINTS FOR WINNING ---
                     let bonus = (Math.max(0, repairs) * 25) + (Math.max(0, playerHP) * 25);
                     score += bonus;
                     updateHUD();
@@ -1014,13 +1068,12 @@ function updateRunner() {
     let isUsingPower = false;
     let isSuper = character.startsWith('Super');
     
-    // Character Specific Powers (ONLY IF USING SUPER VARIANT)
     if (isSuper && character.includes('G') && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
-        player.dy = 0; // Float!
+        player.dy = 0; 
         player.power -= 40; 
         isUsingPower = true;
     } else {
-        player.dy += player.gravity; // Normal gravity
+        player.dy += player.gravity; 
     }
     
     if (isSuper && character.includes('V') && !player.grounded && player.power > 0) {
@@ -1034,20 +1087,17 @@ function updateRunner() {
         player.power += 1; 
     }
     
-    // Hard boundaries
     if (player.x < 10) player.x = 10;
     if (player.x > 750) player.x = 750;
     
     player.y += player.dy;
     
-    // Ground Collision
     if (player.y + player.height >= 340) { 
         player.y = 340 - player.height; 
         player.dy = 0; 
         player.grounded = true; 
     }
 
-    // CONTINUOUS drift back to start if on ground
     if (isSuper && character.includes('V') && player.grounded) {
         if (player.x > 50) player.x -= 4;
         if (player.x < 50) player.x += 4;
@@ -1062,7 +1112,6 @@ function updateRunner() {
 
         if (distX < (player.width / 2 + g.radius - 6) && distY < (player.height / 2 + g.radius - 6)) {
             
-            // Remove the gear so it doesn't trigger multiple hits if they survive
             gears.splice(i, 1); 
             i--;
             
