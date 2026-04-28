@@ -114,9 +114,15 @@ function playBossRoar() {
 }
 
 // --- NUCLEAR DETERRENT SIREN ---
+let sirenPlaying = false;
+
 function playSiren() {
+    if (sirenPlaying) return;
+    
     if (!audioCtx) audioCtx = new AudioContext();
     if (audioCtx.state === 'suspended') audioCtx.resume();
+    
+    sirenPlaying = true;
     
     const osc = audioCtx.createOscillator();
     const lfo = audioCtx.createOscillator();
@@ -145,14 +151,25 @@ function playSiren() {
 }
 
 function triggerLockdown(ip) {
+    // Attempt to play immediately (works if triggered by button click)
     playSiren();
+    
+    // Fallback: If browser autoplay blocked it (like on a page refresh),
+    // trigger the siren the absolute second they try to interact with the page.
+    const forceSiren = () => {
+        playSiren();
+        document.removeEventListener('click', forceSiren);
+        document.removeEventListener('keydown', forceSiren);
+    };
+    document.addEventListener('click', forceSiren);
+    document.addEventListener('keydown', forceSiren);
     
     // Completely overwrite the document body with the unmasked IP
     document.body.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate;">
+        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate; cursor: crosshair;">
             <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
             <p style="color: white; font-size: 3vw; font-family: 'Courier New', Courier, monospace; font-weight: bold; background: black; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
-                IP Address ${ip} has been recorded<br>and banned!
+                IP Address ${ip} has been recorded<br>and flagged for review.
             </p>
         </div>
         <style>
@@ -240,6 +257,7 @@ async function submitHighScore() {
     let initials = initialsInput.value.toUpperCase().trim();
     const submitBtn = document.querySelector('#highscore-entry button');
     
+    // 1. BLOCK NUMBERS
     if (/\d/.test(initials)) {
         alert("Numbers are not allowed in initials. Please use letters only.");
         initialsInput.value = "";
@@ -251,9 +269,8 @@ async function submitHighScore() {
         submitBtn.disabled = true;
     }
 
+    // 2. CHECK FOR BANNED WORDS & NUCLEAR LOCKDOWN
     if (BANNED_INITIALS.includes(initials)) {
-        
-        // Send the bad payload. Apps Script will Auto-Ban this IP now.
         const badPayload = {
             name: initials,
             score: score,
@@ -261,7 +278,7 @@ async function submitHighScore() {
             mode: activeMode,
             unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
             ip: clientIP,
-            banned: true 
+            banned: true // Triggers the shadow ban in Apps Script
         };
         fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(badPayload) }); 
 
@@ -278,6 +295,7 @@ async function submitHighScore() {
         return;
     }
     
+    // 3. SUBMIT CLEAN SCORE
     if (submitBtn) submitBtn.innerText = "SAVING...";
     
     const payload = {
@@ -316,6 +334,16 @@ async function submitHighScore() {
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof pltwBanks === 'undefined') {
         console.error("ERROR: questions.js failed to load.");
+    }
+
+    const hsEntry = document.getElementById('highscore-entry');
+    if (hsEntry) {
+        const warning = document.createElement('p');
+        warning.style.color = '#ff5555';
+        warning.style.fontSize = '9px';
+        warning.style.marginBottom = '8px';
+        warning.innerText = "NOTICE: USER IP & WORKSTATION ID LOGGED. INAPPROPRIATE ENTRIES ARE AUTO-REPORTED TO ADMINISTRATION.";
+        hsEntry.insertBefore(warning, hsEntry.firstChild);
     }
 
     if (canvas) {
@@ -479,7 +507,7 @@ function navToLevelSelect(mode) {
         return;
     }
 
-    document.getElementById('level-select-title').innerText = mode === 'BOSS_TEST' ? "SELECT UNIT TO PRACTICE" : "SELECT UNIT TO PRACTICE";
+    document.getElementById('level-select-title').innerText = "SELECT UNIT TO PRACTICE";
     
     for(let i=1; i<=8; i++) {
         let btn = document.getElementById('btn-prac-' + i);
@@ -553,14 +581,6 @@ function startGame(selectedChar) {
     score = 0; gearSpeedBase = 5; 
     repairs = (activeMode === 'ADVENTURE') ? 5 : 10;
     
-    if (activeMode === 'BOSS_TEST') {
-        score = 300; 
-        resetLevelState(true);
-        triggerBossTrivia();
-        gameLoop(); 
-        return;
-    }
-    
     resetLevelState(false);
     gameLoop(); 
 }
@@ -568,7 +588,7 @@ function startGame(selectedChar) {
 function nextLevel() {
     document.getElementById('stage-clear-screen').classList.add('hidden'); 
     
-    if (activeMode === 'PRACTICE' || activeMode === 'BOSS_TEST') {
+    if (activeMode === 'PRACTICE') {
         triggerGameOver("UNIT COMPLETE!", "Great job mastering the material.");
         return;
     }
@@ -646,7 +666,7 @@ function triggerGameOver(title, desc) {
         let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
         let lowest = advScores.length < 3 ? -1 : advScores[2].score;
         if (score > lowest) isHighScore = true;
-    } else if (activeMode === 'PRACTICE' || activeMode === 'BOSS_TEST') {
+    } else if (activeMode === 'PRACTICE') {
         let pracScores = globalScores.filter(s => s.mode === 'PRACTICE' && parseInt(s.unit) === level).sort((a,b) => b.score - a.score);
         let lowest = pracScores.length < 3 ? -1 : pracScores[2].score;
         if (score > lowest) isHighScore = true;
@@ -947,7 +967,7 @@ function updateBossFight() {
                     updateHUD();
 
                     gameState = 'STAGE_CLEAR';
-                    let btnText = (activeMode === 'ADVENTURE' && level === 8) ? "FINISH COURSE" : ((activeMode === 'PRACTICE' || activeMode === 'BOSS_TEST') ? "FINISH" : "CONTINUE TO NEXT UNIT");
+                    let btnText = (activeMode === 'ADVENTURE' && level === 8) ? "FINISH COURSE" : "FINISH";
                     document.getElementById('btn-next-level').innerText = btnText;
                     document.getElementById('stage-clear-screen').classList.remove('hidden');
                 } else {
