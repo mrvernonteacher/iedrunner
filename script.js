@@ -191,8 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bossHudEl) bossHudEl.style.zIndex = '100';
     
     updateLeaderboardUI();
-    drawCanvasPreview('preview-v', 'Mr. V');
-    drawCanvasPreview('preview-g', 'Mrs. G');
 });
 
 // --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
@@ -203,6 +201,7 @@ window.startGame = startGame;
 window.initBossFight = initBossFight;
 window.nextLevel = nextLevel;
 window.submitHighScore = submitHighScore;
+window.resumeAfterIncorrect = resumeAfterIncorrect;
 
 // --- CONTROLS ---
 function handleAction() {
@@ -217,12 +216,23 @@ function handleAction() {
 }
 
 // --- NAVIGATION & UI ---
+function createCharButton(name, canvasId) {
+    return `
+    <button class="char-btn" onclick="startGame('${name}')" style="display:flex; flex-direction:column; align-items:center;">
+        <canvas id="${canvasId}" width="40" height="60"></canvas>
+        <div style="margin-top:10px; font-weight:bold;">${name.toUpperCase()}</div>
+    </button>`;
+}
+
 function drawCanvasPreview(canvasId, charName) {
     const c = document.getElementById(canvasId);
     if (!c) return;
     const cx = c.getContext('2d');
     cx.clearRect(0, 0, 40, 60);
-    if(charName === 'Mr. V') drawMrV(cx, 0, 5);
+    
+    if(charName.startsWith('Super')) drawCape(cx, 0, 5);
+    
+    if(charName.includes('V')) drawMrV(cx, 0, 5);
     else drawMrsG(cx, 0, 5);
 }
 
@@ -272,6 +282,27 @@ function navToCharSelect(selectedLevel) {
     initAudio(); 
     level = selectedLevel;
     hideAllOverlays();
+    
+    // Dynamically inject the character buttons so we can add the "Super" variants
+    const container = document.querySelector('#char-select-screen div[style*="display: flex"]');
+    if (container) {
+        container.innerHTML = createCharButton('Mr. V', 'preview-v') + createCharButton('Mrs. G', 'preview-g');
+        
+        let vUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Mr. V']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Mr. V']?.includes(level);
+        let gUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Mrs. G']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Mrs. G']?.includes(level);
+        
+        if (vUnlocked) container.innerHTML += createCharButton('Super V', 'preview-sv');
+        if (gUnlocked) container.innerHTML += createCharButton('Super G', 'preview-sg');
+        
+        // Draw Previews
+        setTimeout(() => {
+            drawCanvasPreview('preview-v', 'Mr. V');
+            drawCanvasPreview('preview-g', 'Mrs. G');
+            if (vUnlocked) drawCanvasPreview('preview-sv', 'Super V');
+            if (gUnlocked) drawCanvasPreview('preview-sg', 'Super G');
+        }, 10);
+    }
+    
     document.getElementById('char-select-screen').classList.remove('hidden');
 }
 
@@ -317,9 +348,7 @@ function nextLevel() {
     }
     score += 100; 
     gearSpeedBase += 0.5;
-    
-    // In Adventure mode, reset repairs to 5 instead of stacking them
-    repairs = (activeMode === 'ADVENTURE') ? 5 : 10; 
+    repairs = 5; // Reset repairs to 5 for Adventure Mode
     
     resetLevelState(false);
 }
@@ -517,8 +546,10 @@ function checkAnswer(selected, correct) {
     let framesSpent = Math.floor((timeSpent / 1000) * 60);
     if (framesSpent > 600) framesSpent = 600; 
 
+    const q = currentTriviaSet[currentQuestionIndex];
+
     if (triviaMode === 'RESCUE') {
-        levelFrames += framesSpent; // Make the penalty official
+        levelFrames += framesSpent; // Make the time penalty official
 
         if (selected === correct) {
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
@@ -530,24 +561,22 @@ function checkAnswer(selected, correct) {
                 gameState = 'RUNNING';
             }, 1000);
         } else {
-            if (repairs > 0) {
-                repairs--; updateHUD();
-                document.getElementById('trivia-status').innerText = "INCORRECT! -1 Repair. Try another specification.";
-                document.getElementById('trivia-status').style.color = '#ff5555';
-                setTimeout(() => {
-                    isProcessingAnswer = false;
-                    currentQuestionIndex++; 
-                    triviaStartTime = Date.now(); 
-                    loadQuestion(); 
-                }, 1500);
-            } else {
-                document.getElementById('trivia-status').innerText = "CRITICAL FAILURE! Out of repairs.";
-                document.getElementById('trivia-status').style.color = '#ff5555';
-                setTimeout(() => {
-                    document.getElementById('trivia-screen').classList.add('hidden');
-                    triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
-                }, 1500);
-            }
+            repairs--; updateHUD();
+            
+            let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
+            let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
+            
+            const answersDiv = document.getElementById('answers-container');
+            answersDiv.innerHTML = `
+                <div style="color: #ff5555; font-weight: bold; margin-bottom: 10px; font-size:18px;">INCORRECT</div>
+                <div style="color: #fff; margin-bottom: 10px; font-size: 14px;">The correct answer is: <span style="color:#55ff55;">${correct}</span></div>
+                <div style="color: #ddd; font-size: 12px; margin-bottom: 10px; line-height:1.4;"><i>${explanation}</i></div>
+                <div style="color: #ffcc00; font-size: 10px; margin-bottom: 15px;">Source: ${source}</div>
+                <button class="answer-btn" style="background:#ff5555; color:#000;" onclick="resumeAfterIncorrect()">CONTINUE</button>
+            `;
+            
+            document.getElementById('trivia-status').innerText = repairs < 0 ? "CRITICAL FAILURE!" : "GEAR JAMMED!";
+            document.getElementById('trivia-status').style.color = '#ff5555';
         }
     } else if (triviaMode === 'BOSS') {
         if (selected === correct) {
@@ -562,20 +591,45 @@ function checkAnswer(selected, correct) {
         } else {
             playerHP--;
             updateHUD();
-            document.getElementById('trivia-status').innerText = `INCORRECT! Boss attacks! (-1 HP)`;
+            
+            let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
+            let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
+            
+            const answersDiv = document.getElementById('answers-container');
+            answersDiv.innerHTML = `
+                <div style="color: #ff5555; font-weight: bold; margin-bottom: 10px; font-size:18px;">INCORRECT</div>
+                <div style="color: #fff; margin-bottom: 10px; font-size: 14px;">The correct answer is: <span style="color:#55ff55;">${correct}</span></div>
+                <div style="color: #ddd; font-size: 12px; margin-bottom: 10px; line-height:1.4;"><i>${explanation}</i></div>
+                <div style="color: #ffcc00; font-size: 10px; margin-bottom: 15px;">Source: ${source}</div>
+                <button class="answer-btn" style="background:#ff5555; color:#000;" onclick="resumeAfterIncorrect()">CONTINUE</button>
+            `;
+            
+            document.getElementById('trivia-status').innerText = playerHP <= 0 ? "ARMOR DEPLETED!" : "BOSS ATTACKS!";
             document.getElementById('trivia-status').style.color = '#ff5555';
             playBossRoar();
-            document.getElementById('trivia-container').style.borderColor = '#ff0000';
-            setTimeout(() => {
-                document.getElementById('trivia-container').style.borderColor = '#ffcc00';
-                if (playerHP <= 0) {
-                    document.getElementById('trivia-screen').classList.add('hidden');
-                    triggerGameOver("DEFEATED", bossNames[level-1] + " dismantled you!");
-                } else {
-                    currentQuestionIndex++; 
-                    askBossQuestion(); 
-                }
-            }, 1500);
+        }
+    }
+}
+
+function resumeAfterIncorrect() {
+    if (triviaMode === 'RESCUE') {
+        if (repairs < 0) {
+            document.getElementById('trivia-screen').classList.add('hidden');
+            triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
+        } else {
+            isProcessingAnswer = false;
+            currentQuestionIndex++; 
+            triviaStartTime = Date.now(); 
+            loadQuestion(); 
+        }
+    } else if (triviaMode === 'BOSS') {
+        if (playerHP <= 0) {
+            document.getElementById('trivia-screen').classList.add('hidden');
+            triggerGameOver("DEFEATED", bossNames[level-1] + " dismantled you!");
+        } else {
+            isProcessingAnswer = false;
+            currentQuestionIndex++; 
+            askBossQuestion(); 
         }
     }
 }
@@ -668,14 +722,15 @@ function updateBossFight() {
                     
                     // --- SAVE CHARACTER ABILITY UNLOCK ---
                     let stageClearHeader = document.querySelector('#stage-clear-screen h1');
-                    if (!unlockedPowers[character]) unlockedPowers[character] = [];
+                    let baseChar = character.replace('Super ', '');
+                    if (!unlockedPowers[baseChar]) unlockedPowers[baseChar] = [];
 
                     if (activeMode === 'ADVENTURE') {
                         if (level === 8) {
-                            if (!unlockedPowers[character].includes('ADVENTURE_COMPLETE')) {
-                                unlockedPowers[character].push('ADVENTURE_COMPLETE');
+                            if (!unlockedPowers[baseChar].includes('ADVENTURE_COMPLETE')) {
+                                unlockedPowers[baseChar].push('ADVENTURE_COMPLETE');
                                 try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
-                                stageClearHeader.innerHTML = `COURSE COMPLETE!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR ADVENTURE MODE!</span>`;
+                                stageClearHeader.innerHTML = `COURSE COMPLETE!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${baseChar} POWER UNLOCKED FOR ADVENTURE MODE!</span>`;
                             } else {
                                 stageClearHeader.innerHTML = "COURSE COMPLETE!";
                             }
@@ -683,10 +738,10 @@ function updateBossFight() {
                             stageClearHeader.innerHTML = "BOSS DISMANTLED!";
                         }
                     } else { // Practice or Boss Test
-                        if (!unlockedPowers[character].includes(level)) {
-                            unlockedPowers[character].push(level);
+                        if (!unlockedPowers[baseChar].includes(level)) {
+                            unlockedPowers[baseChar].push(level);
                             try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
-                            stageClearHeader.innerHTML = `BOSS DISMANTLED!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR UNIT ${level}!</span>`;
+                            stageClearHeader.innerHTML = `BOSS DISMANTLED!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${baseChar} POWER UNLOCKED FOR UNIT ${level}!</span>`;
                         } else {
                             stageClearHeader.innerHTML = "BOSS DISMANTLED!";
                         }
@@ -784,6 +839,16 @@ function drawBossShape(c, lvl) {
     }
 }
 
+function drawCape(c, px, py) {
+    c.fillStyle = '#cc0000';
+    c.beginPath();
+    c.moveTo(px + 6, py + 10);
+    c.lineTo(px + 30, py + 10);
+    c.lineTo(px + 45, py + 50);
+    c.lineTo(px - 9, py + 50);
+    c.fill();
+}
+
 function drawMrV(c, px, py) {
     c.fillStyle = '#f1c27d'; c.fillRect(px+8, py, 20, 16);
     c.fillStyle = '#4a3000'; c.fillRect(px+8, py, 20, 4); c.fillRect(px+8, py+10, 20, 6); 
@@ -806,16 +871,10 @@ function updateRunner() {
     if (!ctx) return;
     
     let isUsingPower = false;
-    let hasPowerUnlocked = false;
+    let isSuper = character.startsWith('Super');
     
-    if (activeMode === 'ADVENTURE') {
-        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes('ADVENTURE_COMPLETE');
-    } else {
-        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
-    }
-    
-    // Character Specific Powers (ONLY IF UNLOCKED)
-    if (character === 'Mrs. G' && hasPowerUnlocked && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
+    // Character Specific Powers (ONLY IF USING SUPER VARIANT)
+    if (isSuper && character.includes('G') && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
         player.dy = 0; // Float!
         player.power -= 40; 
         isUsingPower = true;
@@ -823,7 +882,7 @@ function updateRunner() {
         player.dy += player.gravity; // Normal gravity
     }
     
-    if (character === 'Mr. V' && hasPowerUnlocked && !player.grounded && player.power > 0) {
+    if (isSuper && character.includes('V') && !player.grounded && player.power > 0) {
         if (keys.left) { player.x -= 6; player.power -= 20; isUsingPower = true; }
         else if (keys.right) { player.x += 6; player.power -= 20; isUsingPower = true; }
     }
@@ -848,7 +907,7 @@ function updateRunner() {
     }
 
     // CONTINUOUS drift back to start if on ground
-    if (character === 'Mr. V' && player.grounded) {
+    if (isSuper && character.includes('V') && player.grounded) {
         if (player.x > 50) player.x -= 4;
         if (player.x < 50) player.x += 4;
         if (Math.abs(player.x - 50) <= 4) player.x = 50;
@@ -904,17 +963,14 @@ function drawRunner(c) {
     }
     c.fillStyle = '#ffcc00'; c.fillRect(0, 340, 800, 4);
 
-    if (character === 'Mr. V') drawMrV(c, player.x, player.y);
-    else drawMrsG(c, player.x, player.y);
-    
-    let hasPowerUnlocked = false;
-    if (activeMode === 'ADVENTURE') {
-        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes('ADVENTURE_COMPLETE');
-    } else {
-        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    if (character === 'Super V' || character === 'Super G') {
+        drawCape(c, player.x, player.y);
     }
     
-    if (hasPowerUnlocked) {
+    if (character.includes('V')) drawMrV(c, player.x, player.y);
+    else drawMrsG(c, player.x, player.y);
+    
+    if (character.startsWith('Super')) {
         c.fillStyle = '#fff';
         c.fillRect(player.x - 10, player.y - 15, 56, 6);
         c.fillStyle = player.power === 600 ? '#55ff55' : '#ffcc00';
@@ -950,8 +1006,6 @@ function gameLoop() {
             let displayFrames = levelFrames + framesSpent;
             updateClockDisplay(displayFrames);
             
-            // Note: We don't force a game over or timeout here anymore. 
-            // The clock simply freezes visually once the 10-second penalty is reached.
         }
     }
     
