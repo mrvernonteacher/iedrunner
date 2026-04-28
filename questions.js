@@ -192,38 +192,44 @@ const pltwBanks = {
         { q: "Where should dimensions generally be placed in a multiview drawing?", opts: ["Between the views", "Inside the object", "Above the top view", "Below the front view"], ans: "Between the views" },
         { q: "The 'X' in a hole dimension note (e.g., 4X Ø0.50) indicates:", opts: ["Number of identical holes", "Multiplier", "Unknown variable", "Cross section"], ans: "Number of identical holes" }
     ],
-    7: [ 
-        { q: "What measures the resistance of an object to denting or scratching?", opts: ["Hardness", "Toughness", "Ductility", "Stiffness"], ans: "Hardness" },
-        { q: "What test uses a minor load and major load to measure material hardness?", opts: ["Rockwell test", "Tensile test", "Charpy test", "Flexure test"], ans: "Rockwell test" },
-        { q: "The slope of the linear elastic region on a stress-strain curve represents:", opts: ["Young's Modulus", "Yield Strength", "Toughness", "Ductility"], ans: "Young's Modulus" },
-        { q: "A material that breaks with very little plastic deformation is described as:", opts: ["Brittle", "Ductile", "Tough", "Malleable"], ans: "Brittle" },
-        { q: "What type of fracture surface is characteristic of a ductile material?", opts: ["Cup and Cone", "Granular", "Flat and Smooth", "Crystalline"], ans: "Cup and Cone" },
-        { q: "The point on a stress-strain curve where permanent deformation begins is the:", opts: ["Yield Point", "Ultimate Strength", "Fracture Point", "Elastic Limit"], ans: "Yield Point" }, 
-        { q: "What represents the maximum stress a material can withstand before necking begins?", opts: ["Ultimate Tensile Strength", "Yield Strength", "Fracture Point", "Elastic Limit"], ans: "Ultimate Tensile Strength" },
-        { q: "Stress is calculated by dividing the applied force by the:", opts: ["Cross-sectional area", "Original length", "Change in length", "Volume"], ans: "Cross-sectional area" },
-        { q: "Strain is defined as the change in length divided by the:", opts: ["Original length", "Cross-sectional area", "Applied force", "Final length"], ans: "Original length" },
-        { q: "The total area under the stress-strain curve indicates a material's:", opts: ["Toughness", "Hardness", "Stiffness", "Density"], ans: "Toughness" },
-        { q: "Which event in WWII was caused by steel becoming brittle in cold temperatures?", opts: ["Liberty ships breaking", "Tank treads cracking", "Aircraft wings snapping", "Rifles jamming"], ans: "Liberty ships breaking" },
-        { q: "In Onshape, where is the Mass Properties tool icon located?", opts: ["Lower right corner", "Top toolbar", "Feature tree", "View menu"], ans: "Lower right corner" },
-        { q: "If you check Mass Properties in Onshape but the Mass is missing, what did you forget?", opts: ["Assign a material", "Save the document", "Select a face", "Create an assembly"], ans: "Assign a material" },
-        { q: "How do you override a material's default density in Onshape?", opts: ["Create a Custom material", "Scale the part", "Change the workspace units", "Edit the feature"], ans: "Create a Custom material" },
-        { q: "Metals that contain iron, like carbon steel and cast iron, are classified as:", opts: ["Ferrous metals", "Nonferrous metals", "Alloys", "Noble metals"], ans: "Ferrous metals" },
-        { q: "Which nonferrous alloy is a mixture of copper and zinc?", opts: ["Brass", "Bronze", "Steel", "Solder"], ans: "Brass" },
-        { q: "Which material class is inorganic, non-metallic, generally brittle, and an insulator?", opts: ["Ceramics", "Polymers", "Composites", "Metals"], ans: "Ceramics" },
-        { q: "Wood is a natural composite consisting of cellulose fibers in a matrix called:", opts: ["Lignin", "Epoxy", "Resin", "Carbon"], ans: "Lignin" },
-        { q: "Which of the following is considered a hardwood despite being extremely light and soft?", opts: ["Balsa", "Pine", "Cedar", "Fir"], ans: "Balsa" },
-        { q: "Polymers (plastics) are organic molecules formed primarily of:", opts: ["Carbon and hydrogen chains", "Iron and carbon", "Silicon and oxygen", "Copper and tin"], ans: "Carbon and hydrogen chains" },
-        { q: "A composite material is typically a combination of a reinforcement material and a:", opts: ["Matrix material", "Catalyst", "Polymer", "Ceramic"], ans: "Matrix material" },
-        { q: "Which of the following is a widely used composite material in construction?", opts: ["Concrete", "Stainless steel", "Aluminum", "Pine"], ans: "Concrete" },
-        { q: "When evaluating a digital resource, the 'C' in the CRAAP test stands for:", opts: ["Currency", "Credibility", "Content", "Citation"], ans: "Currency" },
-        { q: "In the CRAAP test, checking if the author is an expert in the field relates to:", opts: ["Authority", "Accuracy", "Purpose", "Relevance"], ans: "Authority" },
-        { q: "What is a major advantage of using an academic database like the Cobb Digital Library?", opts: ["Articles are peer-reviewed", "It searches the entire web", "Anyone can publish there", "It has more ads"], ans: "Articles are peer-reviewed" },
-        { q: "Which metric tells how much heat a material absorbs before its temperature rises by 1 degree?", opts: ["Specific heat", "Thermal conductivity", "Melting point", "Thermal expansion"], ans: "Specific heat" },
-        { q: "Which property would an engineer check to ensure metal doesn't crack while drawn into wire?", opts: ["Ductility", "Hardness", "Toughness", "Yield strength"], ans: "Ductility" },
-        { q: "Which of the following would be considered the MOST reliable source for research?", opts: ["Peer-reviewed academic journal", "Unfamiliar website", "Company blog", "Wikipedia"], ans: "Peer-reviewed academic journal" },
-        { q: "To find out if a material will expand when heated and cause stress, engineers look at:", opts: ["Coefficient of thermal expansion", "Specific heat", "Thermal conductivity", "Melting point"], ans: "Coefficient of thermal expansion" },
-        { q: "The measure of how well a material resists twisting is known as the:", opts: ["Shear modulus", "Young's modulus", "Yield strength", "Ductility"], ans: "Shear modulus" }
-    ],
+    // Add or replace your Unit 7 array in questions.js with this:
+pltwBanks[7] = [
+    { 
+        q: "The point on a stress-strain curve where elastic deformation ends and plastic deformation begins is known as what?", 
+        opts: ["Yield Strength", "Tensile Strength", "Fracture Point", "Elastic Limit"], 
+        ans: "Yield Strength",
+        exp: "Yield strength marks the specific point where the material stops stretching reversibly and begins to permanently deform.",
+        src: "Properties of Engineering Materials Worksheet"
+    },
+    { 
+        q: "Which property describes a material's ability to undergo significant plastic deformation before rupture?", 
+        opts: ["Ductility", "Brittleness", "Hardness", "Toughness"], 
+        ans: "Ductility",
+        exp: "Ductile materials (like copper) can be drawn into wires. Brittle materials break without significant permanent deformation.",
+        src: "Properties of Engineering Materials Worksheet"
+    },
+    { 
+        q: "What is the formula for calculating stress (σ)?", 
+        opts: ["Force / Area", "Force x Area", "Mass / Volume", "Strain x Modulus"], 
+        ans: "Force / Area",
+        exp: "Stress is the internal resistance to an external load, calculated as the applied Force divided by the cross-sectional Area.",
+        src: "Properties of Engineering Materials Worksheet"
+    },
+    { 
+        q: "The slope of the linear portion of a stress-strain curve represents what property?", 
+        opts: ["Modulus of Elasticity", "Ultimate Strength", "Density", "Strain"], 
+        ans: "Modulus of Elasticity",
+        exp: "Also known as Young's Modulus, this slope represents the stiffness of a solid material.",
+        src: "Properties of Engineering Materials Worksheet"
+    },
+    { 
+        q: "What is the maximum stress a material can withstand before necking and eventual fracture?", 
+        opts: ["Ultimate Tensile Strength", "Yield Point", "Rupture Point", "Proportional Limit"], 
+        ans: "Ultimate Tensile Strength",
+        exp: "Ultimate Tensile Strength (UTS) is the absolute highest point reached on the stress-strain curve.",
+        src: "Properties of Engineering Materials Worksheet"
+    }
+],
     8: [ 
         { q: "The formula for Mechanical Advantage is:", opts: ["Output Force / Input Force", "Work / Time", "Force * Distance", "Mass * Acceleration"], ans: "Output Force / Input Force" },
         { q: "A mechanism consisting of a rotating profile and a follower is a:", opts: ["Cam and Follower", "Rack and Pinion", "Gear Train", "Lever"], ans: "Cam and Follower" },
