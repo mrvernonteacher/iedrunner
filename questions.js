@@ -1,265 +1,491 @@
-// --- THE FULL 240 QUESTION BANK (30 Per Unit) ---
+// Walton High School - PLTW IED Question Bank
+// Units 1 - 8
+
 const pltwBanks = {
-    1: [ 
-        { q: "Which step involves creating a decision matrix?", opts: ["Generate Concepts", "Develop Solution", "Evaluate Solution", "Define Problem"], ans: "Generate Concepts" },
-        { q: "Which step involves writing a design brief?", opts: ["Define the Problem", "Generate Concepts", "Construct and Test", "Present Solution"], ans: "Define the Problem" },
-        { q: "A full-scale working model used to test a design is a:", opts: ["Prototype", "Mock-up", "Concept", "Sketch"], ans: "Prototype" },
-        { q: "Which of these is a rule of brainstorming?", opts: ["Encourage wild ideas", "Criticize early", "Quality over quantity", "Work alone"], ans: "Encourage wild ideas" },
-        { q: "An engineering notebook must be written in:", opts: ["Pen", "Pencil", "Marker", "Digital only"], ans: "Pen" },
-        { q: "Which of the following is NOT a rule of brainstorming?", opts: ["Criticize ideas immediately", "Welcome piling on", "Encourage wild ideas", "Focus on quantity"], ans: "Criticize ideas immediately" },
-        { q: "An iterative process means that it is designed to be:", opts: ["Repeated to improve design", "Finished in one step", "Done purely on computer", "Approved by a manager"], ans: "Repeated to improve design" },
-        { q: "A group problem-solving technique in which members share ideas is:", opts: ["Brainstorming", "Reverse Engineering", "Prototyping", "CAD Modeling"], ans: "Brainstorming" },
-        { q: "Who are the people who buy and use a product?", opts: ["Consumers", "Engineers", "Designers", "Manufacturers"], ans: "Consumers" },
-        { q: "The document that defines the problem and constraints is the:", opts: ["Design Brief", "Decision Matrix", "Gantt Chart", "Assembly Drawing"], ans: "Design Brief" },
-        { q: "An improvement to an existing technological product is an:", opts: ["Innovation", "Invention", "Discovery", "Hypothesis"], ans: "Innovation" },
-        { q: "A new product, system, or process that has never existed before is an:", opts: ["Invention", "Innovation", "Iteration", "Evaluation"], ans: "Invention" },
-        { q: "What chart is commonly used for project management and scheduling?", opts: ["Gantt Chart", "Pie Chart", "Histogram", "Scatter Plot"], ans: "Gantt Chart" },
-        { q: "Which engineering discipline applies math/science to materials and structures?", opts: ["Civil Engineering", "Chemical Engineering", "Electrical Engineering", "Computer Engineering"], ans: "Civil Engineering" },
-        { q: "The guidelines for human behavior regarding what is right and wrong are:", opts: ["Ethics", "Laws", "Constraints", "Criteria"], ans: "Ethics" },
-        { q: "The limits or restrictions on a design process are known as:", opts: ["Constraints", "Criteria", "Variables", "Prototypes"], ans: "Constraints" },
-        { q: "Desired specifications (elements or features) of a product or system are:", opts: ["Criteria", "Constraints", "Brainstorming", "Ethics"], ans: "Criteria" },
-        { q: "Which step includes creating detailed, working CAD drawings?", opts: ["Develop a Solution", "Define the Problem", "Generate Concepts", "Evaluate Solution"], ans: "Develop a Solution" },
-        { q: "Which step includes collecting performance data from a test?", opts: ["Construct and Test", "Present Solution", "Evaluate Solution", "Define Problem"], ans: "Construct and Test" },
-        { q: "Which step includes a formal presentation or portfolio?", opts: ["Present Solution", "Generate Concepts", "Develop Solution", "Define Problem"], ans: "Present Solution" },
-        { q: "The process of analyzing a design based on testing data to see if it meets criteria is:", opts: ["Evaluate Solution", "Construct and Test", "Define Problem", "Generate Concepts"], ans: "Evaluate Solution" },
-        { q: "A systematic problem-solving strategy, with criteria and constraints, is the:", opts: ["Design Process", "Scientific Method", "Mathematical Model", "Algorithm"], ans: "Design Process" },
-        { q: "An idea that produces a similar idea or an enhanced idea is called:", opts: ["Piling On", "Criticizing", "Evaluating", "Documenting"], ans: "Piling On" },
-        { q: "A person who designs products, structures, or systems to improve lives is an:", opts: ["Engineer", "Consumer", "Accountant", "Operator"], ans: "Engineer" },
-        { q: "A legally recognized right to an invention is a:", opts: ["Patent", "Copyright", "Trademark", "Design Brief"], ans: "Patent" },
-        { q: "A collection of documents that highlights your best work is a:", opts: ["Portfolio", "Notebook", "Brief", "Matrix"], ans: "Portfolio" },
-        { q: "The person or organization that pays for a design project is the:", opts: ["Client", "Designer", "Consumer", "Target Audience"], ans: "Client" },
-        { q: "Errors in an engineering notebook should be corrected by:", opts: ["A single line through, with initials", "Scribbling it out", "Using whiteout", "Tearing out the page"], ans: "A single line through, with initials" },
-        { q: "Which is a major branch of engineering dealing with electricity and electronics?", opts: ["Electrical", "Civil", "Mechanical", "Chemical"], ans: "Electrical" },
-        { q: "The audience that the product is specifically designed for is the:", opts: ["Target Consumer", "Client", "Designer", "Manager"], ans: "Target Consumer" }
+    // UNIT 1: Design Process
+    1: [
+        {
+            q: "What is the first step of the design process?",
+            opts: ["Generate Concepts", "Define the Problem", "Evaluate the Solution", "Construct a Prototype"],
+            ans: "Define the Problem",
+            exp: "Before you can solve a problem, you must clearly identify it, justify it, and define the criteria and constraints.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "A process that repeats a series of steps over and over until the desired outcome is obtained is known as:",
+            opts: ["Iterative", "Linear", "Sequential", "Prototypical"],
+            ans: "Iterative",
+            exp: "Engineering is an iterative process, meaning designers frequently circle back to previous steps to refine their solutions.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "In which step of the design process would you use a decision matrix?",
+            opts: ["Generate Concepts", "Develop a Solution", "Construct and Test", "Present the Solution"],
+            ans: "Generate Concepts",
+            exp: "A decision matrix is used to mathematically compare brainstormed concepts against the design criteria.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "What is a working model used to test a design concept by making actual observations and necessary adjustments?",
+            opts: ["Prototype", "Mock-up", "Thumbnail sketch", "Decision Matrix"],
+            ans: "Prototype",
+            exp: "A prototype is a functional model built to test how a solution will perform in the real world.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "An engineering notebook should be written in:",
+            opts: ["Pen", "Pencil", "Marker", "Invisible Ink"],
+            ans: "Pen",
+            exp: "Engineering notebooks are legal documents and must be written in permanent ink to prevent alteration of dates and ideas.",
+            src: "PLTW Curriculum"
+        }
     ],
-    2: [ 
-        { q: "What sketch shows true width/height, with depth drawn at 45 degrees?", opts: ["Oblique", "Isometric", "Perspective", "Orthographic"], ans: "Oblique" },
-        { q: "In an isometric sketch, axes are drawn at what angle to horizontal?", opts: ["30 degrees", "45 degrees", "60 degrees", "90 degrees"], ans: "30 degrees" },
-        { q: "What line type represents an edge that is not directly visible?", opts: ["Hidden Line", "Center Line", "Object Line", "Construction Line"], ans: "Hidden Line" },
-        { q: "Which view is typically chosen as the front view?", opts: ["Most descriptive view", "Top view", "Right side view", "Smallest view"], ans: "Most descriptive view" },
-        { q: "A sketch featuring a horizon line and vanishing points is:", opts: ["Perspective", "Isometric", "Oblique", "Multiview"], ans: "Perspective" },
-        { q: "A tonal shading technique that uses tightly grouped dots is called:", opts: ["Stippling", "Hatching", "Cross-hatching", "Blending"], ans: "Stippling" },
-        { q: "When sketching, proportions are best maintained by using faint lines called:", opts: ["Construction Lines", "Object Lines", "Hidden Lines", "Border Lines"], ans: "Construction Lines" },
-        { q: "Which line type is used to show the center of a circular feature?", opts: ["Center Line", "Hidden Line", "Phantom Line", "Section Line"], ans: "Center Line" },
-        { q: "As a general rule, dimensions should NOT be placed:", opts: ["Inside the object", "Between views", "Aligned with object", "With extension lines"], ans: "Inside the object" },
-        { q: "Which type of projection uses lines that converge at a single point?", opts: ["Perspective Projection", "Orthographic Projection", "Isometric Projection", "Oblique Projection"], ans: "Perspective Projection" },
-        { q: "If a line is drawn thick and dark to represent an outline, it is a(n):", opts: ["Object Line", "Construction Line", "Hidden Line", "Center Line"], ans: "Object Line" },
-        { q: "Which type of oblique sketch is drawn with full depth?", opts: ["Cavalier", "Cabinet", "Isometric", "Perspective"], ans: "Cavalier" },
-        { q: "Which type of oblique sketch is drawn with half depth to look more realistic?", opts: ["Cabinet", "Cavalier", "Isometric", "Orthographic"], ans: "Cabinet" },
-        { q: "When two lines overlap in a drawing, which line takes precedence?", opts: ["Object over Hidden", "Hidden over Object", "Center over Object", "Construction over Hidden"], ans: "Object over Hidden" },
-        { q: "An inside rounded corner on a machined part is called a:", opts: ["Fillet", "Round", "Chamfer", "Bevel"], ans: "Fillet" },
-        { q: "An outside rounded corner on a machined part is called a:", opts: ["Round", "Fillet", "Chamfer", "Spline"], ans: "Round" },
-        { q: "What defines an area's lightness or darkness in a sketch?", opts: ["Value / Tone", "Hue", "Saturation", "Texture"], ans: "Value / Tone" },
-        { q: "Lines that show where a dimension starts and stops are:", opts: ["Extension Lines", "Dimension Lines", "Leader Lines", "Object Lines"], ans: "Extension Lines" },
-        { q: "A line with an arrowhead pointing to a specific feature with a note attached is a:", opts: ["Leader Line", "Extension Line", "Dimension Line", "Center Line"], ans: "Leader Line" },
-        { q: "A sketch that shows an object's height, width, and depth in a single view is:", opts: ["Pictorial", "Multiview", "Orthographic", "Working Drawing"], ans: "Pictorial" },
-        { q: "Which line indicates a part has been broken to save space on a drawing?", opts: ["Break Line", "Phantom Line", "Section Line", "Center Line"], ans: "Break Line" },
-        { q: "Which view is generally located directly above the Front View?", opts: ["Top View", "Bottom View", "Right Side View", "Isometric View"], ans: "Top View" },
-        { q: "Which view is generally located to the right of the Front View?", opts: ["Right Side View", "Left Side View", "Top View", "Bottom View"], ans: "Right Side View" },
-        { q: "How many principal views can be created in a standard orthographic projection?", opts: ["6", "3", "4", "8"], ans: "6" },
-        { q: "A standardized set of rules used to create technical drawings is called:", opts: ["Conventions", "Algorithms", "Matrices", "Protocols"], ans: "Conventions" },
-        { q: "Shading created by intersecting parallel lines is called:", opts: ["Cross-Hatching", "Hatching", "Stippling", "Blending"], ans: "Cross-Hatching" },
-        { q: "In a 1-point perspective sketch, how many vanishing points are there?", opts: ["One", "Two", "Three", "Zero"], ans: "One" },
-        { q: "The relationship of one part of an object to another regarding size is:", opts: ["Proportion", "Symmetry", "Balance", "Rhythm"], ans: "Proportion" },
-        { q: "A line representing an alternate position of a moving part is a:", opts: ["Phantom Line", "Hidden Line", "Section Line", "Break Line"], ans: "Phantom Line" },
-        { q: "The standard US projection method for technical drawings is:", opts: ["Third-Angle Projection", "First-Angle Projection", "Isometric Projection", "Perspective Projection"], ans: "Third-Angle Projection" }
+
+    // UNIT 2: Technical Sketching
+    2: [
+        {
+            q: "In an isometric sketch, how many degrees are the receding lines drawn at?",
+            opts: ["30 degrees", "45 degrees", "60 degrees", "90 degrees"],
+            ans: "30 degrees",
+            exp: "Isometric pictorials are drawn with width and depth lines projecting at 30-degree angles from the horizontal baseline.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Which line type is used to represent features that cannot be seen in the current view?",
+            opts: ["Object Line", "Hidden Line", "Center Line", "Construction Line"],
+            ans: "Hidden Line",
+            exp: "Hidden lines are drawn as short dashes to represent edges and intersections that are behind other objects.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "When choosing the front view for an orthographic projection, you should select the view that:",
+            opts: ["Shows the shortest dimension", "Has the most hidden lines", "Shows the most detail or best shape", "Is the easiest to draw"],
+            ans: "Shows the most detail or best shape",
+            exp: "The front view should show the longest dimension and the most characteristic shape of the object with the fewest hidden lines.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "A line that shows the middle of a symmetrical part or a hole is called a:",
+            opts: ["Center Line", "Hidden Line", "Object Line", "Section Line"],
+            ans: "Center Line",
+            exp: "Center lines alternate between long and short dashes to indicate the center of geometry.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "A multiview drawing typically shows which three views?",
+            opts: ["Front, Top, Right Side", "Front, Bottom, Left Side", "Top, Back, Left Side", "Isometric, Oblique, Perspective"],
+            ans: "Front, Top, Right Side",
+            exp: "The standard multiview projection in the US displays the Front, Top, and Right Side views of an object.",
+            src: "PLTW Curriculum"
+        }
     ],
-    3: [ 
-        { q: "On a standard dial caliper, one full revolution of the dial represents:", opts: ["0.100 inches", "0.001 inches", "1.000 inches", "0.010 inches"], ans: "0.100 inches" },
-        { q: "The statistical term for the middle number in a sorted data set is:", opts: ["Median", "Mean", "Mode", "Standard Deviation"], ans: "Median" },
-        { q: "What graph is best for showing the frequency distribution of a data set?", opts: ["Histogram", "Pie Chart", "Line Graph", "Scatter Plot"], ans: "Histogram" },
-        { q: "To convert inches to millimeters, multiply by:", opts: ["25.4", "2.54", "0.393", "12"], ans: "25.4" },
-        { q: "The total amount of variation permitted in a dimension is its:", opts: ["Tolerance", "Allowance", "Clearance", "Interference"], ans: "Tolerance" },
-        { q: "How many significant figures are in the measurement 0.0045?", opts: ["Two", "Four", "Five", "Three"], ans: "Two" },
-        { q: "The degree to which repeated measurements show the same result is called:", opts: ["Precision", "Accuracy", "Tolerance", "Calibration"], ans: "Precision" },
-        { q: "Which part of a dial caliper measures the depth of a blind hole?", opts: ["Depth Rod", "Inside Jaws", "Outside Jaws", "Dial Adjustment"], ans: "Depth Rod" },
-        { q: "What is the mean of the data set: 2, 4, 6?", opts: ["4", "3", "5", "12"], ans: "4" },
-        { q: "What is the base unit of mass in the SI (Metric) system?", opts: ["Kilogram", "Gram", "Pound", "Ounce"], ans: "Kilogram" },
-        { q: "The degree of closeness of a measurement to its actual (true) value is:", opts: ["Accuracy", "Precision", "Tolerance", "Deviation"], ans: "Accuracy" },
-        { q: "A curve representing a normal distribution is often called a:", opts: ["Bell Curve", "Sine Wave", "Parabola", "Histogram"], ans: "Bell Curve" },
-        { q: "What does the 'Mode' represent in a data set?", opts: ["Most frequent value", "Average value", "Middle value", "Highest minus lowest"], ans: "Most frequent value" },
-        { q: "The difference between the highest and lowest values in a data set is the:", opts: ["Range", "Mean", "Standard Deviation", "Variance"], ans: "Range" },
-        { q: "A dial caliper can typically measure down to what fraction of an inch?", opts: ["One thousandth (0.001)", "One hundredth (0.01)", "One ten-thousandth (0.0001)", "One tenth (0.1)"], ans: "One thousandth (0.001)" },
-        { q: "The numbers on the blade of a standard inch dial caliper represent:", opts: ["Tenths of an inch", "Inches", "Hundredths of an inch", "Thousandths of an inch"], ans: "Tenths of an inch" },
-        { q: "Which jaws on a caliper are used to measure the diameter of a solid cylinder?", opts: ["Outside Jaws", "Inside Jaws", "Depth Rod", "Step Measuring Faces"], ans: "Outside Jaws" },
-        { q: "Which jaws on a caliper are used to measure the diameter of a drilled hole?", opts: ["Inside Jaws", "Outside Jaws", "Depth Rod", "Step Measuring Faces"], ans: "Inside Jaws" },
-        { q: "Data that can take on any continuous value is called:", opts: ["Continuous Data", "Discrete Data", "Nominal Data", "Ordinal Data"], ans: "Continuous Data" },
-        { q: "Data that can only take on specific distinct values (like shoe size) is:", opts: ["Discrete Data", "Continuous Data", "Ratio Data", "Interval Data"], ans: "Discrete Data" },
-        { q: "In statistics, a measure of how spread out numbers are from the average is:", opts: ["Standard Deviation", "Mean", "Median", "Mode"], ans: "Standard Deviation" },
-        { q: "In a normal distribution, what percentage of data falls within 1 standard deviation?", opts: ["68%", "95%", "99.7%", "50%"], ans: "68%" },
-        { q: "In a normal distribution, what percentage of data falls within 2 standard deviations?", opts: ["95%", "68%", "99.7%", "100%"], ans: "95%" },
-        { q: "To convert millimeters to inches, you divide by:", opts: ["25.4", "2.54", "10", "12"], ans: "25.4" },
-        { q: "The internationally recognized decimal system of weights and measures is:", opts: ["SI System (Metric)", "US Customary System", "Imperial System", "Architectural System"], ans: "SI System (Metric)" },
-        { q: "How many significant figures are in the measurement 1.050?", opts: ["Four", "Three", "Two", "One"], ans: "Four" },
-        { q: "How many significant figures are in the measurement 200?", opts: ["One", "Two", "Three", "Zero"], ans: "One" },
-        { q: "A gauge used to check if a dimension is within specified tolerances is a:", opts: ["Go/No-Go Gauge", "Dial Caliper", "Micrometer", "Ruler"], ans: "Go/No-Go Gauge" },
-        { q: "The process of verifying the accuracy of a measuring tool is called:", opts: ["Calibration", "Precision", "Tolerance", "Documentation"], ans: "Calibration" },
-        { q: "A graphical representation of the distribution of numerical data using bars is a:", opts: ["Histogram", "Line Graph", "Scatter Plot", "Pie Chart"], ans: "Histogram" }
+
+    // UNIT 3: Measurement & Statistics
+    3: [
+        {
+            q: "Which of the following is NOT a measurement typically taken with a dial caliper?",
+            opts: ["Outside Diameter", "Inside Diameter", "Hole Depth", "Surface Roughness"],
+            ans: "Surface Roughness",
+            exp: "Dial calipers can measure outside length, inside diameter, step depth, and hole depth, but cannot measure surface texture.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "The mean, median, and mode are all measures of:",
+            opts: ["Standard Deviation", "Central Tendency", "Data Variation", "Precision"],
+            ans: "Central Tendency",
+            exp: "These statistics describe the center point or typical value of a data set.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "If a set of data is normally distributed, what percentage of values fall within one standard deviation of the mean?",
+            opts: ["50%", "68%", "95%", "99.7%"],
+            ans: "68%",
+            exp: "According to the Empirical Rule, 68% of data falls within ±1 standard deviation in a normal distribution.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Accuracy is defined as:",
+            opts: ["The degree of closeness to the actual or accepted value", "The repeatability of a measurement", "The smallest increment on a scale", "The difference between upper and lower limits"],
+            ans: "The degree of closeness to the actual or accepted value",
+            exp: "Accuracy measures how close a result is to the true value, while precision measures how repeatable the result is.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "What is the median of this data set? [2, 4, 6, 8, 10]",
+            opts: ["6", "5", "8", "30"],
+            ans: "6",
+            exp: "The median is the exact middle number in an ordered data set.",
+            src: "PLTW Curriculum"
+        }
     ],
-    4: [ 
-        { q: "Which constraint forces two lines to meet at a 90-degree angle?", opts: ["Perpendicular", "Tangent", "Coincident", "Parallel"], ans: "Perpendicular" },
-        { q: "Which geometric constraint forces two circles to share the same center?", opts: ["Concentric", "Coincident", "Collinear", "Tangent"], ans: "Concentric" },
-        { q: "Drawing a 2D shape and giving it thickness is called:", opts: ["Extrusion", "Revolution", "Loft", "Sweep"], ans: "Extrusion" },
-        { q: "What CAD tool creates a 3D model by spinning a 2D profile around an axis?", opts: ["Revolve", "Extrude", "Sweep", "Loft"], ans: "Revolve" },
-        { q: "Which operation creates a transitional sloped edge between two faces?", opts: ["Chamfer", "Fillet", "Shell", "Extrude"], ans: "Chamfer" },
-        { q: "Moving an object along a straight line axis in CAD is known as:", opts: ["Translation", "Rotation", "Scaling", "Sweeping"], ans: "Translation" },
-        { q: "Which feature is used to hollow out a part, leaving a specified wall thickness?", opts: ["Shell", "Loft", "Sweep", "Cut"], ans: "Shell" },
-        { q: "Duplicating a feature in a ring around an axis is done using a:", opts: ["Circular Pattern", "Linear Pattern", "Mirror", "Revolve"], ans: "Circular Pattern" },
-        { q: "When using the Extrude tool, which option cuts away material?", opts: ["Remove/Cut", "Add/Join", "Intersect", "New"], ans: "Remove/Cut" },
-        { q: "What must be applied to a 2D sketch to define its exact size?", opts: ["Dimensions", "Constraints", "Materials", "Hatching"], ans: "Dimensions" },
-        { q: "In CAD, drawing features are mathematically driven by parameters, known as:", opts: ["Parametric Modeling", "Direct Modeling", "Surface Modeling", "Mesh Modeling"], ans: "Parametric Modeling" },
-        { q: "The list of features applied to a CAD model in chronological order is the:", opts: ["Browser / History Tree", "Assembly tree", "Materials list", "Properties window"], ans: "Browser / History Tree" },
-        { q: "A file containing multiple part files mated together is an:", opts: ["Assembly", "Drawing", "Part", "Presentation"], ans: "Assembly" },
-        { q: "Flat, 2D surfaces used for sketching in CAD are called:", opts: ["Work Planes", "Axes", "Origins", "Views"], ans: "Work Planes" },
-        { q: "When using Center Engraving on the Epilog laser driver, what value should NOT be entered for the X direction?", opts: ["0", "Center point", "Width", "DPI"], ans: "0" },
-        { q: "Which constraint makes two circles or arcs equal in radius?", opts: ["Equal", "Tangent", "Concentric", "Coincident"], ans: "Equal" },
-        { q: "Which constraint forces a line to run exactly horizontally or vertically?", opts: ["Horizontal/Vertical", "Parallel", "Collinear", "Perpendicular"], ans: "Horizontal/Vertical" },
-        { q: "Which constraint makes a circle touch a line at exactly one point?", opts: ["Tangent", "Coincident", "Concentric", "Intersect"], ans: "Tangent" },
-        { q: "Which feature blends two or more un-alike profiles to create a complex shape?", opts: ["Loft", "Sweep", "Extrude", "Revolve"], ans: "Loft" },
-        { q: "Which feature pushes a 2D profile along a path to create a 3D shape?", opts: ["Sweep", "Loft", "Extrude", "Shell"], ans: "Sweep" },
-        { q: "To mirror a 2D sketch, you must have a profile and a:", opts: ["Mirror Line", "Point", "Plane", "Circle"], ans: "Mirror Line" },
-        { q: "A CAD feature that adds a structural support or web to a part is a:", opts: ["Rib", "Shell", "Fillet", "Draft"], ans: "Rib" },
-        { q: "Duplicating a feature in rows and columns is done using a:", opts: ["Linear Pattern", "Circular Pattern", "Mirror", "Sweep"], ans: "Linear Pattern" },
-        { q: "When parts are brought into an assembly, the first part is usually:", opts: ["Grounded / Fixed", "Deleted", "Mirrored", "Revolved"], ans: "Grounded / Fixed" },
-        { q: "What dictates the way parts can move relative to each other in an assembly?", opts: ["Assembly Constraints/Mates", "Dimensions", "Materials", "Sketches"], ans: "Assembly Constraints/Mates" },
-        { q: "Which mate constraint aligns two cylindrical faces along their center axis?", opts: ["Cylindrical/Insert Mate", "Flush Mate", "Angle Mate", "Tangent Mate"], ans: "Cylindrical/Insert Mate" },
-        { q: "A CAD feature used to angle a surface to allow parts to be removed from a mold is:", opts: ["Draft", "Fillet", "Chamfer", "Shell"], ans: "Draft" },
-        { q: "To create a threaded hole in a part, you use the:", opts: ["Hole Tool", "Extrude Tool", "Revolve Tool", "Sweep Tool"], ans: "Hole Tool" },
-        { q: "Which mathematical operation keeps only the volume shared by two intersecting parts?", opts: ["Intersect", "Join", "Cut", "Subtract"], ans: "Intersect" },
-        { q: "An editable numerical value used to drive CAD geometry is a:", opts: ["Parameter", "Tolerance", "Constraint", "Feature"], ans: "Parameter" }
+
+    // UNIT 4: Intro to CAD
+    4: [
+        {
+            q: "Which tool in Onshape takes a 2D profile and pushes it into 3D space to add volume?",
+            opts: ["Revolve", "Sweep", "Extrude", "Loft"],
+            ans: "Extrude",
+            exp: "The Extrude tool adds depth to a 2D sketch, pulling it straight out in a perpendicular direction.",
+            src: "Onshape Tutorials"
+        },
+        {
+            q: "Which geometric constraint forces two lines to meet at exactly 90 degrees?",
+            opts: ["Parallel", "Tangent", "Coincident", "Perpendicular"],
+            ans: "Perpendicular",
+            exp: "The Perpendicular constraint ensures that the angle between two selected line segments remains locked at 90 degrees.",
+            src: "Onshape Tutorials"
+        },
+        {
+            q: "What is the first step to creating a 3D solid model in CAD?",
+            opts: ["Extrude a face", "Select a sketch plane", "Apply a fillet", "Dimension the part"],
+            ans: "Select a sketch plane",
+            exp: "Before you can sketch the 2D profile, you must tell the software which flat plane (Front, Top, or Right) you are drawing on.",
+            src: "Onshape Tutorials"
+        },
+        {
+            q: "Which tool takes a 2D sketch and spins it around an axis to create a 3D solid?",
+            opts: ["Extrude", "Revolve", "Loft", "Sweep"],
+            ans: "Revolve",
+            exp: "The Revolve tool requires a 2D profile and a straight axis line to spin that profile around.",
+            src: "Onshape Tutorials"
+        },
+        {
+            q: "What does the 'Fillet' tool do?",
+            opts: ["Rounds over a sharp edge", "Chambers an edge at an angle", "Hollows out a part", "Combines two parts together"],
+            ans: "Rounds over a sharp edge",
+            exp: "A fillet removes sharp 90-degree edges by adding a curved radius.",
+            src: "Onshape Tutorials"
+        }
     ],
-    5: [ 
-        { q: "Taking apart a product to understand how it works is:", opts: ["Reverse Engineering", "Prototyping", "Brainstorming", "Value Analysis"], ans: "Reverse Engineering" },
-        { q: "Which analysis step involves identifying inputs and outputs?", opts: ["Functional Analysis", "Visual Analysis", "Structural Analysis", "Material Analysis"], ans: "Functional Analysis" },
-        { q: "Analyzing the color, rhythm, and proportion of a product is:", opts: ["Visual Analysis", "Structural Analysis", "Functional Analysis", "Kinematic Analysis"], ans: "Visual Analysis" },
-        { q: "Disassembling a product and detailing its parts and fasteners is:", opts: ["Structural Analysis", "Visual Analysis", "Functional Analysis", "Market Analysis"], ans: "Structural Analysis" },
-        { q: "A non-functional, physical representation of a design is a:", opts: ["Mock-up", "Prototype", "Working Model", "CAD file"], ans: "Mock-up" },
-        { q: "A primary reason a company might reverse engineer a product is:", opts: ["To improve own designs", "To build a portfolio", "To teach employees CAD", "To write a design brief"], ans: "To improve own designs" },
-        { q: "During a teardown, what is the most important step for reassembly?", opts: ["Documentation", "Destructive Testing", "Painting", "Melting components"], ans: "Documentation" },
-        { q: "Analyzing how physical forces affect a part is part of:", opts: ["Structural Analysis", "Visual Analysis", "Aesthetic Analysis", "Market Analysis"], ans: "Structural Analysis" },
-        { q: "A 'Black Box' systems model focuses primarily on:", opts: ["Inputs and Outputs", "Internal gears", "Color choices", "Manufacturing cost"], ans: "Inputs and Outputs" },
-        { q: "The main purpose of a product teardown is to:", opts: ["Discover how it works", "Destroy the product", "Recycle the plastics", "Test failure point"], ans: "Discover how it works" },
-        { q: "A design principle where elements are mirrored across an axis is:", opts: ["Symmetry", "Asymmetry", "Rhythm", "Proportion"], ans: "Symmetry" },
-        { q: "The point where the entire weight of an object is assumed to be concentrated is:", opts: ["Center of Gravity", "Centroid", "Origin", "Fulcrum"], ans: "Center of Gravity" },
-        { q: "Mass, volume, density, and surface area are examples of:", opts: ["Mass Properties", "Visual Elements", "Functional Inputs", "Aesthetic Principles"], ans: "Mass Properties" },
-        { q: "In visual design, 'Form follows...'?", opts: ["Function", "Aesthetics", "Cost", "Color"], ans: "Function" },
-        { q: "Which of the following is NOT an element of visual design?", opts: ["Cost", "Line", "Color", "Texture"], ans: "Cost" },
-        { q: "The visual element that describes how a surface feels or looks like it feels is:", opts: ["Texture", "Color", "Value", "Space"], ans: "Texture" },
-        { q: "The design principle of emphasizing one feature over others is called:", opts: ["Emphasis", "Rhythm", "Balance", "Economy"], ans: "Emphasis" },
-        { q: "Using bare minimum elements to achieve a design goal is the principle of:", opts: ["Economy", "Contrast", "Unity", "Balance"], ans: "Economy" },
-        { q: "Creating a sense of movement or pattern through repetition is:", opts: ["Rhythm", "Emphasis", "Proportion", "Symmetry"], ans: "Rhythm" },
-        { q: "Which visual element describes an enclosed 2D area (like a circle or square)?", opts: ["Shape", "Form", "Line", "Value"], ans: "Shape" },
-        { q: "Which visual element describes a 3D volume (like a sphere or cube)?", opts: ["Form", "Shape", "Line", "Space"], ans: "Form" },
-        { q: "A chart documenting parts, quantities, and materials during teardown is a:", opts: ["Bill of Materials", "Gantt Chart", "Decision Matrix", "Design Brief"], ans: "Bill of Materials" },
-        { q: "Evaluating how a product interacts with the human body is:", opts: ["Ergonomics", "Aesthetics", "Kinematics", "Economics"], ans: "Ergonomics" },
-        { q: "Which type of balance occurs when elements are not mirrored but still look balanced?", opts: ["Asymmetrical", "Symmetrical", "Radial", "Vertical"], ans: "Asymmetrical" },
-        { q: "Which type of balance radiates outward from a central point?", opts: ["Radial", "Symmetrical", "Asymmetrical", "Linear"], ans: "Radial" },
-        { q: "The degree of lightness or darkness of a color is its:", opts: ["Value", "Hue", "Saturation", "Texture"], ans: "Value" },
-        { q: "The name of a color (red, blue, green) is its:", opts: ["Hue", "Value", "Saturation", "Intensity"], ans: "Hue" },
-        { q: "Which structural element holds parts together temporarily or permanently?", opts: ["Fastener", "Bearing", "Axle", "Cam"], ans: "Fastener" },
-        { q: "A drawing created after a product is built to reflect exactly how it was made is an:", opts: ["As-Built Drawing", "Exploded View", "Concept Sketch", "Isometric Sketch"], ans: "As-Built Drawing" },
-        { q: "What describes the relationship of size between different parts of a design?", opts: ["Proportion", "Balance", "Rhythm", "Unity"], ans: "Proportion" }
+
+    // UNIT 5: Reverse Engineering
+    5: [
+        {
+            q: "What are the three stages of reverse engineering?",
+            opts: ["Visual, Functional, Structural", "Design, Build, Test", "Input, Process, Output", "Analyze, Destroy, Rebuild"],
+            ans: "Visual, Functional, Structural",
+            exp: "Reverse engineering starts with visual analysis, moves to functional testing (inputs/outputs), and ends with structural teardown.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "The purpose of a product teardown is to:",
+            opts: ["Find a way to make the product cheaper", "Understand how the parts interact and function", "Destroy a competitor's product", "Recycle the materials"],
+            ans: "Understand how the parts interact and function",
+            exp: "Teardowns allow engineers to inspect internal components, document how they assemble, and understand the structural mechanics.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Identifying the 'inputs' and 'outputs' of a mechanism occurs during which stage?",
+            opts: ["Visual Analysis", "Structural Analysis", "Functional Analysis", "Redesign Phase"],
+            ans: "Functional Analysis",
+            exp: "Functional analysis treats the product as a 'black box' to observe what goes into it and what it produces.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Balance, Proportion, Contrast, and Symmetry are all examples of:",
+            opts: ["Elements of Design", "Principles of Design", "Structural Analysis", "Material Properties"],
+            ans: "Principles of Design",
+            exp: "The Principles of Design describe how the Elements of Design (Line, Color, Form, etc.) are applied to a product.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Taking apart a pen to see how the spring interacts with the ink cartridge is an example of:",
+            opts: ["Visual Analysis", "Functional Analysis", "Structural Analysis", "Mathematical Analysis"],
+            ans: "Structural Analysis",
+            exp: "Structural analysis requires a physical teardown to see how the internal components are assembled and interact.",
+            src: "PLTW Curriculum"
+        }
     ],
-    6: [ 
-        { q: "A working drawing assembly usually contains parts, and a:", opts: ["Parts List (BOM)", "Decision Matrix", "Gantt Chart", "Design Brief"], ans: "Parts List (BOM)" },
-        { q: "Which dimension type locates the center of a hole from an edge?", opts: ["Location Dimension", "Size Dimension", "Radius Dimension", "Diameter Dimension"], ans: "Location Dimension" },
-        { q: "A hole that does not go completely through a part is a:", opts: ["Blind Hole", "Thru Hole", "Countersink", "Counterbore"], ans: "Blind Hole" },
-        { q: "Which tolerance specifies a target with an equal plus and minus variance?", opts: ["Bilateral", "Unilateral", "Limit", "General"], ans: "Bilateral" },
-        { q: "According to guidelines, you should NEVER dimension to a:", opts: ["Hidden Line", "Center Line", "Object Line", "Extension Line"], ans: "Hidden Line" },
-        { q: "Which assembly constraint makes two flat faces exactly even with each other?", opts: ["Flush", "Mate", "Insert", "Tangent"], ans: "Flush" },
-        { q: "What type of view shows how parts fit together by pulling them apart?", opts: ["Exploded View", "Section View", "Detail View", "Auxiliary View"], ans: "Exploded View" },
-        { q: "When placing dimensions, the overall dimension should be placed:", opts: ["Farthest from view", "Closest to view", "Inside the view", "Attached to hidden line"], ans: "Farthest from view" },
-        { q: "The tightest possible fit between two mating parts is called the:", opts: ["Allowance", "Clearance", "Tolerance", "Deviation"], ans: "Allowance" },
-        { q: "Dimensioning from a single point of origin (datum) reduces:", opts: ["Tolerance Accumulation", "Material Cost", "CAD File Size", "Surface Area"], ans: "Tolerance Accumulation" },
-        { q: "Dimensioning features continuously from end to end is called:", opts: ["Chain Dimensioning", "Datum Dimensioning", "Baseline Dimensioning", "Ordinate Dimensioning"], ans: "Chain Dimensioning" },
-        { q: "A fit where two parts always have a space between them is a:", opts: ["Clearance Fit", "Interference Fit", "Transition Fit", "Force Fit"], ans: "Clearance Fit" },
-        { q: "A fit where two parts are forced together (internal larger than external hole) is a:", opts: ["Interference Fit", "Clearance Fit", "Sliding Fit", "Running Fit"], ans: "Interference Fit" },
-        { q: "To permanently lock two parts together in an Onshape assembly, you should use a:", opts: ["Fastened Mate", "Fixed Constraint", "Flush Mate", "Slider Mate"], ans: "Fastened Mate" },
-        { q: "In Onshape, mates are attached to specific coordinate systems on parts known as:", opts: ["Mate Connectors", "Origins", "Datum Planes", "Nodes"], ans: "Mate Connectors" },
-        { q: "Circles and drilled holes should be dimensioned by their:", opts: ["Diameter", "Radius", "Circumference", "Area"], ans: "Diameter" },
-        { q: "Arcs (incomplete circles) should be dimensioned by their:", opts: ["Radius", "Diameter", "Chord", "Arc Length"], ans: "Radius" },
-        { q: "Which view zooms in on a small, complex part of a drawing for clarity?", opts: ["Detail View", "Section View", "Auxiliary View", "Exploded View"], ans: "Detail View" },
-        { q: "Which view is used to show a slanted surface in its true size and shape?", opts: ["Auxiliary View", "Section View", "Detail View", "Isometric View"], ans: "Auxiliary View" },
-        { q: "A hole with a conical recess to allow a screw head to sit flush is a:", opts: ["Countersink", "Counterbore", "Tapped Hole", "Blind Hole"], ans: "Countersink" },
-        { q: "A hole with a cylindrical recess to allow a bolt head to sit flush is a:", opts: ["Counterbore", "Countersink", "Tapped Hole", "Blind Hole"], ans: "Counterbore" },
-        { q: "A hole that has internal threads cut into it is called a:", opts: ["Tapped Hole", "Clearance Hole", "Blind Hole", "Countersink"], ans: "Tapped Hole" },
-        { q: "The looseness or tightness of a fit between mating parts is the:", opts: ["Allowance", "Tolerance", "Deviation", "Clearance"], ans: "Allowance" },
-        { q: "In an exploded view drawing, parts are linked by:", opts: ["Trail Lines / Tweak Lines", "Extension Lines", "Object Lines", "Hidden Lines"], ans: "Trail Lines / Tweak Lines" },
-        { q: "A circle with a number inside that points to a part in an assembly drawing is a:", opts: ["Balloon", "Bubble", "Note", "Detail Callout"], ans: "Balloon" },
-        { q: "What tolerance is given as +0.05 and -0.00?", opts: ["Unilateral", "Bilateral", "Limit", "General"], ans: "Unilateral" },
-        { q: "What tolerance provides only the absolute maximum and minimum allowed sizes?", opts: ["Limit", "Bilateral", "Unilateral", "General"], ans: "Limit" },
-        { q: "If a part is dimensioned 2.00 +/- 0.10, the total tolerance is:", opts: ["0.20", "0.10", "2.10", "1.90"], ans: "0.20" },
-        { q: "Where should dimensions generally be placed in a multiview drawing?", opts: ["Between the views", "Inside the object", "Above the top view", "Below the front view"], ans: "Between the views" },
-        { q: "The 'X' in a hole dimension note (e.g., 4X Ø0.50) indicates:", opts: ["Number of identical holes", "Multiplier", "Unknown variable", "Cross section"], ans: "Number of identical holes" }
+
+    // UNIT 6: Dimensioning
+    6: [
+        {
+            q: "What is datum dimensioning?",
+            opts: ["Dimensions are chained end-to-end", "All dimensions originate from a common point or line", "Dimensions are only placed on the top view", "Dimensions are given without tolerances"],
+            ans: "All dimensions originate from a common point or line",
+            exp: "Datum dimensioning (or baseline dimensioning) reduces tolerance buildup by starting all measurements from a single reference edge.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "An acceptable amount of dimensional variation that will still allow a part to function correctly is called:",
+            opts: ["Clearance", "Interference", "Tolerance", "Allowance"],
+            ans: "Tolerance",
+            exp: "Tolerance is the total variance allowed in a measurement (Upper Limit - Lower Limit).",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Which of the following is a strict dimensioning rule?",
+            opts: ["Always dimension to hidden lines", "Cross dimension lines whenever possible", "Do not over-dimension a part", "Place dimensions inside the object boundaries"],
+            ans: "Do not over-dimension a part",
+            exp: "Over-dimensioning causes confusion and manufacturing conflicts. A feature should only be dimensioned once.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Which type of fit occurs when two toleranced parts will always leave a gap when assembled?",
+            opts: ["Interference Fit", "Clearance Fit", "Transition Fit", "Allowance Fit"],
+            ans: "Clearance Fit",
+            exp: "A clearance fit ensures that the largest internal part will still fit freely into the smallest external opening.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "A hole that goes completely through a part is designated with what symbol?",
+            opts: ["THRU", "DEPTH", "CBORE", "CSINK"],
+            ans: "THRU",
+            exp: "THRU indicates that the hole penetrates the entire thickness of the object.",
+            src: "PLTW Curriculum"
+        }
     ],
-    // Add or replace your Unit 7 array in questions.js with this:
-pltwBanks[7] = [
-    { 
-        q: "The point on a stress-strain curve where elastic deformation ends and plastic deformation begins is known as what?", 
-        opts: ["Yield Strength", "Tensile Strength", "Fracture Point", "Elastic Limit"], 
-        ans: "Yield Strength",
-        exp: "Yield strength marks the specific point where the material stops stretching reversibly and begins to permanently deform.",
-        src: "Properties of Engineering Materials Worksheet"
-    },
-    { 
-        q: "Which property describes a material's ability to undergo significant plastic deformation before rupture?", 
-        opts: ["Ductility", "Brittleness", "Hardness", "Toughness"], 
-        ans: "Ductility",
-        exp: "Ductile materials (like copper) can be drawn into wires. Brittle materials break without significant permanent deformation.",
-        src: "Properties of Engineering Materials Worksheet"
-    },
-    { 
-        q: "What is the formula for calculating stress (σ)?", 
-        opts: ["Force / Area", "Force x Area", "Mass / Volume", "Strain x Modulus"], 
-        ans: "Force / Area",
-        exp: "Stress is the internal resistance to an external load, calculated as the applied Force divided by the cross-sectional Area.",
-        src: "Properties of Engineering Materials Worksheet"
-    },
-    { 
-        q: "The slope of the linear portion of a stress-strain curve represents what property?", 
-        opts: ["Modulus of Elasticity", "Ultimate Strength", "Density", "Strain"], 
-        ans: "Modulus of Elasticity",
-        exp: "Also known as Young's Modulus, this slope represents the stiffness of a solid material.",
-        src: "Properties of Engineering Materials Worksheet"
-    },
-    { 
-        q: "What is the maximum stress a material can withstand before necking and eventual fracture?", 
-        opts: ["Ultimate Tensile Strength", "Yield Point", "Rupture Point", "Proportional Limit"], 
-        ans: "Ultimate Tensile Strength",
-        exp: "Ultimate Tensile Strength (UTS) is the absolute highest point reached on the stress-strain curve.",
-        src: "Properties of Engineering Materials Worksheet"
-    }
-];
-    8: [ 
-        { q: "The formula for Mechanical Advantage is:", opts: ["Output Force / Input Force", "Work / Time", "Force * Distance", "Mass * Acceleration"], ans: "Output Force / Input Force" },
-        { q: "A mechanism consisting of a rotating profile and a follower is a:", opts: ["Cam and Follower", "Rack and Pinion", "Gear Train", "Lever"], ans: "Cam and Follower" },
-        { q: "Which type of friction occurs when surfaces are sliding past each other?", opts: ["Kinetic Friction", "Static Friction", "Rolling Friction", "Fluid Friction"], ans: "Kinetic Friction" },
-        { q: "Hooke's Law relates to the force exerted by a:", opts: ["Spring", "Cam", "Gear", "Lever"], ans: "Spring" },
-        { q: "Work is defined as:", opts: ["Force x Distance", "Mass x Acceleration", "Power x Time", "Output / Input"], ans: "Force x Distance" },
-        { q: "The gear ratio of a simple gear train is calculated by dividing teeth on the:", opts: ["Driven by Driver", "Driver by Driven", "Idler by Driver", "Driven by Idler"], ans: "Driven by Driver" },
-        { q: "The purpose of an idler gear is to:", opts: ["Change direction (no ratio change)", "Increase ratio", "Decrease torque", "Increase speed"], ans: "Change direction (no ratio change)" },
-        { q: "A lever with the fulcrum directly between the effort and load is a:", opts: ["1st Class Lever", "2nd Class Lever", "3rd Class Lever", "4th Class Lever"], ans: "1st Class Lever" },
-        { q: "The force of static friction is generally ____ than the force of kinetic friction.", opts: ["Greater", "Less", "Equal to", "Unrelated to"], ans: "Greater" },
-        { q: "In Hooke's Law (F = kx), what does 'k' represent?", opts: ["Spring Constant", "Kinetic Energy", "Mass", "Distance"], ans: "Spring Constant" },
-        { q: "Ideal Mechanical Advantage (IMA) does NOT account for:", opts: ["Friction", "Distance", "Input Length", "Output Length"], ans: "Friction" },
-        { q: "A wheel with a groove for a rope or cable is a:", opts: ["Pulley", "Gear", "Sprocket", "Cam"], ans: "Pulley" },
-        { q: "An inclined plane wrapped around a cylinder creates a:", opts: ["Screw", "Wedge", "Cam", "Rack and Pinion"], ans: "Screw" },
-        { q: "If a motor spins a small 10-tooth gear driving a 30-tooth gear, the output has:", opts: ["More torque, less speed", "More torque, more speed", "Less torque, more speed", "Less torque, less speed"], ans: "More torque, less speed" },
-        { q: "Power is defined as:", opts: ["Work divided by Time", "Force times Distance", "Mass times Acceleration", "Input divided by Output"], ans: "Work divided by Time" },
-        { q: "A lever with the load between the fulcrum and the effort is a:", opts: ["2nd Class Lever", "1st Class Lever", "3rd Class Lever", "4th Class Lever"], ans: "2nd Class Lever" },
-        { q: "A lever with the effort between the fulcrum and the load is a:", opts: ["3rd Class Lever", "2nd Class Lever", "1st Class Lever", "4th Class Lever"], ans: "3rd Class Lever" },
-        { q: "A mechanism that converts rotary motion into linear motion is a:", opts: ["Rack and Pinion", "Bevel Gear", "Worm Gear", "Belt and Pulley"], ans: "Rack and Pinion" },
-        { q: "Which gear type allows motion to be transmitted at a 90-degree angle?", opts: ["Bevel Gear", "Spur Gear", "Rack and Pinion", "Sprocket"], ans: "Bevel Gear" },
-        { q: "A twisting force that causes rotation is called:", opts: ["Torque", "Tension", "Shear", "Work"], ans: "Torque" },
-        { q: "The ratio of AMA to IMA is used to calculate a machine's:", opts: ["Efficiency", "Power", "Work", "Torque"], ans: "Efficiency" },
-        { q: "Two inclined planes placed back to back form a:", opts: ["Wedge", "Screw", "Pulley", "Lever"], ans: "Wedge" },
-        { q: "In a pulley system, the IMA is generally equal to the number of:", opts: ["Supporting rope strands", "Pulleys", "Weights", "Gears"], ans: "Supporting rope strands" },
-        { q: "Which system uses a chain instead of a belt to transmit power?", opts: ["Sprocket and Chain", "Pulley and Belt", "Gear Train", "Cam and Follower"], ans: "Sprocket and Chain" },
-        { q: "If Driver gear has 20 teeth and Driven has 60, the Gear Ratio is:", opts: ["3:1", "1:3", "20:1", "60:1"], ans: "3:1" },
-        { q: "If a machine has an IMA of 4 and an AMA of 2, its efficiency is:", opts: ["50%", "200%", "2%", "8%"], ans: "50%" },
-        { q: "A gear system where a single tooth gear drives a larger gear, offering massive torque increase:", opts: ["Worm and Wheel", "Rack and Pinion", "Bevel Gear", "Spur Gear"], ans: "Worm and Wheel" },
-        { q: "The distance between two adjacent threads on a screw is the:", opts: ["Pitch", "Diameter", "Circumference", "Lead"], ans: "Pitch" },
-        { q: "A fixed point around which a lever rotates is the:", opts: ["Fulcrum", "Effort", "Load", "Resistance"], ans: "Fulcrum" },
-        { q: "If input distance is 10ft and output distance is 2ft, the IMA is:", opts: ["5", "0.2", "20", "8"], ans: "5" }
+
+    // UNIT 7: Properties (30 Questions specific to provided documents and videos)
+    7: [
+        {
+            q: "According to the Cobb Digital Library overview, why shouldn't you 'just Google it' when researching?",
+            opts: ["Anyone can publish on the Internet without evaluation", "Search engines are too slow", "Google costs money", "Google filters out academic journals"],
+            ans: "Anyone can publish on the Internet without evaluation",
+            exp: "Information on the internet is not evaluated for accuracy and may be incorrect, misleading, or biased[cite: 31, 32].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "When evaluating an internet source, what does 'Currency' evaluate?",
+            opts: ["The timeliness of the information", "The cost of the article", "The source of the information", "The author's intent"],
+            ans: "The timeliness of the information",
+            exp: "Currency asks if the information is recent enough for your specific research needs[cite: 44, 72].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "When evaluating a source, what does 'Relevance' refer to?",
+            opts: ["The importance of the information for your needs", "Who wrote the information", "The truthfulness of the content", "When the article was published"],
+            ans: "The importance of the information for your needs",
+            exp: "Relevance determines the importance of the information for your needs and where it comes from[cite: 52, 73].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "When evaluating a source, what does 'Authority' refer to?",
+            opts: ["Who wrote the information", "Where the information comes from", "The reliability of the content", "The author's intent"],
+            ans: "Who wrote the information",
+            exp: "Authority checks the source of the information, looking closely at who the author is[cite: 60, 74].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "What does 'Accuracy' mean when evaluating a website?",
+            opts: ["The information is supported by facts and data", "The website looks professional", "The author has a PhD", "The site is updated daily"],
+            ans: "The information is supported by facts and data",
+            exp: "Accuracy measures the reliability, truthfulness, and correctness of the content by checking if it is supported by facts[cite: 68, 75].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "What does the 'Purpose' of a source evaluate?",
+            opts: ["What the author's intent is", "How much the source costs", "The date it was published", "The spelling and grammar"],
+            ans: "What the author's intent is",
+            exp: "Evaluating the purpose of a source means uncovering the author's intent and whether they have an ulterior motive[cite: 76].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "Which of the following is considered the MOST reliable source type?",
+            opts: ["Peer-reviewed academic journals", "Unfamiliar websites", "Blogs", "Individual business websites"],
+            ans: "Peer-reviewed academic journals",
+            exp: "Academic journal articles are reviewed by experts in the field before publication, making them highly reliable[cite: 85, 86, 106].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "Why is a sponsored source or one with a clear bias considered 'Less Reliable'?",
+            opts: ["Because the entity may have an ulterior motive", "Because it is not peer-reviewed", "Because the author is uncredited", "Because it is too current"],
+            ans: "Because the entity may have an ulterior motive",
+            exp: "Materials published by an entity with an ulterior motive lack balance and neutrality, which compromises their objectivity[cite: 100, 101, 111].",
+            src: "Evaluating Resources Full Presentation"
+        },
+        {
+            q: "What property is used by engineers to estimate the weight of a product and identify unknown materials?",
+            opts: ["Density", "Specific heat", "Hardness", "Ductility"],
+            ans: "Density",
+            exp: "Density is a measure of mass per volume used to estimate a product's weight[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "The stress level at which a material begins to permanently deform is known as what?",
+            opts: ["Yield strength", "Ultimate tensile strength", "Shear modulus", "Ductility"],
+            ans: "Yield strength",
+            exp: "The higher the yield strength of a material, the more it resists permanent deformation[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "What is the maximum stress a material's cross-section can handle by a tension force before failing rapidly?",
+            opts: ["Ultimate tensile strength", "Yield strength", "Shear modulus", "Ductility"],
+            ans: "Ultimate tensile strength",
+            exp: "If the ultimate tensile strength is reached, the material will fail rapidly unless the applied load is removed[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "Which property describes a material's tendency to resist twisting?",
+            opts: ["Shear modulus", "Young's modulus", "Fracture toughness", "Thermal conductivity"],
+            ans: "Shear modulus",
+            exp: "Also called the modulus of rigidity, a larger shear modulus means a more rigid material that resists twisting[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "Young’s modulus of elasticity is defined as the ratio of:",
+            opts: ["Stress to strain in tension", "Mass to volume", "Force to area", "Heat to temperature"],
+            ans: "Stress to strain in tension",
+            exp: "It describes the tendency of an object to deform along an axis when opposing forces are applied. The higher the value, the stiffer the material[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "A material with a high value of ductility is best suited for what manufacturing process?",
+            opts: ["Rolling and drawing into wire", "Supporting heavy compressive loads", "Resisting high temperatures", "Insulating electricity"],
+            ans: "Rolling and drawing into wire",
+            exp: "Ductility is the ability to tolerate stretching without breaking. Brittle materials, such as ceramics, have low ductility[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "A material that can absorb a lot of impact energy without breaking is described as having high:",
+            opts: ["Toughness", "Hardness", "Density", "Conductivity"],
+            ans: "Toughness",
+            exp: "Toughness defines a material’s ability to tolerate impact energy without breaking or fracturing[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "Which property defines a material's ability to resist various forms of indentation and penetration on its surface?",
+            opts: ["Hardness", "Toughness", "Strength", "Density"],
+            ans: "Hardness",
+            exp: "The harder the material, the smaller the indentation an object (like a diamond) will leave when pressed into it[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "A high value of electrical resistivity is favored in materials that will provide what?",
+            opts: ["Electrical insulation", "Electrical conductivity", "Thermal expansion", "Structural support"],
+            ans: "Electrical insulation",
+            exp: "Electrical resistivity defines how well a material resists conducting an electric current, making it vital for insulation[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "If an engineer is designing a product that needs to quickly move heat away from a source, they should look for a material with high:",
+            opts: ["Thermal conductivity", "Specific heat", "Electrical resistivity", "Shear modulus"],
+            ans: "Thermal conductivity",
+            exp: "A high value of thermal conductivity means heat flows easily in the solid material[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "Why must engineers consider the coefficient of thermal expansion when joining materials?",
+            opts: ["Most materials expand when heated, causing thermal stress", "Materials might conduct electricity when joined", "It determines the ultimate tensile strength", "It alters the specific heat"],
+            ans: "Most materials expand when heated, causing thermal stress",
+            exp: "A high value of thermal expansion between joined materials can induce severe stresses and needs to be considered[cite: 120].",
+            src: "Properties of Engineering Materials Chart"
+        },
+        {
+            q: "Which class of materials is characterized by containing iron, making them typically magnetic and dense?",
+            opts: ["Ferrous Metals", "Nonferrous Metals", "Ceramics", "Polymers"],
+            ans: "Ferrous Metals",
+            exp: "Because ferrous metals contain iron, most are magnetic[cite: 126]. They are typically strong and durable[cite: 127].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "What is a primary advantage of nonferrous metals?",
+            opts: ["They do not contain iron, making them less susceptible to rust", "They are highly magnetic", "They are excellent thermal insulators", "They are naturally brittle"],
+            ans: "They do not contain iron, making them less susceptible to rust",
+            exp: "Nonferrous metals do not contain iron, making them less susceptible to rust and corrosion[cite: 130].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "Brass and bronze are examples of what type of material?",
+            opts: ["Alloys", "Pure elements", "Composites", "Ceramics"],
+            ans: "Alloys",
+            exp: "Alloys are solid mixtures of elements used to improve material properties compared to the pure base metal[cite: 132, 133].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "Which material class is inorganic, non-metallic, an electrical insulator, and often brittle?",
+            opts: ["Ceramics", "Polymers", "Hardwoods", "Composites"],
+            ans: "Ceramics",
+            exp: "Ceramics are generally stiff and strong but somewhat brittle[cite: 139]. They are excellent heat and electrical insulators[cite: 138, 141].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "Polymers are organic molecules formed mainly from carbon, hydrogen, and oxygen in what kind of structure?",
+            opts: ["Chain-like structure", "Crystalline lattice", "Metallic bond", "Matrix and reinforcement"],
+            ans: "Chain-like structure",
+            exp: "Polymers are organic molecules that are chain-like in structure[cite: 145]. They tend to be very good insulators of heat and electricity[cite: 148].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "What defines a composite material?",
+            opts: ["Physically combining two or more materials that retain their identities", "Chemically reacting two metals", "Melting a polymer and a ceramic together", "A pure elemental structure"],
+            ans: "Physically combining two or more materials that retain their identities",
+            exp: "A composite is not a mixture; each component (matrix and reinforcement) retains its identity while providing unique properties[cite: 152, 153].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "In a composite material, what is the role of the reinforcement material?",
+            opts: ["Provides structural support and enhances physical properties", "Gives the composite its overall bulk form", "Acts as an electrical insulator", "Makes the material transparent"],
+            ans: "Provides structural support and enhances physical properties",
+            exp: "The matrix gives bulk form [cite: 155], while the reinforcement (like carbon fibers) provides strength and support[cite: 156].",
+            src: "Uses of Common Materials Document"
+        },
+        {
+            q: "Where do you find the Mass Properties icon in Onshape?",
+            opts: ["The lower right corner of the graphics area", "The top toolbar", "The view cube", "The feature list"],
+            ans: "The lower right corner of the graphics area",
+            exp: "The Mass Properties icon is located in the very lower right corner of the Onshape interface.",
+            src: "Mass Properties and Materials in Onshape (YouTube)"
+        },
+        {
+            q: "If Onshape does not display the mass of a part, what step is likely missing?",
+            opts: ["A material has not been assigned", "The part is not enclosed", "The density is zero", "The drawing is open"],
+            ans: "A material has not been assigned",
+            exp: "Onshape calculates volume automatically, but it needs an assigned material to determine the density and calculate the mass.",
+            src: "Mass Properties and Materials in Onshape (YouTube)"
+        },
+        {
+            q: "In a tensile test, what happens during the 'plastic deformation' region?",
+            opts: ["The material undergoes permanent deformation", "The material can regain its original shape", "The material fractures instantly", "The force is removed"],
+            ans: "The material undergoes permanent deformation",
+            exp: "Once a material passes its yield point, it enters plastic deformation where changes in shape become permanent.",
+            src: "Material Properties 101 (YouTube)"
+        },
+        {
+            q: "What caused the catastrophic failure of the WW2 Liberty ships in the Bearing Sea?",
+            opts: ["The steel embrittled at low temperatures", "They used too much carbon in the wood", "The shear modulus was too high", "They were hit by projectiles"],
+            ans: "The steel embrittled at low temperatures",
+            exp: "The grade of steel used transitioned from ductile to brittle when exposed to the freezing temperatures of the Bearing Sea.",
+            src: "Material Properties 101 (YouTube)"
+        }
+    ],
+
+    // UNIT 8: Mechanisms (Cams & Friction)
+    8: [
+        {
+            q: "What is the formula for calculating the Gear Ratio (GR) between two gears?",
+            opts: ["Driven / Driver", "Driver / Driven", "Torque x Speed", "Diameter + Teeth"],
+            ans: "Driven / Driver",
+            exp: "Gear ratio is calculated by dividing the number of teeth on the output (driven) gear by the input (driver) gear.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "What is the primary purpose of an idler gear?",
+            opts: ["To increase torque", "To decrease speed", "To change rotational direction without affecting gear ratio", "To lock the gear train"],
+            ans: "To change rotational direction without affecting gear ratio",
+            exp: "Placing a gear between the driver and driven gears ensures they both rotate in the same direction, but the idler's teeth do not affect the final ratio.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "If a driver gear with 10 teeth meshes with a driven gear with 30 teeth, what happens to the torque?",
+            opts: ["Torque decreases", "Torque stays the same", "Torque triples", "Torque drops to zero"],
+            ans: "Torque triples",
+            exp: "A larger driven gear increases torque at the expense of speed. Since the ratio is 3:1, the output torque is 3 times greater.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "Which mechanism converts rotary motion into linear motion?",
+            opts: ["Rack and Pinion", "Bevel Gear", "Worm and Wheel", "Sprocket and Chain"],
+            ans: "Rack and Pinion",
+            exp: "A rack (flat gear) and pinion (round gear) system takes the circular rotation of the pinion and turns it into straight-line motion along the rack.",
+            src: "PLTW Curriculum"
+        },
+        {
+            q: "What type of gear is used to change the angle of rotation by 90 degrees?",
+            opts: ["Bevel Gear", "Spur Gear", "Idler Gear", "Simple Gear Train"],
+            ans: "Bevel Gear",
+            exp: "Bevel gears are cone-shaped and intersect at a 90-degree angle to change the axis of rotation.",
+            src: "PLTW Curriculum"
+        }
     ]
 };
