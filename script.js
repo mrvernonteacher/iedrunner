@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set loading state and fetch
     for(let i=1; i<=3; i++) {
         let el = document.getElementById(`lb-${i}`);
-        if(el) el.innerText = `${i}. LOADING...`;
+        if(el) el.innerHTML = `<div style="display: flex; align-items: center;">${i}. LOADING...</div>`;
     }
     fetchGlobalScores();
 });
@@ -294,7 +294,7 @@ function drawCanvasPreview(canvasId, charName) {
     else drawMrsG(cx, 0, 5);
 }
 
-// New function to draw just the cropped face/shoulders for the leaderboards
+// Draws just the cropped face/shoulders for the leaderboards
 function drawFacePreview(canvasId, charName, isSmall = false) {
     const c = document.getElementById(canvasId);
     if (!c) return;
@@ -302,7 +302,6 @@ function drawFacePreview(canvasId, charName, isSmall = false) {
     cx.clearRect(0, 0, c.width, c.height);
     cx.save();
 
-    // Scale and shift coordinates to frame the head perfectly
     if (isSmall) {
         cx.scale(0.7, 0.7);
         cx.translate(-3, 1);
@@ -334,27 +333,26 @@ function updateLeaderboardUI() {
         const el = document.getElementById(`lb-${i+1}`);
         if(el) {
             if (!scoresLoaded) {
-                el.innerText = `${i+1}. LOADING...`;
+                el.innerHTML = `<div style="display: flex; align-items: center;">${i+1}. LOADING...</div>`;
             } else if (advScores[i]) {
                 let entry = advScores[i];
                 let canvasId = `lb-canvas-${i}`;
                 let charFace = "";
                 
-                // Inject a tiny canvas element for the face instead of text
+                // Inject a tiny canvas element for the face. Flexbox keeps it inline.
                 if (entry.char) {
-                    charFace = `<canvas id="${canvasId}" width="26" height="24" style="vertical-align: middle; margin: 0 8px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
+                    charFace = `<canvas id="${canvasId}" width="26" height="24" style="flex-shrink: 0; margin: 0 8px; border-radius: 4px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
                 }
                 
-                el.innerHTML = `${i+1}. ${charFace} ${entry.name} ... ${entry.score}`;
+                el.innerHTML = `<div style="display: flex; align-items: center; white-space: nowrap;">${i+1}. ${charFace} ${entry.name} ... ${entry.score}</div>`;
                 
-                // Draw the face a split second after the HTML is injected
                 if (entry.char) {
                     setTimeout(() => {
                         drawFacePreview(canvasId, entry.char);
                     }, 10);
                 }
             } else {
-                el.innerText = `${i+1}. --- ... 0`;
+                el.innerHTML = `<div style="display: flex; align-items: center; white-space: nowrap;">${i+1}. --- ... 0</div>`;
             }
         }
     }
@@ -396,12 +394,11 @@ function navToLevelSelect(mode) {
         let topCharCanvas = "";
         let topCharId = `prac-canvas-${i}`;
         
-        // Inject a smaller face canvas for the Practice Buttons
         if (unitScores.length > 0 && unitScores[0].char) {
-            topCharCanvas = `<canvas id="${topCharId}" width="20" height="20" style="vertical-align: middle; margin: 0 4px; border-radius: 3px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
+            topCharCanvas = `<canvas id="${topCharId}" width="20" height="20" style="flex-shrink: 0; margin: 0 4px; border-radius: 3px; background: rgba(0,0,0,0.3); border: 1px solid #444;"></canvas>`;
         }
         
-        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:flex; align-items:center; justify-content:center;">Top: ${topCharCanvas} ${topName} ${topScore}</span>`;
+        btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:flex; align-items:center; justify-content:center; white-space: nowrap;">Top: ${topCharCanvas} ${topName} ${topScore}</span>`;
         
         if (unitScores.length > 0 && unitScores[0].char) {
             setTimeout(() => drawFacePreview(topCharId, unitScores[0].char, true), 10);
