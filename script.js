@@ -317,7 +317,9 @@ function nextLevel() {
     }
     score += 100; 
     gearSpeedBase += 0.5;
-    repairs += 5; 
+    
+    // In Adventure mode, reset repairs to 5 instead of stacking them
+    repairs = (activeMode === 'ADVENTURE') ? 5 : 10; 
     
     resetLevelState(false);
 }
@@ -434,7 +436,7 @@ function triggerRescue() {
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
-    document.getElementById('trivia-status').innerText = "Answer to resume. (Time keeps ticking!)";
+    document.getElementById('trivia-status').innerText = "Answer to resume. (Time penalty capped at 10s)";
     document.getElementById('trivia-status').style.color = '#ffcc00';
     document.getElementById('trivia-screen').classList.remove('hidden');
     loadQuestion();
@@ -469,6 +471,7 @@ function askBossQuestion() {
     gameState = 'TRIVIA';
     triviaMode = 'BOSS';
     isProcessingAnswer = false;
+    triviaStartTime = Date.now();
     
     document.getElementById('boss-hud').classList.remove('hidden');
     document.getElementById('hud').classList.add('hidden');
@@ -507,18 +510,17 @@ function loadQuestion() {
 
 function checkAnswer(selected, correct) {
     if (isProcessingAnswer) return; 
+    isProcessingAnswer = true;
+
+    // Cap the penalty at 10 seconds (600 frames)
+    let timeSpent = Date.now() - triviaStartTime;
+    let framesSpent = Math.floor((timeSpent / 1000) * 60);
+    if (framesSpent > 600) framesSpent = 600; 
 
     if (triviaMode === 'RESCUE') {
-        isProcessingAnswer = true;
-        
-        let timeSpent = Date.now() - triviaStartTime;
-        let framesSpent = Math.floor((timeSpent / 1000) * 60);
-        
-        // Anti-AFK limit: Penalty maxes out at 10 seconds (600 frames)
-        if (framesSpent > 600) framesSpent = 600; 
-        
+        levelFrames += framesSpent; // Make the penalty official
+
         if (selected === correct) {
-            levelFrames += framesSpent; 
             document.getElementById('trivia-status').innerText = "REPAIR SUCCESSFUL! Resuming...";
             document.getElementById('trivia-status').style.color = '#55ff55';
             
@@ -528,7 +530,6 @@ function checkAnswer(selected, correct) {
                 gameState = 'RUNNING';
             }, 1000);
         } else {
-            levelFrames += framesSpent; 
             if (repairs > 0) {
                 repairs--; updateHUD();
                 document.getElementById('trivia-status').innerText = "INCORRECT! -1 Repair. Try another specification.";
@@ -549,7 +550,6 @@ function checkAnswer(selected, correct) {
             }
         }
     } else if (triviaMode === 'BOSS') {
-        isProcessingAnswer = true;
         if (selected === correct) {
             swingsEarned = 1; 
             document.getElementById('trivia-status').innerText = "CORRECT! Get ready to swing!";
@@ -668,15 +668,28 @@ function updateBossFight() {
                     
                     // --- SAVE CHARACTER ABILITY UNLOCK ---
                     let stageClearHeader = document.querySelector('#stage-clear-screen h1');
-                    
                     if (!unlockedPowers[character]) unlockedPowers[character] = [];
-                    if (!unlockedPowers[character].includes(level)) {
-                        unlockedPowers[character].push(level);
-                        try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
-                        
-                        stageClearHeader.innerHTML = `BOSS DISMANTLED!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR UNIT ${level}!</span>`;
-                    } else {
-                        stageClearHeader.innerHTML = "BOSS DISMANTLED!";
+
+                    if (activeMode === 'ADVENTURE') {
+                        if (level === 8) {
+                            if (!unlockedPowers[character].includes('ADVENTURE_COMPLETE')) {
+                                unlockedPowers[character].push('ADVENTURE_COMPLETE');
+                                try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
+                                stageClearHeader.innerHTML = `COURSE COMPLETE!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR ADVENTURE MODE!</span>`;
+                            } else {
+                                stageClearHeader.innerHTML = "COURSE COMPLETE!";
+                            }
+                        } else {
+                            stageClearHeader.innerHTML = "BOSS DISMANTLED!";
+                        }
+                    } else { // Practice or Boss Test
+                        if (!unlockedPowers[character].includes(level)) {
+                            unlockedPowers[character].push(level);
+                            try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
+                            stageClearHeader.innerHTML = `BOSS DISMANTLED!<br><span style="font-size:12px; color:#ffcc00; display:block; margin-top:15px; text-transform:uppercase;">${character} POWER UNLOCKED FOR UNIT ${level}!</span>`;
+                        } else {
+                            stageClearHeader.innerHTML = "BOSS DISMANTLED!";
+                        }
                     }
                     
                     // --- APPLY BONUS POINTS FOR WINNING ---
@@ -793,7 +806,13 @@ function updateRunner() {
     if (!ctx) return;
     
     let isUsingPower = false;
-    let hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    let hasPowerUnlocked = false;
+    
+    if (activeMode === 'ADVENTURE') {
+        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes('ADVENTURE_COMPLETE');
+    } else {
+        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    }
     
     // Character Specific Powers (ONLY IF UNLOCKED)
     if (character === 'Mrs. G' && hasPowerUnlocked && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
@@ -888,7 +907,13 @@ function drawRunner(c) {
     if (character === 'Mr. V') drawMrV(c, player.x, player.y);
     else drawMrsG(c, player.x, player.y);
     
-    let hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    let hasPowerUnlocked = false;
+    if (activeMode === 'ADVENTURE') {
+        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes('ADVENTURE_COMPLETE');
+    } else {
+        hasPowerUnlocked = unlockedPowers[character] && unlockedPowers[character].includes(level);
+    }
+    
     if (hasPowerUnlocked) {
         c.fillStyle = '#fff';
         c.fillRect(player.x - 10, player.y - 15, 56, 6);
@@ -915,35 +940,18 @@ function gameLoop() {
         frameCount++; updateBossFight(); drawFirstPersonBoss(ctx);
     } else if (gameState === 'TRIVIA') {
         if (triviaMode === 'RESCUE' && !isProcessingAnswer) {
+            
+            // Watch the clock literally drain their run time while reading!
             let timeSpent = Date.now() - triviaStartTime;
             let framesSpent = Math.floor((timeSpent / 1000) * 60);
             
-            // Limit the penalty to 10 seconds (600 frames) so they can't AFK the game
-            if (framesSpent > 600) framesSpent = 600; 
+            if (framesSpent > 600) framesSpent = 600; // Hard cap at 10 seconds
             
             let displayFrames = levelFrames + framesSpent;
-            let remaining = updateClockDisplay(displayFrames);
+            updateClockDisplay(displayFrames);
             
-            if (remaining <= 0) {
-                isProcessingAnswer = true;
-                levelFrames += framesSpent;
-                
-                if (activeMode === 'PRACTICE' && score < 500) {
-                    document.getElementById('trivia-status').innerText = "TIME OUT!";
-                    document.getElementById('trivia-status').style.color = '#ff5555';
-                    setTimeout(() => {
-                        document.getElementById('trivia-screen').classList.add('hidden');
-                        triggerGameOver("NOT WORTHY!", `You must score 500+ points to face ${bossNames[level-1].toUpperCase()}!`);
-                    }, 1500);
-                } else {
-                    document.getElementById('trivia-status').innerText = "TIME OUT! Repair bypassed.";
-                    document.getElementById('trivia-status').style.color = '#ff5555';
-                    setTimeout(() => {
-                        document.getElementById('trivia-screen').classList.add('hidden');
-                        triggerBossTrivia(); 
-                    }, 1500);
-                }
-            }
+            // Note: We don't force a game over or timeout here anymore. 
+            // The clock simply freezes visually once the 10-second penalty is reached.
         }
     }
     
