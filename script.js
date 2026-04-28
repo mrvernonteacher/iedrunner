@@ -2,6 +2,11 @@ const canvas = document.getElementById('mainCanvas');
 let ctx;
 const gameWrapper = document.getElementById('game-wrapper');
 
+// --- DATABASE CONFIGURATION ---
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxLX5imVOH0Xl0NeWNMKzUsB-YLacOiSUjAu2j7FrGgyLZvGH2ANB3pNzPk_oYYFO1Lg/exec";
+let globalScores = [];
+let scoresLoaded = false;
+
 // --- RETRO AUDIO ENGINE ---
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioCtx;
@@ -127,31 +132,79 @@ let triviaMode = 'BOSS';
 
 const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
 
-// --- SAFE LOCAL STORAGE INITIALIZATION ---
-let adventureScores = [
-    { name: "MRV", score: 1500, char: "Mr. V" }, 
-    { name: "IED", score: 1000, char: "Mrs. G" }, 
-    { name: "ENG", score: 500, char: "Mr. V" }
-];
-let practiceScores = {};
-for(let i=1; i<=8; i++) { practiceScores[i] = []; }
-
+// Local Storage for Unlocks ONLY
 let unlockedPowers = { 'Mr. V': [], 'Mrs. G': [] };
 
 try {
-    let savedAdv = JSON.parse(localStorage.getItem('waltonAdventureScores'));
-    if (savedAdv) adventureScores = savedAdv;
-    
-    let savedPrac = JSON.parse(localStorage.getItem('waltonPracticeScores'));
-    if (savedPrac) {
-        practiceScores = savedPrac;
-        for(let i=1; i<=8; i++) { if(!practiceScores[i]) practiceScores[i] = []; }
-    }
-    
     let savedUnlocks = JSON.parse(localStorage.getItem('waltonUnlocks'));
     if (savedUnlocks) unlockedPowers = savedUnlocks;
 } catch (e) {
-    console.warn("Local storage is restricted or unavailable in this environment. High scores and unlocks will not persist.");
+    console.warn("Local storage restricted. Unlocks will not persist.");
+}
+
+// --- ASYNC DATABASE FUNCTIONS ---
+async function fetchGlobalScores() {
+    try {
+        let response = await fetch(WEB_APP_URL);
+        globalScores = await response.json();
+        scoresLoaded = true;
+        
+        // Refresh UI if we are on screens that display scores
+        updateLeaderboardUI();
+        if (!document.getElementById('level-select-screen').classList.contains('hidden') && pendingMode === 'PRACTICE') {
+            navToLevelSelect('PRACTICE'); 
+        }
+    } catch (error) {
+        console.error("Error fetching global scores:", error);
+    }
+}
+
+async function submitHighScore() {
+    const initialsInput = document.getElementById('hs-initials');
+    const initials = initialsInput.value.toUpperCase();
+    
+    if (initials.length !== 3) {
+        alert("Please enter exactly 3 letters for the arcade scoreboard.");
+        return;
+    }
+    
+    // UI Loading State
+    const submitBtn = document.querySelector('#highscore-entry button');
+    if(submitBtn) {
+        submitBtn.innerText = "SAVING...";
+        submitBtn.disabled = true;
+    }
+    
+    const payload = {
+        name: initials,
+        score: score,
+        char: character,
+        mode: activeMode,
+        unit: activeMode === 'ADVENTURE' ? 'N/A' : level
+    };
+    
+    try {
+        await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' }, // Avoids CORS preflight blocks
+            body: JSON.stringify(payload)
+        });
+    } catch (e) {
+        console.error("Error saving score:", e);
+    }
+    
+    // Reset UI
+    if(submitBtn) {
+        submitBtn.innerText = "SUBMIT";
+        submitBtn.disabled = false;
+    }
+    
+    document.getElementById('highscore-entry').classList.add('hidden');
+    document.getElementById('btn-return-menu').classList.remove('hidden');
+    
+    // Pull the fresh data and return to menu
+    await fetchGlobalScores();
+    navToMainMenu();
 }
 
 // --- INITIALIZATION (WAIT FOR HTML TO LOAD) ---
@@ -190,7 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (hudEl) hudEl.style.zIndex = '100';
     if (bossHudEl) bossHudEl.style.zIndex = '100';
     
-    updateLeaderboardUI();
+    // Set loading state and fetch
+    for(let i=1; i<=3; i++) {
+        let el = document.getElementById(`lb-${i}`);
+        if(el) el.innerText = `${i}. LOADING...`;
+    }
+    fetchGlobalScores();
 });
 
 // --- EXPOSE FUNCTIONS TO HTML BUTTONS ---
@@ -237,12 +295,20 @@ function drawCanvasPreview(canvasId, charName) {
 }
 
 function updateLeaderboardUI() {
+    let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
+    
     for(let i=0; i<3; i++) {
-        let entry = adventureScores[i] || {name: "---", score: 0, char: ""};
         const el = document.getElementById(`lb-${i+1}`);
         if(el) {
-            let charStr = entry.char ? ` (${entry.char})` : "";
-            el.innerText = `${i+1}. ${entry.name}${charStr} ... ${entry.score}`;
+            if (!scoresLoaded) {
+                el.innerText = `${i+1}. LOADING...`;
+            } else if (advScores[i]) {
+                let entry = advScores[i];
+                let charStr = entry.char ? ` (${entry.char})` : "";
+                el.innerText = `${i+1}. ${entry.name}${charStr} ... ${entry.score}`;
+            } else {
+                el.innerText = `${i+1}. --- ... 0`;
+            }
         }
     }
 }
@@ -268,11 +334,19 @@ function navToLevelSelect(mode) {
     for(let i=1; i<=8; i++) {
         let btn = document.getElementById('btn-prac-' + i);
         if(!btn) continue;
-        let unitScores = practiceScores[i] || [];
+        
+        let title = btn.getAttribute('data-title');
+        
+        if (!scoresLoaded) {
+             btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Loading Scores...</span>`;
+             continue;
+        }
+        
+        let unitScores = globalScores.filter(s => s.mode === 'PRACTICE' && parseInt(s.unit) === i).sort((a,b) => b.score - a.score);
         let topScore = unitScores.length > 0 ? unitScores[0].score : 0;
         let topName = unitScores.length > 0 ? unitScores[0].name : "---";
         let topChar = (unitScores.length > 0 && unitScores[0].char) ? ` (${unitScores[0].char})` : "";
-        let title = btn.getAttribute('data-title');
+        
         btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Top: ${topName}${topChar} ${topScore}</span>`;
     }
     document.getElementById('level-select-screen').classList.remove('hidden');
@@ -402,50 +476,25 @@ function triggerGameOver(title, desc) {
     hsDiv.classList.add('hidden');
     returnBtn.classList.remove('hidden');
 
+    // Dynamic global check
+    let isHighScore = false;
     if (activeMode === 'ADVENTURE') {
-        let lowestHighScore = adventureScores.length < 3 ? -1 : adventureScores[2].score;
-        if (score > lowestHighScore) {
-            hsDiv.classList.remove('hidden');
-            returnBtn.classList.add('hidden'); 
-            document.getElementById('hs-initials').value = ''; 
-        }
+        let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
+        let lowest = advScores.length < 3 ? -1 : advScores[2].score;
+        if (score > lowest) isHighScore = true;
     } else if (activeMode === 'PRACTICE' || activeMode === 'BOSS_TEST') {
-        let unitScores = practiceScores[level] || [];
-        let lowestHighScore = unitScores.length < 3 ? -1 : unitScores[2].score;
-        if (score > lowestHighScore) {
-            hsDiv.classList.remove('hidden');
-            returnBtn.classList.add('hidden'); 
-            document.getElementById('hs-initials').value = ''; 
-        }
+        let pracScores = globalScores.filter(s => s.mode === 'PRACTICE' && parseInt(s.unit) === level).sort((a,b) => b.score - a.score);
+        let lowest = pracScores.length < 3 ? -1 : pracScores[2].score;
+        if (score > lowest) isHighScore = true;
+    }
+    
+    if (isHighScore) {
+        hsDiv.classList.remove('hidden');
+        returnBtn.classList.add('hidden'); 
+        document.getElementById('hs-initials').value = ''; 
     }
     
     document.getElementById('game-over-screen').classList.remove('hidden');
-}
-
-function submitHighScore() {
-    const initials = document.getElementById('hs-initials').value;
-    if (initials.length !== 3) {
-        alert("Please enter exactly 3 letters for the arcade scoreboard.");
-        return;
-    }
-    
-    if (activeMode === 'ADVENTURE') {
-        adventureScores.push({ name: initials, score: score, char: character });
-        adventureScores.sort((a,b) => b.score - a.score);
-        adventureScores = adventureScores.slice(0, 3);
-        try { localStorage.setItem('waltonAdventureScores', JSON.stringify(adventureScores)); } catch(e){}
-    } else {
-        if(!practiceScores[level]) practiceScores[level] = [];
-        practiceScores[level].push({ name: initials, score: score, char: character });
-        practiceScores[level].sort((a,b) => b.score - a.score);
-        practiceScores[level] = practiceScores[level].slice(0, 3);
-        try { localStorage.setItem('waltonPracticeScores', JSON.stringify(practiceScores)); } catch(e){}
-    }
-    
-    document.getElementById('highscore-entry').classList.add('hidden');
-    document.getElementById('btn-return-menu').classList.remove('hidden');
-    updateLeaderboardUI();
-    navToMainMenu();
 }
 
 // --- TRIVIA LOGIC ---
@@ -539,7 +588,7 @@ function checkAnswer(selected, correct) {
     if (isProcessingAnswer) return; 
     isProcessingAnswer = true;
 
-    // Apply the 10-second penalty cap to the run time permanently
+    // Cap the penalty at 10 seconds (600 frames)
     let timeSpent = Date.now() - triviaStartTime;
     let framesSpent = Math.floor((timeSpent / 1000) * 60);
     if (framesSpent > 600) framesSpent = 600; 
@@ -558,7 +607,8 @@ function checkAnswer(selected, correct) {
                 gameState = 'RUNNING';
             }, 1000);
         } else {
-            // Display Incorrect Learning Module
+            repairs--; updateHUD();
+            
             let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
             let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
             
@@ -585,7 +635,9 @@ function checkAnswer(selected, correct) {
                 startBossSwingPhase();
             }, 1000);
         } else {
-            // Display Incorrect Learning Module
+            playerHP--;
+            updateHUD();
+            
             let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
             let source = q.src || (level === 7 ? "Properties of Engineering Materials Worksheet" : "PLTW Curriculum");
             
@@ -604,10 +656,8 @@ function checkAnswer(selected, correct) {
     }
 }
 
-// Fired ONLY after they read the explanation and click "CONTINUE"
 function resumeAfterIncorrect() {
     if (triviaMode === 'RESCUE') {
-        repairs--; updateHUD();
         if (repairs < 0) {
             document.getElementById('trivia-screen').classList.add('hidden');
             triggerGameOver("WORKSHOP HAZARD", "You ran out of repairs during sequence!");
@@ -618,7 +668,6 @@ function resumeAfterIncorrect() {
             loadQuestion(); 
         }
     } else if (triviaMode === 'BOSS') {
-        playerHP--; updateHUD();
         if (playerHP <= 0) {
             document.getElementById('trivia-screen').classList.add('hidden');
             triggerGameOver("DEFEATED", bossNames[level-1] + " dismantled you!");
@@ -734,7 +783,7 @@ function updateBossFight() {
                         } else {
                             stageClearHeader.innerHTML = "BOSS DISMANTLED!";
                         }
-                    } else { // Practice or Boss Test
+                    } else { 
                         if (!unlockedPowers[baseChar].includes(level)) {
                             unlockedPowers[baseChar].push(level);
                             try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
