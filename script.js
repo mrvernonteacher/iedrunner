@@ -283,7 +283,6 @@ function navToCharSelect(selectedLevel) {
     level = selectedLevel;
     hideAllOverlays();
     
-    // Dynamically inject the character buttons so we can add the "Super" variants
     const container = document.querySelector('#char-select-screen div[style*="display: flex"]');
     if (container) {
         container.innerHTML = createCharButton('Mr. V', 'preview-v') + createCharButton('Mrs. G', 'preview-g');
@@ -465,7 +464,7 @@ function triggerRescue() {
     triviaStartTime = Date.now();
     
     document.getElementById('trivia-header').innerText = "GEAR JAM! REPAIR SEQUENCE";
-    document.getElementById('trivia-status').innerText = "Answer to resume. (Time penalty capped at 10s)";
+    document.getElementById('trivia-status').innerText = "Answer to resume.";
     document.getElementById('trivia-status').style.color = '#ffcc00';
     document.getElementById('trivia-screen').classList.remove('hidden');
     loadQuestion();
@@ -995,17 +994,22 @@ function gameLoop() {
     } else if (gameState === 'BOSS_FIGHT') {
         frameCount++; updateBossFight(); drawFirstPersonBoss(ctx);
     } else if (gameState === 'TRIVIA') {
-        if (triviaMode === 'RESCUE' && !isProcessingAnswer) {
-            
+        if (!isProcessingAnswer) {
             // Watch the clock literally drain their run time while reading!
             let timeSpent = Date.now() - triviaStartTime;
             let framesSpent = Math.floor((timeSpent / 1000) * 60);
             
-            if (framesSpent > 600) framesSpent = 600; // Hard cap at 10 seconds
+            if (framesSpent > 600) {
+                framesSpent = 600; // Hard cap the penalty at 10 seconds visually
+                document.getElementById('trivia-status').innerText = "Time Penalty Capped. Game Paused.";
+                document.getElementById('trivia-status').style.color = '#ffcc00';
+            } else {
+                document.getElementById('trivia-status').innerText = `Answer to resume. (Penalty: -${Math.floor(framesSpent/60)}s / 10s)`;
+                document.getElementById('trivia-status').style.color = '#ffcc00';
+            }
             
             let displayFrames = levelFrames + framesSpent;
             updateClockDisplay(displayFrames);
-            
         }
     }
     
