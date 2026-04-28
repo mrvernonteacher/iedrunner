@@ -6,6 +6,7 @@ const gameWrapper = document.getElementById('game-wrapper');
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxxLX5imVOH0Xl0NeWNMKzUsB-YLacOiSUjAu2j7FrGgyLZvGH2ANB3pNzPk_oYYFO1Lg/exec";
 let globalScores = [];
 let scoresLoaded = false;
+let clientIP = "Unknown"; 
 
 // --- SECURITY & FILTERING ---
 const BANNED_INITIALS = ["KKK", "SSS", "NIG", "FAG", "ASS", "DIC", "DIK", "PNS", "VAG", "KYS", "FUQ", "FUK", "FUC"];
@@ -123,7 +124,7 @@ function playSiren() {
     
     osc.type = 'sawtooth';
     lfo.type = 'square';
-    lfo.frequency.value = 5; // Fast siren modulation
+    lfo.frequency.value = 5; 
     
     const modGain = audioCtx.createGain();
     modGain.gain.value = 300;
@@ -135,33 +136,23 @@ function playSiren() {
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     
-    // Obnoxiously loud
     gain.gain.value = 0.4;
     
     osc.start();
     lfo.start();
     
-    // Auto-kills the siren after 5 seconds to prevent permanent ear damage
-    osc.stop(audioCtx.currentTime + 5);
-    lfo.stop(audioCtx.currentTime + 5);
+    // Siren plays infinitely until the tab is closed
 }
 
 function triggerLockdown(ip) {
     playSiren();
     
-    // Create the masked IP for the screen display
-    let maskedIP = "192.168.XXX.XX";
-    if (ip !== "Unknown" && ip.includes('.')) {
-        let parts = ip.split('.');
-        maskedIP = parts[0] + "." + parts[1] + ".XXX.XX";
-    }
-
-    // Completely overwrite the document body
+    // Completely overwrite the document body with the unmasked IP
     document.body.innerHTML = `
         <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate;">
             <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
             <p style="color: white; font-size: 3vw; font-family: 'Courier New', Courier, monospace; font-weight: bold; background: black; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
-                IP Address ${maskedIP} has been recorded<br>and flagged for review.
+                IP Address ${ip} has been recorded<br>and flagged for review.
             </p>
         </div>
         <style>
@@ -217,10 +208,22 @@ try {
 }
 
 // --- ASYNC DATABASE FUNCTIONS ---
-async function fetchGlobalScores() {
+async function fetchGlobalData() {
     try {
+        // Fetch IP first to check against the ban list
+        clientIP = await getIP();
+
         let response = await fetch(WEB_APP_URL);
-        globalScores = await response.json();
+        let data = await response.json();
+        
+        // 1. Check if the user's IP is on the banned list
+        if (data.banned && data.banned.includes(clientIP)) {
+            triggerLockdown(clientIP);
+            return; // Halt all game loading
+        }
+
+        // 2. Load Scores
+        globalScores = data.scores || [];
         scoresLoaded = true;
         
         updateLeaderboardUI();
@@ -228,7 +231,7 @@ async function fetchGlobalScores() {
             navToLevelSelect('PRACTICE'); 
         }
     } catch (error) {
-        console.error("Error fetching global scores:", error);
+        console.error("Error fetching global data:", error);
     }
 }
 
@@ -237,7 +240,6 @@ async function submitHighScore() {
     let initials = initialsInput.value.toUpperCase().trim();
     const submitBtn = document.querySelector('#highscore-entry button');
     
-    // 1. BLOCK NUMBERS
     if (/\d/.test(initials)) {
         alert("Numbers are not allowed in initials. Please use letters only.");
         initialsInput.value = "";
@@ -249,25 +251,21 @@ async function submitHighScore() {
         submitBtn.disabled = true;
     }
 
-    const userIP = await getIP();
-
-    // 2. CHECK FOR BANNED WORDS & NUCLEAR LOCKDOWN
     if (BANNED_INITIALS.includes(initials)) {
         
-        // Silently send the bad entry to the Google Sheet with the banned flag
+        // Send the bad payload. Apps Script will Auto-Ban this IP now.
         const badPayload = {
             name: initials,
             score: score,
             char: character,
             mode: activeMode,
             unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
-            ip: userIP,
-            banned: true // Triggers the shadow ban in Apps Script
+            ip: clientIP,
+            banned: true 
         };
         fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(badPayload) }); 
 
-        // Trigger the flashing siren screen of doom
-        triggerLockdown(userIP);
+        triggerLockdown(clientIP);
         return; 
     }
     
@@ -280,7 +278,6 @@ async function submitHighScore() {
         return;
     }
     
-    // 3. SUBMIT CLEAN SCORE
     if (submitBtn) submitBtn.innerText = "SAVING...";
     
     const payload = {
@@ -289,7 +286,7 @@ async function submitHighScore() {
         char: character,
         mode: activeMode,
         unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
-        ip: userIP,
+        ip: clientIP,
         banned: false
     };
     
@@ -311,14 +308,14 @@ async function submitHighScore() {
     document.getElementById('highscore-entry').classList.add('hidden');
     document.getElementById('btn-return-menu').classList.remove('hidden');
     
-    await fetchGlobalScores();
+    await fetchGlobalData();
     navToMainMenu();
 }
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof pltwBanks === 'undefined') {
-        console.error("ERROR: questions.js failed to load. Ensure the file is in the same folder and linked in your HTML.");
+        console.error("ERROR: questions.js failed to load.");
     }
 
     if (canvas) {
@@ -355,7 +352,9 @@ document.addEventListener('DOMContentLoaded', () => {
         let el = document.getElementById(`lb-${i}`);
         if(el) el.innerHTML = `<div style="display: flex; align-items: center;">${i}. LOADING...</div>`;
     }
-    fetchGlobalScores();
+    
+    // Kick off the data fetch (which also checks for bans)
+    fetchGlobalData();
 });
 
 // --- EXPOSE FUNCTIONS ---
@@ -480,7 +479,7 @@ function navToLevelSelect(mode) {
         return;
     }
 
-    document.getElementById('level-select-title').innerText = mode === 'BOSS_TEST' ? "SELECT BOSS TEST UNIT" : "SELECT UNIT TO PRACTICE";
+    document.getElementById('level-select-title').innerText = mode === 'BOSS_TEST' ? "SELECT UNIT TO PRACTICE" : "SELECT UNIT TO PRACTICE";
     
     for(let i=1; i<=8; i++) {
         let btn = document.getElementById('btn-prac-' + i);
