@@ -273,6 +273,965 @@ const pltwBanks = {
         { q: "A fixed point around which a lever rotates is the:", opts: ["Fulcrum", "Effort", "Load", "Resistance"], ans: "Fulcrum", exp: "The fulcrum acts as the hinge or pivot point for any lever.", src: "PLTW Curriculum" },
         { q: "If input distance is 10ft and output distance is 2ft, the IMA is:", opts: ["5", "0.2", "20", "8"], ans: "5", exp: "IMA = Input Distance / Output Distance. 10 / 2 = 5.", src: "PLTW Curriculum" }
     ]
+    // UNIT 9: Spring Final Review (EOC Blueprint Aligned - Part 1)
+    9: [
+        // GLOBAL CONCEPTS (~25% of EOC Blueprint)
+        { 
+            q: "Which of the following best defines the primary role of an engineer?", 
+            opts: ["Running experiments to discover new laws of physics", "The creation of solutions to meet the needs of people and society", "Fixing broken mechanical equipment in a shop", "Writing complex computer algorithms for data sorting"], 
+            ans: "The creation of solutions to meet the needs of people and society", 
+            exp: "Engineering is the creation of solutions, such as new and improved products, technologies, systems and processes, to meet the needs of people and society. [cite: 251]", 
+            src: "PLTW Framework (CAR-A)" 
+        },
+        { 
+            q: "According to professional codes of ethics, engineers have a primary responsibility to serve:", 
+            opts: ["The public interest", "Their personal bank account", "Only their direct employer", "The marketing department"], 
+            ans: "The public interest", 
+            exp: "Engineers have a responsibility to serve the public interest, their clients, and the profession with a high degree of honesty, integrity, and accountability. [cite: 266]", 
+            src: "PLTW Framework (ERM-A)" 
+        },
+        { 
+            q: "Evaluating a complex, real-world problem requires engineers to balance cost, safety, and environmental impacts. This balancing act is known as:", 
+            opts: ["Prototyping", "Tolerance accumulation", "Making trade-offs", "Reverse engineering"], 
+            ans: "Making trade-offs", 
+            exp: "Engineers must identify the need for trade-offs to address a range of criteria and constraints, including cost, safety, reliability, and environmental impacts. [cite: 274]", 
+            src: "PLTW Framework (ERM-B)" 
+        },
+        { 
+            q: "When reviewing statistical data, which of the following is an appropriate measure of the 'center' of a normal data distribution?", 
+            opts: ["Interquartile range", "Standard deviation", "Mean", "Variance"], 
+            ans: "Mean", 
+            exp: "Engineers use statistics appropriate to the shape of the data distribution to compare center (median, mean) and spread. [cite: 242]", 
+            src: "PLTW Framework (CCP-G)" 
+        },
+        { 
+            q: "Which of the following graphical representations is best suited for showing the distribution of a single set of measurement data?", 
+            opts: ["Gantt chart", "Histogram", "Decision matrix", "Exploded view"], 
+            ans: "Histogram", 
+            exp: "Experimental data for a single count or measurement can be graphically represented with charts and plots such as histograms or dot plots. [cite: 238]", 
+            src: "PLTW Framework (CCP-G)" 
+        },
+        { 
+            q: "In an engineering context, taking action for collective well-being and using natural resources effectively is central to:", 
+            opts: ["Sustainable development", "Algorithm design", "CAD modeling", "Spatial visualization"], 
+            ans: "Sustainable development", 
+            exp: "Engineers must take action for collective well-being and sustainable development using an ethical decision-making process. [cite: 275] This includes using natural resources effectively and efficiently. [cite: 277]", 
+            src: "PLTW Framework (CCP-J)" 
+        },
+        { 
+            q: "Which principle aligns a product's design specifically with its intended human use and ergonomics?", 
+            opts: ["Human-centered design", "Generative design", "Algorithmic thinking", "Parametric modeling"], 
+            ans: "Human-centered design", 
+            exp: "Engineers explain the benefits of human-centered design and apply principles to align product design with intended use. [cite: 366]", 
+            src: "PLTW Framework (CCP-J)" 
+        },
+        { 
+            q: "Why is it important for engineers to define the 'life cycle' of a product?", 
+            opts: ["To determine the retail price", "To understand its environmental and societal impacts from creation to disposal", "To know how many to manufacture", "To write a software algorithm for it"], 
+            ans: "To understand its environmental and societal impacts from creation to disposal", 
+            exp: "Engineers describe the life cycle of a product or service [cite: 273] because different engineering solutions can have significantly different impacts on individuals, society, and the natural world. [cite: 272]", 
+            src: "PLTW Framework (ERM-B)" 
+        },
+        { 
+            q: "An engineer uses a database like the Cobb Digital Library instead of a generic web search because:", 
+            opts: ["It guarantees the data is uncopyrighted", "It automatically generates a prototype", "It contains credible, peer-reviewed sources", "It writes the design brief for them"], 
+            ans: "It contains credible, peer-reviewed sources", 
+            exp: "Engineers must find relevant data in credible sources such as literature, databases, and policy documents to support decisions. [cite: 212]", 
+            src: "PLTW Framework (CCP-D)" 
+        },
+        { 
+            q: "When communicating technical information, engineers use which of the following to clearly support their claims?", 
+            opts: ["Anecdotal stories", "Unverified blogs", "Sketches, tables, charts, and graphs", "Personal opinions"], 
+            ans: "Sketches, tables, charts, and graphs", 
+            exp: "Engineers use sketches, tables, charts, and graphs when appropriate to clearly communicate information and in making arguments and claims. [cite: 299]", 
+            src: "PLTW Framework (CCP-D)" 
+        },
+        { 
+            q: "What is a required step before drawing a valid engineering conclusion?", 
+            opts: ["Publishing the data immediately", "Ignoring opposing views", "Acknowledging limitations and biases in the evidence", "Deleting outlier data"], 
+            ans: "Acknowledging limitations and biases in the evidence", 
+            exp: "Engineers draw valid conclusions based on supporting evidence while acknowledging the limitations, opposing views, and biases. [cite: 215]", 
+            src: "PLTW Framework (CCP-D)" 
+        },
+        { 
+            q: "Which skill is considered a nontechnical skill required for professional engineering practice?", 
+            opts: ["Calculus", "Computer programming", "Collaboration and problem-solving", "Thermodynamics"], 
+            ans: "Collaboration and problem-solving", 
+            exp: "Nontechnical skills common to all engineering disciplines include problem-solving, handling uncertainty, and systems thinking. [cite: 252]", 
+            src: "PLTW Framework (CAR-A)" 
+        },
+        { 
+            q: "If an engineer is designing an HVAC (heating and cooling) system for a building, which discipline are they primarily practicing?", 
+            opts: ["Chemical Engineering", "Mechanical Engineering", "Civil Engineering", "Computer Engineering"], 
+            ans: "Mechanical Engineering", 
+            exp: "Mechanical engineering involves technical roles that deal with mechanical systems, thermal systems, and motion. [cite: 254]", 
+            src: "PLTW Framework (CAR-B)" 
+        },
+        { 
+            q: "In an engineering team, what is the purpose of a peer review process?", 
+            opts: ["To assign grades to teammates", "To provide effective, positive feedback to improve the product", "To fire underperforming employees", "To bypass quality assurance testing"], 
+            ans: "To provide effective, positive feedback to improve the product", 
+            exp: "Engineers analyze and evaluate the work of others to describe the positive outcomes of a peer review process [cite: 291] and provide effective feedback. [cite: 292]", 
+            src: "PLTW Framework (Global Concepts)" 
+        },
+
+        // PROBLEM SOLVING (~30% of EOC Blueprint)
+        { 
+            q: "Which step of the design process involves synthesizing an ill-formed problem into a meaningful, well-defined problem?", 
+            opts: ["Construct and Test", "Evaluate Solution", "Define the Problem", "Present Solution"], 
+            ans: "Define the Problem", 
+            exp: "Engineers synthesize an ill-formed problem into a meaningful, well-defined problem using relevant information. [cite: 219]", 
+            src: "PLTW Framework (CCP-E)" 
+        },
+        { 
+            q: "Requirements like cost limits, safety codes, and manufacturing capabilities are known as:", 
+            opts: ["Variables", "Constraints", "Criteria", "Hypotheses"], 
+            ans: "Constraints", 
+            exp: "Engineers define measurable criteria and realistic constraints (such as cost, safety, reliability) against which alternatives can be evaluated. [cite: 220]", 
+            src: "PLTW Framework (CCP-E)" 
+        },
+        { 
+            q: "What tool is used to mathematically compare competing solution ideas against design constraints and criteria?", 
+            opts: ["A decision matrix", "A Gantt chart", "A histogram", "A scatter plot"], 
+            ans: "A decision matrix", 
+            exp: "Engineers carry out a plan to compare competing solution ideas and justify the selection of a solution path with respect to design requirements. [cite: 223]", 
+            src: "PLTW Framework (CCP-E)" 
+        },
+        { 
+            q: "Why is the engineering design process considered 'iterative'?", 
+            opts: ["It happens in a strict linear order", "It uses computer algorithms", "It requires returning to previous steps to optimize a solution", "It is only used once per project"], 
+            ans: "It requires returning to previous steps to optimize a solution", 
+            exp: "Engineers strategically iterate steps of the design process to improve and optimize a solution. [cite: 226]", 
+            src: "PLTW Framework (CCP-E)" 
+        },
+        { 
+            q: "In an experimental design protocol, the variable that the engineer intentionally changes or manipulates is the:", 
+            opts: ["Dependent variable", "Independent variable", "Control variable", "Constant"], 
+            ans: "Independent variable", 
+            exp: "Engineers develop a testable hypothesis, experimental controls, and important variables (independent and dependent) to address a problem. [cite: 230]", 
+            src: "PLTW Framework (CCP-F)" 
+        },
+        { 
+            q: "During an experiment, if unexpected results occur, what is the best practice?", 
+            opts: ["Falsify the data to match the hypothesis", "Identify possible sources of error and repeat the experiment", "Change the units of measurement", "Assume the hypothesis was right anyway"], 
+            ans: "Identify possible sources of error and repeat the experiment", 
+            exp: "Engineers identify possible sources of errors, if they exist, redesign and repeat the experiment when appropriate. [cite: 235]", 
+            src: "PLTW Framework (CCP-F)" 
+        },
+        { 
+            q: "Which project management tool helps allocate tasks among team members and tracks a project's schedule over time?", 
+            opts: ["Gantt chart", "Decision matrix", "Dial caliper", "Black box model"], 
+            ans: "Gantt chart", 
+            exp: "Engineers develop a project schedule, allocate tasks among team members, and track progress for successful completion of the project. [cite: 261]", 
+            src: "PLTW Framework (CCP-H)" 
+        },
+        { 
+            q: "Project management scope, time, cost, quality, and resources are collectively referred to as:", 
+            opts: ["Project deliverables and constraints", "The design brief", "The scientific method", "Assembly components"], 
+            ans: "Project deliverables and constraints", 
+            exp: "Engineers must define the project deliverables and constraints, such as scope, time, cost, quality, resources, and risk. [cite: 260]", 
+            src: "PLTW Framework (CCP-H)" 
+        },
+        { 
+            q: "Describing an electronic circuit in terms of its power source, conductive path, and output load is an example of:", 
+            opts: ["Systems thinking", "Algorithmic generation", "Visual analysis", "Parametric modeling"], 
+            ans: "Systems thinking", 
+            exp: "Systems thinking involves describing a system in terms of its components and/or subsystems and their interactions (e.g., source, path, load). [cite: 357]", 
+            src: "PLTW Framework (CCP-I)" 
+        },
+        { 
+            q: "A model that evaluates a system based purely on what goes into it and what comes out of it, without looking at internal mechanics, is a:", 
+            opts: ["White box model", "Black box model", "Parametric model", "Mathematical model"], 
+            ans: "Black box model", 
+            exp: "Engineers describe a system using a black box model indicating inputs and outputs, and boundaries. [cite: 363]", 
+            src: "PLTW Framework (CCP-I)" 
+        },
+        { 
+            q: "When a complex problem is broken down into multiple, manageable subprocesses, this is known as:", 
+            opts: ["Problem decomposition", "Iteration", "Generative design", "Abstraction"], 
+            ans: "Problem decomposition", 
+            exp: "Engineers separate a complex process into multiple subprocesses that can be implemented in an organized way to complete the larger process. [cite: 370]", 
+            src: "PLTW Framework (AAP-A)" 
+        },
+        { 
+            q: "A set of ordered instructions involving discrete steps to accomplish a complex task is called an:", 
+            opts: ["Algorithm", "Abstract", "Equation", "Isometric sketch"], 
+            ans: "Algorithm", 
+            exp: "Engineers write a set of ordered instructions (algorithms) involving multiple discrete steps to accomplish a complex task. [cite: 373]", 
+            src: "PLTW Framework (AAP-B)" 
+        },
+        { 
+            q: "When engineers predict what effect changing one component will have on the whole assembly, they are applying:", 
+            opts: ["Systems thinking", "Visual analysis", "Data plotting", "Historical review"], 
+            ans: "Systems thinking", 
+            exp: "Engineers predict what the effect of making a change to a component of a system will have on the system as a whole. [cite: 362]", 
+            src: "PLTW Framework (CCP-I)" 
+        },
+
+        // TOOLS AND TECHNOLOGY (~22.5% of EOC Blueprint)
+        { 
+            q: "Which phase of reverse engineering focuses on the aesthetic principles and elements of a product?", 
+            opts: ["Visual analysis", "Functional analysis", "Structural analysis", "Material analysis"], 
+            ans: "Visual analysis", 
+            exp: "Visual analysis of a natural or man-made object describes the apparent visual principles and elements of design. [cite: 311]", 
+            src: "PLTW Framework (CCP-L)" 
+        },
+        { 
+            q: "Which phase of reverse engineering requires a physical teardown to determine the interaction of component parts?", 
+            opts: ["Structural analysis", "Visual analysis", "Functional analysis", "Ergonomic analysis"], 
+            ans: "Structural analysis", 
+            exp: "Structural analysis determines the materials used and the configuration and interaction of component parts when assembled. [cite: 313]", 
+            src: "PLTW Framework (CCP-L)" 
+        },
+        { 
+            q: "Fasteners, press fits, and adhesives are examples of methods used to:", 
+            opts: ["Rigidly join parts of an assembly", "Allow degrees of freedom", "Conduct visual analysis", "Measure tolerances"], 
+            ans: "Rigidly join parts of an assembly", 
+            exp: "Engineers describe methods to rigidly join parts of an assembly, including press fits, adhesives, and mechanical fasteners. [cite: 314]", 
+            src: "PLTW Framework (CCP-L)" 
+        },
+        { 
+            q: "What is the primary difference between accuracy and precision in measurement?", 
+            opts: ["Accuracy is closeness to the true value; precision is repeatability", "Precision is closeness to the true value; accuracy is repeatability", "Accuracy uses standard units; precision uses metric", "There is no difference"], 
+            ans: "Accuracy is closeness to the true value; precision is repeatability", 
+            exp: "Engineers must describe the accuracy and precision of a measurement and differentiate between the two. [cite: 329]", 
+            src: "PLTW Framework (ETT-A)" 
+        },
+        { 
+            q: "A force that fundamentally opposes the motion of a mechanical system is:", 
+            opts: ["Friction", "Torque", "Gravity", "Inertia"], 
+            ans: "Friction", 
+            exp: "Engineers must explain that friction is a force that opposes motion. [cite: 333]", 
+            src: "PLTW Framework (ETT-B)" 
+        },
+        { 
+            q: "When a designer tests a material's hardness, flexure, or conductivity without breaking it, this is called:", 
+            opts: ["Non-destructive testing", "Tensile testing", "Destructive testing", "Fatigue testing"], 
+            ans: "Non-destructive testing", 
+            exp: "Engineers conduct non-destructive tests (e.g. hardness, flexure, conductivity) on different material types to investigate properties. [cite: 340]", 
+            src: "PLTW Framework (ETT-C)" 
+        },
+        { 
+            q: "A mechanism that moves back and forth in a straight line is exhibiting what type of motion?", 
+            opts: ["Reciprocating motion", "Rotary motion", "Oscillating motion", "Irregular motion"], 
+            ans: "Reciprocating motion", 
+            exp: "Engineers describe different types of motion, including rotary, oscillating, linear, and reciprocating. [cite: 344]", 
+            src: "PLTW Framework (ETT-D)" 
+        },
+        { 
+            q: "Which mechanism uses an egg-shaped or irregular profile to convert rotary motion into linear/periodic motion?", 
+            opts: ["Cam and follower", "Spur gear", "Block and tackle", "Bevel gear"], 
+            ans: "Cam and follower", 
+            exp: "Cams and followers can be used to move objects in periodic or irregular motion. [cite: 345]", 
+            src: "PLTW Framework (ETT-D)" 
+        },
+        { 
+            q: "If an engineer wants to transform motion without changing its fundamental type (e.g., slow rotary to fast rotary), they would most likely use:", 
+            opts: ["Simple mechanisms like gears or pulleys", "A rack and pinion", "A cam and follower", "A slider crank"], 
+            ans: "Simple mechanisms like gears or pulleys", 
+            exp: "Mechanisms in a design can transform a motion without changing its type (e.g. slow to fast rotary motion using gears). [cite: 348]", 
+            src: "PLTW Framework (ETT-D)" 
+        },
+        { 
+            q: "To automate a human-powered device and control the speed of a mechanical system, an engineer would integrate:", 
+            opts: ["An electrical circuit with a motor and variable resistance", "A larger cam", "A stronger structural matrix", "A wooden gear train"], 
+            ans: "An electrical circuit with a motor and variable resistance", 
+            exp: "Engineers design and build an electrical circuit that includes a motor, a switch, and variable resistance to power and control the speed of a mechanism. [cite: 351]", 
+            src: "PLTW Framework (10.5.2)" 
+        },
+        { 
+            q: "Why must an engineer be aware that all physical measurements are an approximation?", 
+            opts: ["Because measuring devices have limits of precision", "Because math models are always perfect", "Because the metric system is flawed", "Because data is always discrete"], 
+            ans: "Because measuring devices have limits of precision", 
+            exp: "Engineers must explain that all measurements are an approximation of the true value of a quantity due to tool limitations. [cite: 328]", 
+            src: "PLTW Framework (ETT-A)" 
+        },
+        { 
+            q: "In an electrical circuit, how do resistance, current, and voltage relate?", 
+            opts: ["Voltage = Current x Resistance (Ohm's Law)", "Current = Voltage x Resistance", "Resistance = Voltage x Current", "Voltage = Mass x Acceleration"], 
+            ans: "Voltage = Current x Resistance (Ohm's Law)", 
+            exp: "Engineers must calculate circuit resistance, current, and voltage within a circuit using formulas like Ohm's Law. [cite: 350]", 
+            src: "PLTW Framework (10.5.1)" 
+        },
+
+        // MODELING SYSTEMS (~25% of EOC Blueprint)
+        { 
+            q: "Because models are a simplified version of a complex phenomenon, engineers must identify:", 
+            opts: ["The limitations of the model", "The aesthetic color of the model", "The exact manufacturing cost", "The patent registration number"], 
+            ans: "The limitations of the model", 
+            exp: "Models use abstraction to represent a simplified version... engineers must identify limitations of the model and differences between the model and reality. [cite: 388]", 
+            src: "PLTW Framework (MOD-A)" 
+        },
+        { 
+            q: "An equation or formula used to describe a process and make predictions is known as a:", 
+            opts: ["Mathematical model", "Physical prototype", "Virtual assembly", "Generative design"], 
+            ans: "Mathematical model", 
+            exp: "Engineers use a mathematical model (algorithm, table of values, equation, graph) to represent data and make predictions. [cite: 396]", 
+            src: "PLTW Framework (MOD-B)" 
+        },
+        { 
+            q: "On a scatter plot showing two quantitative variables, drawing a 'line of best fit' helps an engineer:", 
+            opts: ["Solve problems and make predictions based on the data trend", "Hide outlier data", "Convert units from metric to imperial", "Create a 3D extrusion"], 
+            ans: "Solve problems and make predictions based on the data trend", 
+            exp: "Engineers fit a function to the data and use the function to solve problems and/or make predictions in the context of the data. [cite: 399]", 
+            src: "PLTW Framework (MOD-B)" 
+        },
+        { 
+            q: "In a mathematical model for a straight line, what does the slope represent?", 
+            opts: ["The rate of change", "The starting value", "The y-intercept", "The tolerance"], 
+            ans: "The rate of change", 
+            exp: "In mathematical models, engineers interpret the rate of change (slope) and the y-intercept (constant term) in the context of the data. [cite: 400]", 
+            src: "PLTW Framework (MOD-B)" 
+        },
+        { 
+            q: "Which CAD tool takes a two-dimensional profile and sweeps it in a circle to create a three-dimensional object?", 
+            opts: ["Revolve", "Extrude", "Loft", "Fillet"], 
+            ans: "Revolve", 
+            exp: "Engineers identify three-dimensional objects generated by rotation (revolution) of a two-dimensional object. [cite: 403]", 
+            src: "PLTW Framework (MOD-C)" 
+        },
+        { 
+            q: "Which of the following describes an allowable variation in the size of an individual manufactured feature?", 
+            opts: ["Tolerance", "Allowance", "Clearance", "Interference"], 
+            ans: "Tolerance", 
+            exp: "Appropriate engineering tolerances specify the allowable variation, size of individual features, and orientation between features. [cite: 411]", 
+            src: "PLTW Framework (MOD-D)" 
+        },
+        { 
+            q: "A tolerance that permits variation in only one direction from a specified dimension is a:", 
+            opts: ["Unilateral tolerance", "Bilateral tolerance", "Limit dimension", "Clearance fit"], 
+            ans: "Unilateral tolerance", 
+            exp: "Engineers identify and differentiate among a limit dimension, unilateral tolerance (one direction), and bilateral tolerance (both directions). [cite: 415]", 
+            src: "PLTW Framework (MOD-D)" 
+        },
+        { 
+            q: "The intended gap or difference in size between two mating parts of an assembly is known as:", 
+            opts: ["Allowance", "Tolerance", "Draft", "Rib"], 
+            ans: "Allowance", 
+            exp: "Engineers determine the allowance between two mating parts of an assembly based on dimensions given on a technical drawing. [cite: 415]", 
+            src: "PLTW Framework (MOD-D)" 
+        },
+        { 
+            q: "If an engineer needs two parts to slide easily past one another, they should dimension the parts to create a:", 
+            opts: ["Clearance fit", "Interference fit", "Force fit", "Press fit"], 
+            ans: "Clearance fit", 
+            exp: "Engineers specify appropriate dimensions to create a clearance fit (parts slide freely) or interference fit (parts are forced together). [cite: 415]", 
+            src: "PLTW Framework (MOD-D)" 
+        },
+        { 
+            q: "Applying rules like horizontal, vertical, parallel, or concentric to 2D CAD sketches is known as using:", 
+            opts: ["Geometric constraints", "Dimensional constraints", "Assemblies", "Generative design"], 
+            ans: "Geometric constraints", 
+            exp: "CAD modeling includes the appropriate application of geometric constraints (horizontal, vertical, parallel, perpendicular, tangent, concentric). [cite: 415]", 
+            src: "PLTW Framework (MOD-E)" 
+        },
+        { 
+            q: "When creating an assembly drawing in CAD, what tool is used to identify specific component parts by number?", 
+            opts: ["Balloons linked to a parts list", "Hidden lines", "Section lines", "Tolerance notes"], 
+            ans: "Balloons linked to a parts list", 
+            exp: "Engineers generate an assembly drawing using CAD software to identify component parts using part identification numbers and a parts list. [cite: 415]", 
+            src: "PLTW Framework (MOD-F)" 
+        },
+        { 
+            q: "What is the purpose of applying 'joints' or 'mates' to a multi-component CAD model?", 
+            opts: ["To constrain models and simulate realistic relative motion", "To change the color of the parts", "To apply a uniform density", "To print a 2D drawing"], 
+            ans: "To constrain models and simulate realistic relative motion", 
+            exp: "Engineers correctly apply joints to constrain multi-component models and/or simulate realistic relative motion of the component parts. [cite: 415]", 
+            src: "PLTW Framework (MOD-E)" 
+        },
+        { 
+            q: "Using CAD to mathematically relate dimensions (e.g., setting hole diameter equal to half the part width) is an example of:", 
+            opts: ["Using parametric formulas", "Direct modeling", "Applying a tolerance", "Abstract reasoning"], 
+            ans: "Using parametric formulas", 
+            exp: "Engineers create relationships among part features and dimensions using parametric formulas. [cite: 415]", 
+            src: "PLTW Framework (MOD-E)" 
+        },
+        { 
+            q: "Which design concept focuses on whether a part can actually be built efficiently in the real world?", 
+            opts: ["Design for Manufacturability", "Aesthetic Proportion", "Visual Rhythm", "Algorithm Design"], 
+            ans: "Design for Manufacturability", 
+            exp: "Engineers apply the principles of design for manufacturability and assembly to analyze if a product can be built as designed. [cite: 317]", 
+            src: "PLTW Framework (CCP-M)" 
+        },
+        // --- SPRING FINAL REVIEW (PART 2) ---
+
+        // GLOBAL CONCEPTS & PROFESSIONALISM
+        { 
+            q: "What is the primary purpose of establishing 'team norms' at the beginning of an engineering project?", 
+            opts: ["To assign the final grades", "To establish a communication protocol and rules of engagement", "To calculate the mechanical advantage", "To select the CAD software"], 
+            ans: "To establish a communication protocol and rules of engagement", 
+            exp: "Engineers develop and follow team norms to dictate individual roles, expectations of performance, and rules of engagement within the team.", 
+            src: "PLTW Framework (CCP-G)" 
+        },
+        { 
+            q: "If an engineer is developing an idea and relies on positive interdependence among all teammates to succeed, they are engaging in:", 
+            opts: ["Independent thinking", "Generative design", "Effective collaboration", "Iterative prototyping"], 
+            ans: "Effective collaboration", 
+            exp: "Effective team environments develop ideas and create products through positive interdependence among all teammates.", 
+            src: "PLTW Framework (D7)" 
+        },
+        { 
+            q: "Why is it critical for an engineer to document their work in an organized notebook?", 
+            opts: ["To make the project look more expensive", "So someone unfamiliar with the work can follow and understand the process", "To avoid using CAD software", "To hide proprietary secrets from the client"], 
+            ans: "So someone unfamiliar with the work can follow and understand the process", 
+            exp: "According to best practices, engineers effectively document work in an organized notebook so someone unfamiliar with the work can follow the process.", 
+            src: "PLTW Framework (D8)" 
+        },
+        { 
+            q: "When an engineer makes a strategic use of textual, graphical, audio, and visual elements in a presentation, their main goal is to:", 
+            opts: ["Enhance understanding of findings, reasoning, and evidence", "Distract from a failed prototype", "Avoid writing a design brief", "Replace the need for a physical model"], 
+            ans: "Enhance understanding of findings, reasoning, and evidence", 
+            exp: "Engineers make strategic use of digital media in presentations to enhance understanding of findings, reasoning, and evidence, and to add interest.", 
+            src: "PLTW Framework (D8)" 
+        },
+        { 
+            q: "Applying inferential reasoning in an engineering experiment means:", 
+            opts: ["Making a wild guess without data", "Using CAD to draw a part", "Making or supporting claims about a larger population based on sample data", "Reversing the design process"], 
+            ans: "Making or supporting claims about a larger population based on sample data", 
+            exp: "Engineers apply inferential reasoning to make and/or support claims about populations based on data.", 
+            src: "PLTW Framework (03.2)" 
+        },
+        { 
+            q: "If a designer acknowledges and respects the local, national, and international perspectives of others, they are demonstrating:", 
+            opts: ["Professionalism and Ethics", "Parametric Modeling", "Structural Analysis", "Dimensional Analysis"], 
+            ans: "Professionalism and Ethics", 
+            exp: "Successful engineering professionals exhibit personal and professional characteristics by acknowledging and respecting international perspectives and ideas.", 
+            src: "PLTW Framework (06.1)" 
+        },
+
+        // PROBLEM SOLVING & PROCESSES
+        { 
+            q: "When an engineer separates a complex process into multiple subprocesses that can be implemented in an organized way, they are using:", 
+            opts: ["Systems thinking", "Problem decomposition", "Generative design", "Spatial visualization"], 
+            ans: "Problem decomposition", 
+            exp: "Problem decomposition skills are used to break down data, problems, and processes into manageable parts.", 
+            src: "PLTW Framework (012.1)" 
+        },
+        { 
+            q: "What is the primary benefit of using an existing, correct algorithm as a building block for a new algorithm?", 
+            opts: ["It guarantees the product will sell", "It helps ensure the new algorithm is correct", "It increases the friction of the system", "It eliminates the need for a prototype"], 
+            ans: "It helps ensure the new algorithm is correct", 
+            exp: "Engineers use existing correct algorithms as building blocks for constructing a new algorithm to help ensure the new algorithm is correct.", 
+            src: "PLTW Framework (012.2)" 
+        },
+        { 
+            q: "If an engineer wants to manipulate, analyze, and present quantitative data using regression analyses, the best tool to use is:", 
+            opts: ["A 3D CAD program", "A spreadsheet application", "A word processor", "A physical notebook"], 
+            ans: "A spreadsheet application", 
+            exp: "Engineers use the functions and tools within a spreadsheet application to manipulate, analyze, and present data in a useful way.", 
+            src: "PLTW Framework (012.4)" 
+        },
+        { 
+            q: "In the context of computational thinking, what does 'abstraction' mean?", 
+            opts: ["Adding as many complex details as possible", "Identifying what has been made more general by hiding or removing unnecessary details", "Drawing a part in an isometric view", "Using a dial caliper to measure thickness"], 
+            ans: "Identifying what has been made more general by hiding or removing unnecessary details", 
+            exp: "Engineers apply abstraction to generalize problems and solutions by identifying what details have been hidden or removed.", 
+            src: "PLTW Framework (012.5)" 
+        },
+        { 
+            q: "A designer evaluating the potential social, economic, and environmental impacts of a solution (including unanticipated risks) is practicing:", 
+            opts: ["Systems thinking", "CAD extrusion", "Tolerancing", "Algorithm writing"], 
+            ans: "Systems thinking", 
+            exp: "Systems thinking involves predicting the local and global risks and impacts of an engineering decision/solution.", 
+            src: "PLTW Framework (11.1.3)" 
+        },
+        { 
+            q: "Before beginning a new design, an engineer critically reflects on past experiences. This is an example of:", 
+            opts: ["Adaptability to change", "Reflecting critically to inform future progress", "Algorithm design", "Reverse engineering"], 
+            ans: "Reflecting critically to inform future progress", 
+            exp: "Engineers reflect critically on past experiences to inform future progress during the design process.", 
+            src: "PLTW Framework (01.2)" 
+        },
+        { 
+            q: "Which project management constraint deals with the specific features and functions that must be delivered by the end of the project?", 
+            opts: ["Cost", "Time", "Scope", "Risk"], 
+            ans: "Scope", 
+            exp: "Project management involves defining project deliverables and constraints such as scope, time, cost, quality, resources, and risk.", 
+            src: "PLTW Framework (5.1.1)" 
+        },
+        { 
+            q: "When a team uses cloud-based document sharing and video conferencing to complete a project, they are using:", 
+            opts: ["Parametric modeling", "Collaborative tools", "Destructive testing", "Go/No-Go gauges"], 
+            ans: "Collaborative tools", 
+            exp: "Engineers select and use collaborative tools, such as cloud-based tools and document sharing, to successfully complete a project.", 
+            src: "PLTW Framework (5.1.3)" 
+        },
+
+        // TOOLS, TECH & MATERIALS
+        { 
+            q: "Using dimensional analysis and unit conversions allows an engineer to:", 
+            opts: ["Change a 2D sketch into a 3D model", "Transform data to consistent units appropriate for a particular model", "Increase the precision of a dial caliper", "Change the material density of a part"], 
+            ans: "Transform data to consistent units appropriate for a particular model", 
+            exp: "Engineers use dimensional analysis and unit conversions to transform data to consistent units or to units appropriate for a particular purpose.", 
+            src: "PLTW Framework (10.1.3)" 
+        },
+        { 
+            q: "An engineer shoots an arrow at a target 10 times. All 10 arrows hit the extreme top left corner in a tight cluster. This result is:", 
+            opts: ["Accurate but not precise", "Precise but not accurate", "Both accurate and precise", "Neither accurate nor precise"], 
+            ans: "Precise but not accurate", 
+            exp: "Precision is repeatability (the tight cluster). Accuracy is closeness to the true value (the bullseye).", 
+            src: "PLTW Framework (10.1.2)" 
+        },
+        { 
+            q: "If an engineer wants to design a mechanism that is highly efficient with very little energy lost to heat, they must account for:", 
+            opts: ["Frictional forces", "The color of the parts", "The aesthetic proportions", "The spreadsheet algorithm"], 
+            ans: "Frictional forces", 
+            exp: "Friction is a force that opposes motion. Engineers must identify how frictional force impacts the function and efficiency of a mechanism.", 
+            src: "PLTW Framework (010.2)" 
+        },
+        { 
+            q: "Which property is considered a 'mechanical' property of a material?", 
+            opts: ["Electrical resistivity", "Yield strength", "Specific heat", "Magnetic attraction"], 
+            ans: "Yield strength", 
+            exp: "Yield strength, ultimate tensile strength, and hardness are mechanical properties. Resistivity is electrical, specific heat is thermal.", 
+            src: "PLTW Framework (10.3.2)" 
+        },
+        { 
+            q: "A mechanism that produces motion swinging back and forth in an arc (like a pendulum) is classified as:", 
+            opts: ["Linear motion", "Rotary motion", "Oscillating motion", "Intermittent motion"], 
+            ans: "Oscillating motion", 
+            exp: "Engineers must describe different types of motion (e.g. rotary, oscillating, linear, reciprocating, intermittent, and irregular).", 
+            src: "PLTW Framework (10.4.1)" 
+        },
+        { 
+            q: "Which element in an electrical circuit is specifically designed to safely start or stop the flow of current?", 
+            opts: ["A switch", "A motor", "A variable resistor", "A battery"], 
+            ans: "A switch", 
+            exp: "Engineers design and build electrical circuits that include a motor, a switch, and variable resistance to power mechanisms.", 
+            src: "PLTW Framework (10.5.2)" 
+        },
+        { 
+            q: "When performing a reverse engineering teardown, discovering that the outer casing is made of Injection Molded Polycarbonate is part of the:", 
+            opts: ["Functional analysis", "Visual analysis", "Structural analysis", "Mathematical analysis"], 
+            ans: "Structural analysis", 
+            exp: "Structural analysis determines the materials used and the configuration of component parts when assembled.", 
+            src: "PLTW Framework (9.1.4)" 
+        },
+        { 
+            q: "A hinge joint on a laptop screen removes specific degrees of freedom to allow movement in only one axis. This is an example of:", 
+            opts: ["A rigid adhesive connection", "Interfacing parts in an assembly", "An electrical insulator", "A pneumatic system"], 
+            ans: "Interfacing parts in an assembly", 
+            exp: "Engineers identify joints that allow movement between interfacing parts and the degrees of freedom they remove (including hinges).", 
+            src: "PLTW Framework (9.1.6)" 
+        },
+        { 
+            q: "Which material class is best known for being inorganic, non-metallic, and an excellent electrical insulator?", 
+            opts: ["Ferrous metals", "Polymers", "Ceramics", "Alloys"], 
+            ans: "Ceramics", 
+            exp: "Ceramics are inorganic, non-metallic electrical insulators that are generally stiff and hard but somewhat brittle.", 
+            src: "Uses of Common Materials Document" 
+        },
+        { 
+            q: "If an engineer wants to design a frying pan handle that will not burn the user, they should choose a material with a:", 
+            opts: ["High thermal conductivity", "Low thermal conductivity", "High electrical conductivity", "Low melting point"], 
+            ans: "Low thermal conductivity", 
+            exp: "A low value of thermal conductivity is favorable to insulate the passage of heat.", 
+            src: "Properties of Engineering Materials Chart" 
+        },
+
+        // MODELING SYSTEMS & CAD
+        { 
+            q: "A CAD designer wants to apply an annotation that defines the allowable variation in the location between two drilled holes. They are applying a:", 
+            opts: ["Tolerance", "Datum dimension", "Parametric formula", "Generative design"], 
+            ans: "Tolerance", 
+            exp: "Appropriate engineering tolerances specify the allowable variation, size, orientation, and location between features of an object.", 
+            src: "PLTW Framework (013.4)" 
+        },
+        { 
+            q: "In an orthographic projection, if an object has a slanted or angled face, what type of view is required to show that face in its true size and shape?", 
+            opts: ["Section view", "Auxiliary view", "Detail view", "Isometric view"], 
+            ans: "Auxiliary view", 
+            exp: "An auxiliary view is an orthographic projection used to show the true size and shape of an angled surface.", 
+            src: "PLTW Framework (Modeling)" 
+        },
+        { 
+            q: "A cutting plane line and cross-hatching are used together to create a:", 
+            opts: ["Full- or half-section view", "Detail view", "Exploded assembly", "Parametric model"], 
+            ans: "Full- or half-section view", 
+            exp: "Engineers identify errors and omissions in a full- or half-section view, including the location of the cutting plane line.", 
+            src: "PLTW Framework (13.3.5)" 
+        },
+        { 
+            q: "If a CAD model is built using dimensions that refer back to a single, mathematical variable (like 'Length = Width / 2'), the model is using:", 
+            opts: ["Parametric formulas", "Absolute tolerancing", "Direct modeling", "Limit dimensions"], 
+            ans: "Parametric formulas", 
+            exp: "Engineers create relationships among part features and dimensions using parametric formulas.", 
+            src: "PLTW Framework (13.5.3)" 
+        },
+        { 
+            q: "To correctly identify a part in an assembly drawing, a designer uses:", 
+            opts: ["A balloon and a parts list", "A section line", "A bilateral tolerance", "A mathematical equation"], 
+            ans: "A balloon and a parts list", 
+            exp: "Engineers generate an assembly drawing using CAD software to identify component parts using part identification numbers (balloons) and a parts list.", 
+            src: "PLTW Framework (13.6.3)" 
+        },
+        { 
+            q: "Which dimensioning method reduces tolerance accumulation by measuring all features from a single reference edge?", 
+            opts: ["Chain dimensioning", "Baseline / Datum dimensioning", "Parametric dimensioning", "Unilateral dimensioning"], 
+            ans: "Baseline / Datum dimensioning", 
+            exp: "Datum (baseline) dimensioning prevents the stacking of errors by measuring all features from a single origin point.", 
+            src: "PLTW Framework (Modeling)" 
+        },
+        { 
+            q: "If a technical drawing contains an error in a line type (e.g., using a solid line instead of a dashed line for a hidden feature), this is an error in:", 
+            opts: ["Tolerancing", "Drawing conventions / standards", "Algorithmic thinking", "Material selection"], 
+            ans: "Drawing conventions / standards", 
+            exp: "Engineers must identify errors in orthographic projections including errors in line locations and line types according to accepted technical drawing techniques.", 
+            src: "PLTW Framework (13.3.4)" 
+        },
+        { 
+            q: "When a designer uses computer-aided engineering tools to optimize the physical shape of a part for maximum strength and minimum weight, they are using:", 
+            opts: ["Generative design and shape optimization", "A Gantt chart", "Reverse engineering", "A decision matrix"], 
+            ans: "Generative design and shape optimization", 
+            exp: "Engineers use computer-aided engineering tools (e.g. generative design and shape optimization) to optimize design performance of a mechanical part.", 
+            src: "PLTW Framework (9.2.3)" 
+        },
+        // --- SPRING FINAL REVIEW (PART 3) ---
+
+        // GLOBAL CONCEPTS (~25% of Blueprint)
+        { 
+            q: "According to the PLTW framework, engineering is best defined as:", 
+            opts: ["The creation of solutions to meet the needs of people and society", "The scientific study of natural phenomena", "The use of statistical models to graph data", "The process of taking apart a consumer product"], 
+            ans: "The creation of solutions to meet the needs of people and society", 
+            exp: "Engineering is the creation of solutions, such as new and improved products, technologies, systems and processes, to meet the needs of people and society. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When an engineer makes a judgment or decision, they should evaluate the point of view and rhetoric of their sources to identify:", 
+            opts: ["Deficiencies, limitations, and biases", "Parametric formulas", "Mechanical advantages", "Generative designs"], 
+            ans: "Deficiencies, limitations, and biases", 
+            exp: "Engineers must evaluate point of view, reasoning, and use of evidence and rhetoric, in oral or written communication and identify deficiencies, limitations and biases. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Why is it important for an engineer to understand the life cycle of a product?", 
+            opts: ["To determine its environmental, social, and economic impacts over time", "To know exactly when it will break down", "To calculate the appropriate manufacturing tolerances", "To set the retail price"], 
+            ans: "To determine its environmental, social, and economic impacts over time", 
+            exp: "Engineers describe the life cycle of a product or service because different engineering solutions can have significantly different impacts on individuals, society, and the natural world. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When addressing a complex, real-world problem, engineers must often make 'trade-offs'. This means they must:", 
+            opts: ["Balance a range of criteria and constraints, such as cost versus safety", "Trade their design with another engineering firm", "Always choose the cheapest material available", "Ignore the environmental impacts if the product is reliable"], 
+            ans: "Balance a range of criteria and constraints, such as cost versus safety", 
+            exp: "Engineers evaluate a solution to a complex, real-world problem and identify the need for trade-offs to address a range of criteria and constraints, including cost, safety, reliability, and aesthetics. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which concept involves taking action for collective well-being and using natural resources effectively and efficiently?", 
+            opts: ["Sustainable development", "Reverse engineering", "Parametric modeling", "Algorithm creation"], 
+            ans: "Sustainable development", 
+            exp: "Engineers take action for collective well-being and sustainable development using an ethical decision-making process. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which of the following is considered a nontechnical skill required for professional engineering practice?", 
+            opts: ["Problem-solving and handling uncertainty", "Calculating circuit resistance", "Building a 3D CAD model", "Using dimensional analysis"], 
+            ans: "Problem-solving and handling uncertainty", 
+            exp: "Identify technical and nontechnical skills common to all engineering disciplines that are gained from specialized education... including problem-solving, handling uncertainty, systems thinking, and modeling. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "An engineer critically self-evaluates their personal contributions and collaboration effectiveness within a team. This is an example of:", 
+            opts: ["Professional practice and communication", "Experimental design", "Systems thinking", "Computational thinking"], 
+            ans: "Professional practice and communication", 
+            exp: "Engineers critically and realistically self-evaluate personal contributions and collaboration effectiveness within a team. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which of the following is a key characteristic of 'human-centered design'?", 
+            opts: ["Aligning product design with its intended use and user", "Using only sustainable materials", "Automating a mechanical system", "Applying geometric constraints in CAD"], 
+            ans: "Aligning product design with its intended use and user", 
+            exp: "Explain the benefits of human-centered design and apply principles to align product design with intended use. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+
+        // PROBLEM SOLVING (~30% of Blueprint)
+        { 
+            q: "During the design process, when an engineer synthesizes an ill-formed problem into a meaningful one, they are defining the:", 
+            opts: ["Problem", "Prototype", "Tolerance", "Algorithm"], 
+            ans: "Problem", 
+            exp: "Synthesize an ill-formed problem into a meaningful, well-defined problem using relevant information. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which of the following must be defined before competing solution ideas can be objectively compared?", 
+            opts: ["Criteria and constraints", "The critical path", "The black box model", "The center of mass"], 
+            ans: "Criteria and constraints", 
+            exp: "Define measurable visual, functional, and structural design requirements (criteria) and realistic constraints against which solution alternatives can be evaluated and optimized. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When an engineer loops back through steps of the design process to improve and optimize a solution, the process is considered:", 
+            opts: ["Iterative", "Linear", "Parametric", "Abstract"], 
+            ans: "Iterative", 
+            exp: "Strategically iterate steps of the design process to improve and optimize a solution. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "In an experimental design, the variable that the experimenter intentionally manipulates is the:", 
+            opts: ["Independent variable", "Dependent variable", "Control variable", "Constant"], 
+            ans: "Independent variable", 
+            exp: "Develop a testable hypothesis, experimental controls and important variables (independent and dependent) address a problem or answer a question. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When establishing a project schedule in project management, identifying the longest sequence of dependent tasks is known as finding the:", 
+            opts: ["Critical path", "Gantt chart", "Black box", "Iterative cycle"], 
+            ans: "Critical path", 
+            exp: "Develop a project schedule (with the critical path identified when appropriate), allocate tasks among team members, and track progress. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Describing an electronic circuit's components—such as the source, path, and load—and how they interact is an example of:", 
+            opts: ["Systems thinking", "Data abstraction", "Visual analysis", "Parametric modeling"], 
+            ans: "Systems thinking", 
+            exp: "Describe a system in terms of its components and/or subsystems and their interactions. For example, describe the components of an electronic circuit, including source, path, and load. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "A model that describes a system purely by its inputs, outputs, and boundaries without detailing its internal workings is a:", 
+            opts: ["Black box model", "Parametric model", "Mathematical model", "Generative model"], 
+            ans: "Black box model", 
+            exp: "Describe a system using a black box model indicating inputs and outputs, boundaries. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Applying problem decomposition skills means:", 
+            opts: ["Breaking down data, problems, and processes into manageable parts", "Destroying a prototype to test its limits", "Converting units from metric to imperial", "Using CAD to optimize a shape"], 
+            ans: "Breaking down data, problems, and processes into manageable parts", 
+            exp: "Apply problem decomposition skills to break down data, problems, and processes into manageable parts. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "A set of ordered instructions involving multiple discrete steps used to accomplish a complex task is called an:", 
+            opts: ["Algorithm", "Abstract", "Equation", "Isometric sketch"], 
+            ans: "Algorithm", 
+            exp: "Write a set of ordered instructions (with or without a computer) involving multiple discrete steps to accomplish a complex task or achieve a desired result. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Identifying what has been made more general by hiding or removing specific details to generalize a problem is called:", 
+            opts: ["Abstraction", "Iteration", "Tolerancing", "Prototyping"], 
+            ans: "Abstraction", 
+            exp: "Identify what has been made more general by an abstraction and what details have been hidden or removed. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Populating a spreadsheet with data and organizing it to be useful in accomplishing a specific goal is a fundamental part of:", 
+            opts: ["Computational thinking", "Reverse engineering", "Parametric modeling", "Tolerance analysis"], 
+            ans: "Computational thinking", 
+            exp: "Populate a spreadsheet application with data and organize the data to be useful in accomplishing a specific goal. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which function in a spreadsheet application helps predict future trends based on existing data?", 
+            opts: ["Regression analysis", "Auto-sum", "Font formatting", "Cell merging"], 
+            ans: "Regression analysis", 
+            exp: "Use the functions and tools within a spreadsheet application to manipulate, analyze, and present data in a useful way, including graphs, regression analyses, and descriptive statistical analyses. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Automating a human-powered device using a mechanical and/or electrical system demonstrates:", 
+            opts: ["Formulating solutions that use automation", "Creating a black box model", "Applying non-destructive testing", "Conducting a visual analysis"], 
+            ans: "Formulating solutions that use automation", 
+            exp: "Formulate solutions that use automation to solve a problem. Automate a human-powered device using a mechanical and/or electrical system. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+
+        // TOOLS, TECH & MATERIALS (~22.5% of Blueprint)
+        { 
+            q: "When determining if a physical product can actually be built as designed using available fabrication processes, an engineer is focusing on:", 
+            opts: ["Design for manufacturability", "Aesthetic proportions", "Abstract reasoning", "Statistical spread"], 
+            ans: "Design for manufacturability", 
+            exp: "Apply the principles of design for manufacturability and assembly of mechanical products. Define basic fabrication processes and analyze if a product can be built as designed. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which phase of reverse engineering determines the purpose, inputs, outputs, and operation of a product?", 
+            opts: ["Functional analysis", "Visual analysis", "Structural analysis", "Material analysis"], 
+            ans: "Functional analysis", 
+            exp: "Perform a functional analysis of a product or system to determine the purpose, inputs and outputs, and operation of a product or system. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "During reverse engineering, tearing down a product to see how parts are connected with adhesives or fasteners is part of the:", 
+            opts: ["Structural analysis", "Visual analysis", "Functional analysis", "Ergonomic analysis"], 
+            ans: "Structural analysis", 
+            exp: "Perform a structural analysis of a product or system to determine the materials used, the form of component parts, as well as the configuration and interaction of component parts when assembled. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "An engineer needs to transform data to consistent units appropriate for a particular model. They should use:", 
+            opts: ["Dimensional analysis and unit conversions", "A decision matrix", "Parametric CAD tools", "A Go/No-Go gauge"], 
+            ans: "Dimensional analysis and unit conversions", 
+            exp: "Use dimensional analysis and unit conversions to transform data to consistent units or to units appropriate for a particular purpose or model. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Because no measuring device is perfect, engineers must accept that all physical measurements are:", 
+            opts: ["An approximation of the true value", "Always 100% accurate", "Not necessary for CAD", "Only valid in the metric system"], 
+            ans: "An approximation of the true value", 
+            exp: "Explain that all measurements are an approximation of the true value of a quantity. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which of the following is considered a force that opposes motion in a mechanical system?", 
+            opts: ["Friction", "Voltage", "Tolerance", "Inertia"], 
+            ans: "Friction", 
+            exp: "Explain that friction is a force that opposes motion. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "An engineer needs to test the conductivity and hardness of a material without breaking or ruining the sample. They should conduct:", 
+            opts: ["Non-destructive tests", "Tensile testing", "Destructive testing", "Life cycle analysis"], 
+            ans: "Non-destructive tests", 
+            exp: "Conduct non-destructive tests (e.g. hardness, flexure, conductivity) on different material types to investigate material properties. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Cams and followers are primarily used in mechanical design to:", 
+            opts: ["Move objects in periodic or irregular motion", "Conduct electrical current", "Rigidly join two parts together", "Calculate statistical variance"], 
+            ans: "Move objects in periodic or irregular motion", 
+            exp: "Explain how cams and followers can be used to move objects in periodic or irregular motion. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "If a designer uses a mechanism to turn a slow rotary motion into a fast rotary motion, they are using the mechanism to:", 
+            opts: ["Transform a motion without changing its type", "Change rotary motion into linear motion", "Increase the coefficient of friction", "Automate a human-powered device"], 
+            ans: "Transform a motion without changing its type", 
+            exp: "Use mechanisms in a design to transform a motion without changing its type (e.g. slow to fast rotary motion, magnifying linear movement, or changing axis of motion). [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "To power and control the speed of a mechanical mechanism, an engineer would design an electrical circuit containing a:", 
+            opts: ["Motor, switch, and variable resistance", "Cam and follower", "Dial caliper and Go/No-Go gauge", "Gantt chart"], 
+            ans: "Motor, switch, and variable resistance", 
+            exp: "Design and build an electrical circuit that includes a motor, a switch and variable resistance to power and control the speed of a mechanism. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Calculating the resistance, current, and voltage within a circuit requires an understanding of:", 
+            opts: ["Ohm's Law", "The Empirical Rule", "Parametric Modeling", "Dimensional Analysis"], 
+            ans: "Ohm's Law", 
+            exp: "Calculate circuit resistance, current, and voltage within a circuit. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which tool uses algorithms to optimize the design performance and physical shape of a mechanical part based on material and weight constraints?", 
+            opts: ["Generative design / Shape optimization", "A Gantt chart", "A decision matrix", "A digital multimeter"], 
+            ans: "Generative design / Shape optimization", 
+            exp: "Use computer-aided engineering tools (e.g. generative design and shape optimization) to optimize design performance of a mechanical part or assembly. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+
+        // MODELING SYSTEMS (~25% of Blueprint)
+        { 
+            q: "Why is there no guarantee that an engineering model accurately represents a real object or phenomenon?", 
+            opts: ["Because models use abstraction to represent a simplified version of a complex phenomenon", "Because CAD software always contains bugs", "Because engineers cannot use mathematical algorithms", "Because dimensional analysis is inaccurate"], 
+            ans: "Because models use abstraction to represent a simplified version of a complex phenomenon", 
+            exp: "Recognize that models use abstraction to represent a simplified version of a complex phenomenon and there is no guarantee that the model accurately represents the real object or phenomenon. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which of the following is an example of a mathematical model used to describe relationships and make predictions?", 
+            opts: ["An equation or algorithm", "A physical 3D printed prototype", "A Gantt chart", "An orthographic sketch"], 
+            ans: "An equation or algorithm", 
+            exp: "Build and/or use a mathematical model (algorithm, table of values, equation, graph) to represent data, describe relationships, describe processes, and to make predictions. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When interpreting a mathematical model (like a linear graph), what does the slope generally represent?", 
+            opts: ["The rate of change", "The y-intercept", "The standard deviation", "The tolerance"], 
+            ans: "The rate of change", 
+            exp: "In mathematical models, interpret the rate of change (slope) and the y-intercept (constant term) in the context of the data. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Which dimensioning element specifies the allowable variation in the size of an individual feature?", 
+            opts: ["Tolerance", "Datum", "Leader line", "Section line"], 
+            ans: "Tolerance", 
+            exp: "Apply appropriate engineering tolerances to specify the allowable variation, size of individual features, and orientation and location between features of an object. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "A tolerance stated as '1.50 ± 0.05' is an example of a:", 
+            opts: ["Bilateral tolerance", "Unilateral tolerance", "Limit dimension", "Clearance fit"], 
+            ans: "Bilateral tolerance", 
+            exp: "Identify and differentiate among a limit dimension, unilateral tolerance, and bilateral tolerance. A bilateral tolerance allows variation in both directions. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "The planned difference in size between two mating parts (like a peg and a hole) is called the:", 
+            opts: ["Allowance", "Tolerance", "Draft angle", "Parametric constraint"], 
+            ans: "Allowance", 
+            exp: "Determine the allowance between two mating parts of an assembly based on dimensions given on a technical drawing. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Specifying dimensions so that a metal pin is slightly larger than the hole it goes into creates a(n):", 
+            opts: ["Interference fit", "Clearance fit", "Transition fit", "Parametric fit"], 
+            ans: "Interference fit", 
+            exp: "Identify the need for and specify appropriate dimensions to create a clearance fit or interference fit where appropriate. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "In 3D CAD modeling, creating relationships among part features and dimensions using equations (e.g., d1 = d2 / 2) is called using:", 
+            opts: ["Parametric formulas", "Absolute constraints", "Visual analysis", "Interference fitting"], 
+            ans: "Parametric formulas", 
+            exp: "Create relationships among part features and dimensions using parametric formulas. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "To accurately represent the physical behaviors of a design idea in a CAD sketch, an engineer must apply:", 
+            opts: ["Geometric and dimensional constraints", "Balloons and parts lists", "Gantt charts", "Section lines"], 
+            ans: "Geometric and dimensional constraints", 
+            exp: "Correctly build and constrain a three-dimensional solid computer model... This could include the appropriate application of geometric (horizontal, vertical, parallel, perpendicular, tangent, concentric) and dimensional constraints. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "When putting together a multi-component model in CAD, an engineer uses what to simulate realistic relative motion?", 
+            opts: ["Joints / Assembly constraints", "Extrusions", "Parametric formulas", "Tolerances"], 
+            ans: "Joints / Assembly constraints", 
+            exp: "Correctly apply joints to constrain multi-component models and/or simulate realistic relative motion of the component parts. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "An assembly drawing generated in CAD typically identifies component parts using:", 
+            opts: ["Part identification numbers (balloons) and a parts list", "Hidden lines and center marks", "Parametric equations", "Decision matrices"], 
+            ans: "Part identification numbers (balloons) and a parts list", 
+            exp: "Generate an assembly drawing using CAD software to identify component parts and show details of assembly using part identification numbers, a parts list, and other annotations. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "Identifying errors in a technical drawing, such as incorrect line types or missing dimensions, ensures the drawing follows:", 
+            opts: ["Standard engineering practices and conventions", "The scientific method", "The empirical rule", "Systems thinking"], 
+            ans: "Standard engineering practices and conventions", 
+            exp: "Identify errors and omissions in orthographic projections and multiview drawings... to fully detail an object or part using accepted technical drawing techniques. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "What type of technical drawing view uses a cutting plane line to show the interior details of a part?", 
+            opts: ["Section view", "Auxiliary view", "Isometric view", "Exploded view"], 
+            ans: "Section view", 
+            exp: "Identify errors and omissions in a full- or half-section view (including errors in line locations, line types, location of cutting plane line). [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "A three-dimensional object generated by spinning a two-dimensional profile around an axis was created using which CAD operation?", 
+            opts: ["Revolve / Rotation", "Extrusion", "Sweep", "Loft"], 
+            ans: "Revolve / Rotation", 
+            exp: "Identify three-dimensional objects generated by rotation of a two-dimensional object. [cite: 1]", 
+            src: "PLTW Framework" 
+        },
+        { 
+            q: "A diagram representing data for two quantitative variables to describe how they are related is called a:", 
+            opts: ["Scatter plot", "Histogram", "Box plot", "Gantt chart"], 
+            ans: "Scatter plot", 
+            exp: "Represent data for two quantitative variables on a scatter plot, and describe how the variables are related. [cite: 1]", 
+            src: "PLTW Framework" 
+        }
+    ]
 };
 
 window.pltwBanks = pltwBanks; // Forces the bank to be globally accessible to the game logic
