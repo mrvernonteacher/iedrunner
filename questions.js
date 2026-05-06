@@ -272,7 +272,7 @@ const pltwBanks = {
         { q: "The distance between two adjacent threads on a screw is the:", opts: ["Pitch", "Diameter", "Circumference", "Lead"], ans: "Pitch", exp: "Pitch measures the gap between threads. Lead measures how far the screw drives per rotation.", src: "PLTW Curriculum" },
         { q: "A fixed point around which a lever rotates is the:", opts: ["Fulcrum", "Effort", "Load", "Resistance"], ans: "Fulcrum", exp: "The fulcrum acts as the hinge or pivot point for any lever.", src: "PLTW Curriculum" },
         { q: "If input distance is 10ft and output distance is 2ft, the IMA is:", opts: ["5", "0.2", "20", "8"], ans: "5", exp: "IMA = Input Distance / Output Distance. 10 / 2 = 5.", src: "PLTW Curriculum" }
-    ]
+    ],
     // UNIT 9: Spring Final Review (EOC Blueprint Aligned - Part 1)
     9: [
         // GLOBAL CONCEPTS (~25% of EOC Blueprint)
