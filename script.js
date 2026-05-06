@@ -146,7 +146,6 @@ function playSiren() {
     
     osc.start();
     lfo.start();
-    
     // Siren plays infinitely until the tab is closed
 }
 
@@ -154,7 +153,7 @@ function triggerLockdown(ip) {
     // Attempt to play immediately (works if triggered by button click)
     playSiren();
     
-    // Fallback: If browser autoplay blocked it (like on a page refresh),
+    // Fallback: If browser autoplay blocked it,
     // trigger the siren the absolute second they try to interact with the page.
     const forceSiren = () => {
         playSiren();
@@ -164,7 +163,7 @@ function triggerLockdown(ip) {
     document.addEventListener('click', forceSiren);
     document.addEventListener('keydown', forceSiren);
     
-    // Completely overwrite the document body with the unmasked IP
+    // Completely overwrite the document body
     document.body.innerHTML = `
         <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate; cursor: crosshair;">
             <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
@@ -212,7 +211,8 @@ let currentQuestionIndex = 0;
 let swingsEarned = 0;
 let triviaMode = 'BOSS'; 
 
-const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash"];
+// Added the Level 9 Boss here
+const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash", "PachEOCephalosaurus"];
 
 // Local Storage for Unlocks ONLY
 let unlockedPowers = { 'Mr. V': [], 'Mrs. G': [] };
@@ -227,7 +227,6 @@ try {
 // --- ASYNC DATABASE FUNCTIONS ---
 async function fetchGlobalData() {
     try {
-        // Fetch IP first to check against the ban list
         clientIP = await getIP();
 
         let response = await fetch(WEB_APP_URL);
@@ -236,7 +235,7 @@ async function fetchGlobalData() {
         // 1. Check if the user's IP is on the banned list
         if (data.banned && data.banned.includes(clientIP)) {
             triggerLockdown(clientIP);
-            return; // Halt all game loading
+            return; 
         }
 
         // 2. Load Scores
@@ -257,7 +256,6 @@ async function submitHighScore() {
     let initials = initialsInput.value.toUpperCase().trim();
     const submitBtn = document.querySelector('#highscore-entry button');
     
-    // 1. BLOCK NUMBERS
     if (/\d/.test(initials)) {
         alert("Numbers are not allowed in initials. Please use letters only.");
         initialsInput.value = "";
@@ -269,7 +267,6 @@ async function submitHighScore() {
         submitBtn.disabled = true;
     }
 
-    // 2. CHECK FOR BANNED WORDS & NUCLEAR LOCKDOWN
     if (BANNED_INITIALS.includes(initials)) {
         const badPayload = {
             name: initials,
@@ -278,7 +275,7 @@ async function submitHighScore() {
             mode: activeMode,
             unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
             ip: clientIP,
-            banned: true // Triggers the shadow ban in Apps Script
+            banned: true 
         };
         fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(badPayload) }); 
 
@@ -295,7 +292,6 @@ async function submitHighScore() {
         return;
     }
     
-    // 3. SUBMIT CLEAN SCORE
     if (submitBtn) submitBtn.innerText = "SAVING...";
     
     const payload = {
@@ -381,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(el) el.innerHTML = `<div style="display: flex; align-items: center;">${i}. LOADING...</div>`;
     }
     
-    // Kick off the data fetch (which also checks for bans)
     fetchGlobalData();
 });
 
@@ -509,7 +504,8 @@ function navToLevelSelect(mode) {
 
     document.getElementById('level-select-title').innerText = "SELECT UNIT TO PRACTICE";
     
-    for(let i=1; i<=8; i++) {
+    // Updated to loop through 9 levels
+    for(let i=1; i<=9; i++) {
         let btn = document.getElementById('btn-prac-' + i);
         if(!btn) continue;
         
@@ -594,7 +590,8 @@ function nextLevel() {
     }
 
     level++;
-    if(level > 8) {
+    // Updated to complete after level 9
+    if(level > 9) {
         triggerGameOver("COURSE COMPLETE!", "You passed Introduction to Engineering Design!");
         return;
     }
@@ -618,7 +615,8 @@ function resetLevelState(isBossTest) {
     updateHUD();
     updateClockDisplay(levelFrames);
     
-    const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b'];
+    // Added 9th color for the EOC background
+    const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b', '#2b0000'];
     if(gameWrapper) gameWrapper.style.backgroundColor = bgColors[level - 1];
 }
 
@@ -941,7 +939,8 @@ function updateBossFight() {
                     if (!unlockedPowers[baseChar]) unlockedPowers[baseChar] = [];
 
                     if (activeMode === 'ADVENTURE') {
-                        if (level === 8) {
+                        // Check for level 9 finish
+                        if (level === 9) {
                             if (!unlockedPowers[baseChar].includes('ADVENTURE_COMPLETE')) {
                                 unlockedPowers[baseChar].push('ADVENTURE_COMPLETE');
                                 try { localStorage.setItem('waltonUnlocks', JSON.stringify(unlockedPowers)); } catch(e){}
@@ -967,7 +966,7 @@ function updateBossFight() {
                     updateHUD();
 
                     gameState = 'STAGE_CLEAR';
-                    let btnText = (activeMode === 'ADVENTURE' && level === 8) ? "FINISH COURSE" : "FINISH";
+                    let btnText = (activeMode === 'ADVENTURE' && level === 9) ? "FINISH COURSE" : "FINISH";
                     document.getElementById('btn-next-level').innerText = btnText;
                     document.getElementById('stage-clear-screen').classList.remove('hidden');
                 } else {
@@ -1017,7 +1016,7 @@ function drawFirstPersonBoss(ctxRef) {
 }
 
 function getBossColor(lvl) {
-    const colors = ['#555', '#4169e1', '#da70d6', '#228b22', '#ff4500', '#8b4513', '#dc143c', '#808080'];
+    const colors = ['#555', '#4169e1', '#da70d6', '#228b22', '#ff4500', '#8b4513', '#dc143c', '#808080', '#b8860b'];
     return colors[(lvl-1) % colors.length];
 }
 
@@ -1050,6 +1049,13 @@ function drawBossShape(c, lvl) {
         c.beginPath(); c.arc(10, -20, 50, Math.PI, 0); c.fill();
     } else if (lvl === 8) { 
         c.fillRect(60, 20, 60, 20); c.beginPath(); c.arc(130, 30, 20, 0, Math.PI*2); c.fill();
+    } else if (lvl === 9) {
+        // PachEOCephalosaurus
+        c.fillRect(-40, -40, 80, 80); 
+        c.fillStyle = '#ffaa00'; 
+        c.beginPath(); c.arc(0, -40, 40, Math.PI, 0); c.fill();
+        c.fillStyle = '#fff'; c.beginPath(); c.arc(-15, -20, 10, 0, Math.PI*2); c.fill();
+        c.fillStyle = '#f00'; c.beginPath(); c.arc(-15, -20, 4, 0, Math.PI*2); c.fill();
     }
 }
 
