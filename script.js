@@ -246,20 +246,18 @@ document.addEventListener('visibilitychange', () => {
         let timeGone = Date.now() - tabLeaveTime;
         tabStrikeCount++;
         
-        if (timeGone > 5000) {
-            triggerCheaterReset("AWAY FOR MORE THAN 5 SECONDS");
-        } else if (tabStrikeCount >= 3) {
-            triggerCheaterReset("3 TAB SWITCHES DETECTED");
+        if (timeGone > 5000 || tabStrikeCount >= 3) {
+            triggerCheaterReset();
         } else {
             alert(`WARNING ${tabStrikeCount}/3: You left the testing tab! If you are gone for more than 5 seconds or switch tabs 3 times, your quiz will automatically reset and flag your submission.`);
         }
     }
 });
 
-function triggerCheaterReset(reason) {
+function triggerCheaterReset() {
     isCheating = true;
     clearInterval(quizInterval);
-    alert(`SECURITY BREACH: ${reason}. Your quiz has been voided.`);
+    alert(`Quiz stopped due to inactivity of browsing away for more than 5 s.`);
     score = 0; 
     endQuiz();
 }
@@ -334,7 +332,7 @@ async function submitHighScore() {
     
     let detailsString = "";
     if (activeMode === 'QUIZ_REVIEW') {
-        detailsString = `${quizCorrect}/${quizTotal}${isCheating ? " [FLAGGED: TAB SWITCHED]" : ""}`;
+        detailsString = `${quizCorrect}/${quizTotal}`;
     }
 
     const payload = {
@@ -545,6 +543,11 @@ function navToLevelSelect(mode) {
         
         let title = btn.getAttribute('data-title');
         
+        if (mode === 'QUIZ_REVIEW') {
+            btn.innerHTML = title; // Clean interface for Quiz Review mode
+            continue;
+        }
+        
         if (!scoresLoaded) {
              btn.innerHTML = `${title}<br><span style="color:#ffcc00; font-size:10px; margin-top:5px; display:block;">Loading Scores...</span>`;
              continue;
@@ -664,7 +667,6 @@ function askQuizQuestion() {
     let perc = quizIndex === 0 ? 0 : Math.round((quizCorrect / quizIndex) * 100);
     document.getElementById('quiz-progress').innerText = `${quizCorrect}/${quizTotal} (${perc}%)`;
     
-    // Updated Regex Sniffer: Grants 60s for math/calc, 30s for standard
     const calcRegex = /\b(calculate|determine|formula|ratio|percentage|radius|diameter|area|volume|density|mass|force|friction|IMA|AMA|efficiency|value|equation)\b|\d+/i;
     let timeLimit = calcRegex.test(q.q) ? 60 : 30;
     
@@ -716,22 +718,21 @@ function checkQuizAnswer(selected, correct) {
     clearInterval(quizInterval);
     
     const q = quizQuestions[quizIndex];
+    const answersDiv = document.getElementById('answers-container');
     
     if (selected === correct) {
         quizCorrect++;
-        document.getElementById('trivia-status').innerText = "CORRECT!";
-        document.getElementById('trivia-status').style.color = '#55ff55';
+        document.getElementById('trivia-status').innerText = "";
         
-        setTimeout(() => {
-            quizIndex++;
-            askQuizQuestion();
-        }, 1000);
+        answersDiv.innerHTML = `
+            <div style="color: #55ff55; font-weight: bold; margin-bottom: 15px; font-size:24px; text-shadow: 2px 2px 0px #000;">CORRECT!</div>
+            <button class="answer-btn" style="background:#55ff55; color:#000; font-size: 16px; padding: 15px 30px;" onclick="quizIndex++; askQuizQuestion();">CONTINUE</button>
+        `;
     } else {
         let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
         let source = q.src || "PLTW Curriculum";
         let reason = selected === null ? "TIME IS UP!" : "INCORRECT";
         
-        const answersDiv = document.getElementById('answers-container');
         answersDiv.innerHTML = `
             <div style="color: #ff5555; font-weight: bold; margin-bottom: 10px; font-size:18px;">${reason}</div>
             <div style="color: #fff; margin-bottom: 10px; font-size: 14px;">The correct answer is: <span style="color:#55ff55;">${correct}</span></div>
@@ -772,11 +773,10 @@ function endQuiz() {
     document.getElementById('quiz-progress').innerText = finalPerc;
     
     let msg = score >= 70 ? "Excellent work." : "You should review this material again.";
-    if (isCheating) msg = "QUIZ VOIDED DUE TO SECURITY BREACH.";
+    if (isCheating) msg = "Quiz stopped due to inactivity of browsing away for more than 5 s.";
     
     triggerGameOver("QUIZ COMPLETE", msg);
 }
-
 
 function nextLevel() {
     document.getElementById('stage-clear-screen').classList.add('hidden'); 
@@ -863,7 +863,8 @@ function triggerGameOver(title, desc) {
 
     let isHighScore = false;
     
-    if (activeMode === 'QUIZ_REVIEW') {
+    // Only allow high score submission for Quiz Review if they did not cheat
+    if (activeMode === 'QUIZ_REVIEW' && !isCheating) {
         isHighScore = true; 
     } else if (activeMode === 'ADVENTURE') {
         let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
