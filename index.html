@@ -55,8 +55,9 @@
         <div id="main-menu" class="overlay">
             <h1 style="color: #ffcc00; font-size: 40px; margin-bottom: 0; text-shadow: 3px 3px 0px #000;">IED RUNNER</h1>
             <p style="margin-top: 5px; font-size: 14px; color: #ddd;">EOC EDITION</p>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;">
                 <button class="menu-btn" onclick="navToLevelSelect('ADVENTURE')">ADVENTURE MODE</button>
+                <button class="menu-btn" style="background: #4169e1; color: white;" onclick="navToLevelSelect('PRACTICE')">PRACTICE MODE</button>
                 <button class="menu-btn" style="background: #ff5555; color: white;" onclick="navToLevelSelect('QUIZ_REVIEW')">EOC QUIZ REVIEW</button>
             </div>
             
@@ -99,7 +100,7 @@
         <div id="trivia-screen" class="overlay hidden" style="background: rgba(0,0,0,0.95);">
             <h2 id="trivia-header" style="color: #ffcc00; margin-top: 0;">ASSESSMENT</h2>
             
-            <div id="quiz-timer-display" class="hidden">15</div>
+            <div id="quiz-timer-display" class="hidden">30</div>
 
             <div id="question-text" style="font-size: 16px; margin-bottom: 20px; max-width: 700px; line-height: 1.4;"></div>
             <div id="answers-container" style="display: flex; flex-direction: column; gap: 8px; width: 80%; max-width: 600px;"></div>
