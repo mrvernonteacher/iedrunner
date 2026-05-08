@@ -227,7 +227,7 @@ let triviaMode = 'BOSS';
 
 const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash", "PachEOCephalosaurus"];
 
-let unlockedPowers = { 'Fulcru': [], 'Lift Off': [] };
+let unlockedPowers = { 'Mr. V': [], 'Mrs. G': [] };
 
 try {
     let savedUnlocks = JSON.parse(localStorage.getItem('waltonUnlocks'));
@@ -453,7 +453,7 @@ function drawCanvasPreview(canvasId, charName) {
     cx.clearRect(0, 0, 40, 60);
     
     if(charName.startsWith('Super')) drawCape(cx, 0, 5);
-    if(charName.includes('Fulcru')) drawMrV(cx, 0, 5);
+    if(charName.includes('V')) drawMrV(cx, 0, 5);
     else drawMrsG(cx, 0, 5);
 }
 
@@ -472,7 +472,7 @@ function drawFacePreview(canvasId, charName, isSmall = false) {
     }
 
     if(charName.startsWith('Super')) drawCape(cx, 0, 0);
-    if(charName.includes('Fulcru')) drawMrV(cx, 0, 0);
+    if(charName.includes('V')) drawMrV(cx, 0, 0);
     else drawMrsG(cx, 0, 0);
 
     cx.restore();
@@ -583,19 +583,19 @@ function navToCharSelect(selectedLevel) {
     
     const container = document.querySelector('#char-select-screen div[style*="display: flex"]');
     if (container) {
-        container.innerHTML = createCharButton('Fulcru', 'preview-v') + createCharButton('Lift Off', 'preview-g');
+        container.innerHTML = createCharButton('Mr. V', 'preview-v') + createCharButton('Mrs. G', 'preview-g');
         
-        let vUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Fulcru']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Fulcru']?.includes(level);
-        let gUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Lift Off']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Lift Off']?.includes(level);
+        let vUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Mr. V']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Mr. V']?.includes(level);
+        let gUnlocked = (activeMode === 'ADVENTURE') ? unlockedPowers['Mrs. G']?.includes('ADVENTURE_COMPLETE') : unlockedPowers['Mrs. G']?.includes(level);
         
-        if (vUnlocked) container.innerHTML += createCharButton('Super Fulcru', 'preview-sv');
-        if (gUnlocked) container.innerHTML += createCharButton('Super Lift Off', 'preview-sg');
+        if (vUnlocked) container.innerHTML += createCharButton('Super V', 'preview-sv');
+        if (gUnlocked) container.innerHTML += createCharButton('Super G', 'preview-sg');
         
         setTimeout(() => {
-            drawCanvasPreview('preview-v', 'Fulcru');
-            drawCanvasPreview('preview-g', 'Lift Off');
-            if (vUnlocked) drawCanvasPreview('preview-sv', 'Super Fulcru');
-            if (gUnlocked) drawCanvasPreview('preview-sg', 'Super Lift Off');
+            drawCanvasPreview('preview-v', 'Mr. V');
+            drawCanvasPreview('preview-g', 'Mrs. G');
+            if (vUnlocked) drawCanvasPreview('preview-sv', 'Super V');
+            if (gUnlocked) drawCanvasPreview('preview-sg', 'Super G');
         }, 10);
     }
     
@@ -1309,7 +1309,7 @@ function updateRunner() {
     let isUsingPower = false;
     let isSuper = character.startsWith('Super');
     
-    if (isSuper && character.includes('Lift Off') && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
+    if (isSuper && character.includes('G') && !player.grounded && player.dy > 0 && keys.action && player.power > 0) {
         player.dy = 0; 
         player.power -= 40; 
         isUsingPower = true;
@@ -1317,7 +1317,7 @@ function updateRunner() {
         player.dy += player.gravity; 
     }
     
-    if (isSuper && character.includes('Fulcru') && !player.grounded && player.power > 0) {
+    if (isSuper && character.includes('V') && !player.grounded && player.power > 0) {
         if (keys.left) { player.x -= 6; player.power -= 20; isUsingPower = true; }
         else if (keys.right) { player.x += 6; player.power -= 20; isUsingPower = true; }
     }
@@ -1339,7 +1339,7 @@ function updateRunner() {
         player.grounded = true; 
     }
 
-    if (isSuper && character.includes('Fulcru') && player.grounded) {
+    if (isSuper && character.includes('V') && player.grounded) {
         if (player.x > 50) player.x -= 4;
         if (player.x < 50) player.x += 4;
         if (Math.abs(player.x - 50) <= 4) player.x = 50;
@@ -1400,11 +1400,11 @@ function drawRunner(c) {
     }
     c.fillStyle = '#ffcc00'; c.fillRect(0, 340, 800, 4);
 
-    if (character === 'Super Fulcru' || character === 'Super Lift Off') {
+    if (character === 'Super V' || character === 'Super G') {
         drawCape(c, player.x, player.y);
     }
     
-    if (character.includes('Fulcru')) drawMrV(c, player.x, player.y);
+    if (character.includes('V')) drawMrV(c, player.x, player.y);
     else drawMrsG(c, player.x, player.y);
     
     if (character.startsWith('Super')) {
