@@ -11,6 +11,15 @@ let clientIP = "Unknown";
 // --- SECURITY & FILTERING ---
 const BANNED_INITIALS = ["KKK", "SSS", "NIG", "FAG", "ASS", "DIC", "DIK", "PNS", "VAG", "KYS", "FUQ", "FUK", "FUC"];
 
+// Disable right-click and copy/paste to prevent easy cheating
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('copy', e => {
+    if (activeMode === 'QUIZ_REVIEW') {
+        e.clipboardData.setData('text/plain', 'Nice try!');
+        e.preventDefault();
+    }
+});
+
 async function getIP() {
     try {
         const response = await fetch('https://api.ipify.org?format=json');
@@ -118,7 +127,6 @@ let sirenPlaying = false;
 
 function playSiren() {
     if (sirenPlaying) return;
-    
     if (!audioCtx) audioCtx = new AudioContext();
     if (audioCtx.state === 'suspended') audioCtx.resume();
     
@@ -141,20 +149,15 @@ function playSiren() {
     
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-    
     gain.gain.value = 0.4;
     
     osc.start();
     lfo.start();
-    // Siren plays infinitely until the tab is closed
 }
 
 function triggerLockdown(ip) {
-    // Attempt to play immediately (works if triggered by button click)
     playSiren();
     
-    // Fallback: If browser autoplay blocked it,
-    // trigger the siren the absolute second they try to interact with the page.
     const forceSiren = () => {
         playSiren();
         document.removeEventListener('click', forceSiren);
@@ -163,7 +166,6 @@ function triggerLockdown(ip) {
     document.addEventListener('click', forceSiren);
     document.addEventListener('keydown', forceSiren);
     
-    // Completely overwrite the document body
     document.body.innerHTML = `
         <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate; cursor: crosshair;">
             <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
@@ -190,6 +192,17 @@ let animationId; let frameCount = 0; let levelFrames = 0;
 let isProcessingAnswer = false; 
 let triviaStartTime = 0; 
 
+// Quiz & Anti-Cheat Variables
+let quizQuestions = [];
+let quizIndex = 0;
+let quizCorrect = 0;
+let quizTotal = 0;
+let quizTimer = 0;
+let quizInterval;
+let tabStrikeCount = 0;
+let tabLeaveTime = 0;
+let isCheating = false;
+
 // Input Tracking
 const keys = { action: false, left: false, right: false };
 
@@ -211,17 +224,44 @@ let currentQuestionIndex = 0;
 let swingsEarned = 0;
 let triviaMode = 'BOSS'; 
 
-// Added the Level 9 Boss here
 const bossNames = ["Robo-Rex", "Mecha-Triceratops", "Ptero-Drone", "Stego-Cyborg", "Veloci-Router", "Bronto-Dozer", "Spino-Saw", "Ankylo-Smash", "PachEOCephalosaurus"];
 
-// Local Storage for Unlocks ONLY
 let unlockedPowers = { 'Mr. V': [], 'Mrs. G': [] };
 
 try {
     let savedUnlocks = JSON.parse(localStorage.getItem('waltonUnlocks'));
     if (savedUnlocks) unlockedPowers = savedUnlocks;
 } catch (e) {
-    console.warn("Local storage restricted. Unlocks will not persist.");
+    console.warn("Local storage restricted.");
+}
+
+// --- QUIZ ANTI-CHEAT LISTENER ---
+document.addEventListener('visibilitychange', () => {
+    // Only engage security protocol if they are actively taking the quiz
+    if (activeMode !== 'QUIZ_REVIEW' || gameState !== 'TRIVIA' || isCheating) return;
+
+    if (document.hidden) {
+        tabLeaveTime = Date.now();
+    } else {
+        let timeGone = Date.now() - tabLeaveTime;
+        tabStrikeCount++;
+        
+        if (timeGone > 5000) {
+            triggerCheaterReset("AWAY FOR MORE THAN 5 SECONDS");
+        } else if (tabStrikeCount >= 3) {
+            triggerCheaterReset("3 TAB SWITCHES DETECTED");
+        } else {
+            alert(`WARNING ${tabStrikeCount}/3: You left the testing tab! If you are gone for more than 5 seconds or switch tabs 3 times, your quiz will automatically reset and flag your submission.`);
+        }
+    }
+});
+
+function triggerCheaterReset(reason) {
+    isCheating = true;
+    clearInterval(quizInterval);
+    alert(`SECURITY BREACH: ${reason}. Your quiz has been voided.`);
+    score = 0; 
+    endQuiz();
 }
 
 // --- ASYNC DATABASE FUNCTIONS ---
@@ -232,13 +272,11 @@ async function fetchGlobalData() {
         let response = await fetch(WEB_APP_URL);
         let data = await response.json();
         
-        // 1. Check if the user's IP is on the banned list
         if (data.banned && data.banned.includes(clientIP)) {
             triggerLockdown(clientIP);
             return; 
         }
 
-        // 2. Load Scores
         globalScores = data.scores || [];
         scoresLoaded = true;
         
@@ -294,6 +332,11 @@ async function submitHighScore() {
     
     if (submitBtn) submitBtn.innerText = "SAVING...";
     
+    let detailsString = "";
+    if (activeMode === 'QUIZ_REVIEW') {
+        detailsString = `${quizCorrect}/${quizTotal}${isCheating ? " [FLAGGED: TAB SWITCHED]" : ""}`;
+    }
+
     const payload = {
         name: initials,
         score: score,
@@ -301,7 +344,8 @@ async function submitHighScore() {
         mode: activeMode,
         unit: activeMode === 'ADVENTURE' ? 'N/A' : level,
         ip: clientIP,
-        banned: false
+        banned: false,
+        details: detailsString
     };
     
     try {
@@ -330,16 +374,6 @@ async function submitHighScore() {
 document.addEventListener('DOMContentLoaded', () => {
     if (typeof pltwBanks === 'undefined') {
         console.error("ERROR: questions.js failed to load.");
-    }
-
-    const hsEntry = document.getElementById('highscore-entry');
-    if (hsEntry) {
-        const warning = document.createElement('p');
-        warning.style.color = '#ff5555';
-        warning.style.fontSize = '9px';
-        warning.style.marginBottom = '8px';
-        warning.innerText = "NOTICE: USER IP & WORKSTATION ID LOGGED. INAPPROPRIATE ENTRIES ARE AUTO-REPORTED TO ADMINISTRATION.";
-        hsEntry.insertBefore(warning, hsEntry.firstChild);
     }
 
     if (canvas) {
@@ -418,7 +452,6 @@ function drawCanvasPreview(canvasId, charName) {
     cx.clearRect(0, 0, 40, 60);
     
     if(charName.startsWith('Super')) drawCape(cx, 0, 5);
-    
     if(charName.includes('V')) drawMrV(cx, 0, 5);
     else drawMrsG(cx, 0, 5);
 }
@@ -438,7 +471,6 @@ function drawFacePreview(canvasId, charName, isSmall = false) {
     }
 
     if(charName.startsWith('Super')) drawCape(cx, 0, 0);
-
     if(charName.includes('V')) drawMrV(cx, 0, 0);
     else drawMrsG(cx, 0, 0);
 
@@ -487,7 +519,10 @@ function updateLeaderboardUI() {
 }
 
 function navToMainMenu() {
+    clearInterval(quizInterval);
     hideAllOverlays();
+    document.getElementById('hud').classList.add('hidden');
+    document.getElementById('boss-hud').classList.add('hidden');
     updateLeaderboardUI();
     document.getElementById('main-menu').classList.remove('hidden');
     gameState = 'START';
@@ -502,9 +537,8 @@ function navToLevelSelect(mode) {
         return;
     }
 
-    document.getElementById('level-select-title').innerText = "SELECT UNIT TO PRACTICE";
+    document.getElementById('level-select-title').innerText = mode === 'QUIZ_REVIEW' ? "SELECT MODULE FOR QUIZ" : "SELECT UNIT TO PRACTICE";
     
-    // Updated to loop through 9 levels
     for(let i=1; i<=9; i++) {
         let btn = document.getElementById('btn-prac-' + i);
         if(!btn) continue;
@@ -559,6 +593,13 @@ function navToCharSelect(selectedLevel) {
         }, 10);
     }
     
+    // Toggle the security warning visibility based on mode
+    if (pendingMode === 'QUIZ_REVIEW') {
+        document.getElementById('quiz-warning-text').classList.remove('hidden');
+    } else {
+        document.getElementById('quiz-warning-text').classList.add('hidden');
+    }
+    
     document.getElementById('char-select-screen').classList.remove('hidden');
 }
 
@@ -567,7 +608,7 @@ function hideAllOverlays() {
     overlays.forEach(o => o.classList.add('hidden'));
 }
 
-// --- CORE GAME FLOW ---
+// --- CORE GAME / QUIZ FLOW ---
 function startGame(selectedChar) {
     initAudio();
     character = selectedChar;
@@ -577,9 +618,172 @@ function startGame(selectedChar) {
     score = 0; gearSpeedBase = 5; 
     repairs = (activeMode === 'ADVENTURE') ? 5 : 10;
     
+    // Reset Anti-Cheat Trackers
+    tabStrikeCount = 0;
+    isCheating = false;
+    
+    if (activeMode === 'QUIZ_REVIEW') {
+        document.getElementById('hud').classList.remove('hidden');
+        document.getElementById('quiz-progress-container').classList.remove('hidden');
+        document.getElementById('btn-restart-quiz').classList.remove('hidden');
+        document.getElementById('time-container').classList.add('hidden'); 
+        document.getElementById('repairs-container').classList.add('hidden'); 
+        
+        // Generate the random bag without replacement
+        let bank = [...pltwBanks[level]];
+        bank.sort(() => Math.random() - 0.5); // Shuffle
+        
+        let numQs = level === 9 ? 50 : 25; // 50 for EOC Final, 25 for standard
+        quizQuestions = bank.slice(0, Math.min(numQs, bank.length));
+        
+        quizIndex = 0;
+        quizCorrect = 0;
+        quizTotal = quizQuestions.length;
+        
+        gameState = 'TRIVIA';
+        askQuizQuestion();
+        return;
+    }
+    
+    // Setup for Normal Modes
+    document.getElementById('quiz-progress-container').classList.add('hidden');
+    document.getElementById('btn-restart-quiz').classList.add('hidden');
+    document.getElementById('time-container').classList.remove('hidden');
+    document.getElementById('repairs-container').classList.remove('hidden');
+    
     resetLevelState(false);
     gameLoop(); 
 }
+
+// --- QUIZ ENGINE ---
+function askQuizQuestion() {
+    if (quizIndex >= quizTotal) {
+        endQuiz();
+        return;
+    }
+    
+    isProcessingAnswer = false;
+    const q = quizQuestions[quizIndex];
+    
+    // Update Progress UI
+    let perc = quizIndex === 0 ? 0 : Math.round((quizCorrect / quizIndex) * 100);
+    document.getElementById('quiz-progress').innerText = `${quizCorrect}/${quizTotal} (${perc}%)`;
+    
+    // Regex Sniffer to grant 30 seconds for math/calc questions
+    const calcRegex = /\b(calculate|determine|formula|ratio|percentage|radius|diameter|area|volume|density|mass|force|friction|IMA|AMA|efficiency|value|equation)\b|\d+/i;
+    let timeLimit = calcRegex.test(q.q) ? 30 : 15;
+    
+    quizTimer = timeLimit;
+    const timerDisplay = document.getElementById('quiz-timer-display');
+    timerDisplay.innerText = quizTimer;
+    timerDisplay.classList.remove('hidden');
+    timerDisplay.style.borderColor = '#55ff55';
+    
+    clearInterval(quizInterval);
+    quizInterval = setInterval(() => {
+        if (isCheating) {
+            clearInterval(quizInterval);
+            return;
+        }
+        
+        quizTimer--;
+        timerDisplay.innerText = quizTimer;
+        
+        if (quizTimer <= 5) timerDisplay.style.borderColor = '#ff5555';
+        
+        if (quizTimer <= 0) {
+            clearInterval(quizInterval);
+            checkQuizAnswer(null, q.ans); // Time out acts as a wrong answer
+        }
+    }, 1000);
+    
+    document.getElementById('trivia-header').innerText = `QUESTION ${quizIndex + 1} OF ${quizTotal}`;
+    document.getElementById('trivia-status').innerText = "";
+    document.getElementById('question-text').innerText = q.q;
+    
+    const answersDiv = document.getElementById('answers-container');
+    answersDiv.innerHTML = ''; 
+    
+    const shuffledOpts = [...q.opts].sort(() => Math.random() - 0.5);
+    shuffledOpts.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn'; btn.innerText = opt;
+        btn.onclick = () => checkQuizAnswer(opt, q.ans);
+        answersDiv.appendChild(btn);
+    });
+    
+    document.getElementById('trivia-screen').classList.remove('hidden');
+}
+
+function checkQuizAnswer(selected, correct) {
+    if (isProcessingAnswer) return;
+    isProcessingAnswer = true;
+    clearInterval(quizInterval);
+    
+    const q = quizQuestions[quizIndex];
+    
+    if (selected === correct) {
+        quizCorrect++;
+        document.getElementById('trivia-status').innerText = "CORRECT!";
+        document.getElementById('trivia-status').style.color = '#55ff55';
+        
+        setTimeout(() => {
+            quizIndex++;
+            askQuizQuestion();
+        }, 1000);
+    } else {
+        let explanation = q.exp || "Review your PLTW IED course notes for this concept.";
+        let source = q.src || "PLTW Curriculum";
+        let reason = selected === null ? "TIME IS UP!" : "INCORRECT";
+        
+        const answersDiv = document.getElementById('answers-container');
+        answersDiv.innerHTML = `
+            <div style="color: #ff5555; font-weight: bold; margin-bottom: 10px; font-size:18px;">${reason}</div>
+            <div style="color: #fff; margin-bottom: 10px; font-size: 14px;">The correct answer is: <span style="color:#55ff55;">${correct}</span></div>
+            <div style="color: #ddd; font-size: 12px; margin-bottom: 10px; line-height:1.4;"><i>${explanation}</i></div>
+            <div style="color: #ffcc00; font-size: 10px; margin-bottom: 15px;">Source: ${source}</div>
+            <button id="btn-quiz-continue" class="answer-btn" style="background:#555; color:#888; cursor:not-allowed;" disabled>WAIT (5)...</button>
+        `;
+        
+        // 5-Second Forced Reading Pause
+        let waitTime = 5;
+        const continueBtn = document.getElementById('btn-quiz-continue');
+        
+        let waitInterval = setInterval(() => {
+            waitTime--;
+            if (waitTime > 0) {
+                continueBtn.innerText = `WAIT (${waitTime})...`;
+            } else {
+                clearInterval(waitInterval);
+                continueBtn.innerText = "CONTINUE";
+                continueBtn.style.background = "#ff5555";
+                continueBtn.style.color = "#000";
+                continueBtn.style.cursor = "pointer";
+                continueBtn.disabled = false;
+                continueBtn.onclick = () => {
+                    quizIndex++;
+                    askQuizQuestion();
+                };
+            }
+        }, 1000);
+    }
+}
+
+function endQuiz() {
+    document.getElementById('trivia-screen').classList.add('hidden');
+    document.getElementById('quiz-timer-display').classList.add('hidden');
+    
+    // Set global score to the percentage for the Google Sheet
+    score = Math.round((quizCorrect / quizTotal) * 100) || 0; 
+    let finalPerc = `${quizCorrect}/${quizTotal} (${score}%)`;
+    document.getElementById('quiz-progress').innerText = finalPerc;
+    
+    let msg = score >= 70 ? "Excellent work." : "You should review this material again.";
+    if (isCheating) msg = "QUIZ VOIDED DUE TO SECURITY BREACH.";
+    
+    triggerGameOver("QUIZ COMPLETE", msg);
+}
+
 
 function nextLevel() {
     document.getElementById('stage-clear-screen').classList.add('hidden'); 
@@ -590,7 +794,6 @@ function nextLevel() {
     }
 
     level++;
-    // Updated to complete after level 9
     if(level > 9) {
         triggerGameOver("COURSE COMPLETE!", "You passed Introduction to Engineering Design!");
         return;
@@ -615,7 +818,6 @@ function resetLevelState(isBossTest) {
     updateHUD();
     updateClockDisplay(levelFrames);
     
-    // Added 9th color for the EOC background
     const bgColors = ['#87CEEB', '#b0c4de', '#cd853f', '#4b0082', '#2f4f4f', '#8b4513', '#556b2f', '#483d8b', '#2b0000'];
     if(gameWrapper) gameWrapper.style.backgroundColor = bgColors[level - 1];
 }
@@ -648,19 +850,30 @@ function triggerGameOver(title, desc) {
     document.getElementById('trivia-screen').classList.add('hidden');
     document.getElementById('boss-hud').classList.add('hidden');
     document.getElementById('hud').classList.add('hidden');
+    document.getElementById('quiz-timer-display').classList.add('hidden');
 
     document.getElementById('game-over-title').innerText = title;
     document.getElementById('game-over-desc').innerText = desc;
-    document.getElementById('final-score-display').innerText = score;
+    
+    // Append the fraction if it's a quiz, otherwise just the score
+    if (activeMode === 'QUIZ_REVIEW') {
+        document.getElementById('final-score-display').innerText = `${score}% (${quizCorrect}/${quizTotal})`;
+    } else {
+        document.getElementById('final-score-display').innerText = score;
+    }
     
     const hsDiv = document.getElementById('highscore-entry');
     const returnBtn = document.getElementById('btn-return-menu');
     
     hsDiv.classList.add('hidden');
     returnBtn.classList.remove('hidden');
+    document.getElementById('selfie-verification').classList.add('hidden');
 
     let isHighScore = false;
-    if (activeMode === 'ADVENTURE') {
+    
+    if (activeMode === 'QUIZ_REVIEW') {
+        isHighScore = true; // Always save Quiz attempts for the teacher's ledger
+    } else if (activeMode === 'ADVENTURE') {
         let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
         let lowest = advScores.length < 3 ? -1 : advScores[2].score;
         if (score > lowest) isHighScore = true;
@@ -676,10 +889,19 @@ function triggerGameOver(title, desc) {
         document.getElementById('hs-initials').value = ''; 
     }
     
+    // Generate Selfie Code for Clean Quiz Submissions
+    if (activeMode === 'QUIZ_REVIEW' && !isCheating) {
+        const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+        const timeStr = new Date().toLocaleTimeString();
+        document.getElementById('verification-code').innerText = code;
+        document.getElementById('verification-time').innerText = timeStr;
+        document.getElementById('selfie-verification').classList.remove('hidden');
+    }
+    
     document.getElementById('game-over-screen').classList.remove('hidden');
 }
 
-// --- TRIVIA LOGIC ---
+// --- TRIVIA LOGIC (Adventure/Practice Mode) ---
 function triggerRescue() {
     gameState = 'TRIVIA'; 
     triviaMode = 'RESCUE';
@@ -939,7 +1161,6 @@ function updateBossFight() {
                     if (!unlockedPowers[baseChar]) unlockedPowers[baseChar] = [];
 
                     if (activeMode === 'ADVENTURE') {
-                        // Check for level 9 finish
                         if (level === 9) {
                             if (!unlockedPowers[baseChar].includes('ADVENTURE_COMPLETE')) {
                                 unlockedPowers[baseChar].push('ADVENTURE_COMPLETE');
@@ -1050,7 +1271,6 @@ function drawBossShape(c, lvl) {
     } else if (lvl === 8) { 
         c.fillRect(60, 20, 60, 20); c.beginPath(); c.arc(130, 30, 20, 0, Math.PI*2); c.fill();
     } else if (lvl === 9) {
-        // PachEOCephalosaurus
         c.fillRect(-40, -40, 80, 80); 
         c.fillStyle = '#ffaa00'; 
         c.beginPath(); c.arc(0, -40, 40, Math.PI, 0); c.fill();
@@ -1219,8 +1439,7 @@ function gameLoop() {
         updateBossFight(); 
         drawFirstPersonBoss(ctx);
     } else if (gameState === 'TRIVIA') {
-        if (!isProcessingAnswer) {
-            
+        if (!isProcessingAnswer && activeMode !== 'QUIZ_REVIEW') {
             let timeSpent = Date.now() - triviaStartTime;
             let framesSpent = Math.floor((timeSpent / 1000) * 60);
             
