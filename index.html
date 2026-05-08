@@ -2,109 +2,137 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Walton IED Runner</title>
-    <link rel="stylesheet" href="style.css">
+    <title>IED Runner - EOC Edition</title>
+    <style>
+        /* Base arcade styling */
+        body { background: #111; color: white; font-family: 'Courier New', Courier, monospace; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
+        #game-wrapper { position: relative; width: 800px; height: 400px; background: #87CEEB; border: 4px solid #fff; box-shadow: 0 0 20px rgba(0,0,0,0.8); overflow: hidden; }
+        canvas { display: block; }
+        .hidden { display: none !important; }
+        
+        /* Overlays and Menus */
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; box-sizing: border-box; }
+        .menu-btn, .answer-btn, .char-btn { background: #ffcc00; color: #000; border: 2px solid #fff; padding: 10px 20px; margin: 5px; font-weight: bold; font-family: 'Courier New', Courier, monospace; cursor: pointer; text-transform: uppercase; font-size: 14px; }
+        .menu-btn:hover, .answer-btn:hover, .char-btn:hover { background: #fff; }
+        .char-btn canvas { background: #333; border: 1px solid #666; }
+        
+        /* Heads Up Display */
+        #hud, #boss-hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; font-weight: bold; color: white; text-shadow: 2px 2px 0px #000; z-index: 100;}
+        .hud-stat { margin: 0 10px; }
+        
+        /* Leaderboard */
+        #leaderboard { margin-top: 20px; font-size: 14px; text-align: left; background: rgba(0,0,0,0.5); padding: 10px; border: 1px solid #444; width: 300px; }
+        
+        /* Anti-Cheat UI Elements */
+        #quiz-warning-text { color: #ff5555; max-width: 600px; font-size: 12px; margin-top: 20px; border: 1px solid #ff5555; padding: 10px; background: rgba(255,0,0,0.1); }
+        #quiz-timer-display { font-size: 24px; font-weight: bold; color: white; margin-bottom: 15px; background: #333; padding: 5px 15px; border-radius: 5px; border: 2px solid #55ff55; }
+        #selfie-verification { border: 2px dashed #55ff55; padding: 15px; background: rgba(0,255,0,0.1); margin-bottom: 20px; text-align: center; }
+    </style>
 </head>
 <body>
-
-    <h1 class="main-title">Walton IED Runner</h1>
-    
     <div id="game-wrapper">
-        <div id="hud" class="hidden">
-            <div>Unit: <span id="level-display">1</span></div>
-            <div>Score: <span id="score">0</span></div>
-            <div style="color: #fff;">Time: <span id="time-display">0:00</span></div>
-            <div id="repairs-hud" style="color: #55ff55;">Repairs: <span id="repairs-display">5</span></div>
-        </div>
-        
-        <div id="boss-hud" class="hidden">
-            <div style="color:#55ff55;">Player HP: <span id="player-hp-display">5</span></div>
-            <div style="color:#ffcc00;">Time: <span id="swing-time-display">0.0</span></div>
-            <div style="color:#ff5555;">Boss Armor: <span id="boss-health">3</span></div>
-        </div>
-        
         <canvas id="mainCanvas" width="800" height="400"></canvas>
 
+        <div id="hud" class="hidden">
+            <div>
+                <span class="hud-stat">UNIT: <span id="level-display">1</span></span>
+                <span class="hud-stat">SCORE: <span id="score">0</span></span>
+                <span class="hud-stat" id="repairs-container">REPAIRS: <span id="repairs-display">5</span></span>
+            </div>
+            <div style="display: flex; align-items: center;">
+                <span id="quiz-progress-container" class="hidden hud-stat" style="color: #55ff55;">PROGRESS: <span id="quiz-progress">0/0 (0%)</span></span>
+                <span class="hud-stat" id="time-container">TIME: <span id="time-display">0:00</span></span>
+                <button id="btn-restart-quiz" class="hidden menu-btn" style="padding: 2px 5px; font-size: 10px; margin-left: 10px; background: #ff5555; color: white; border: 1px solid white;" onclick="navToMainMenu()">RESTART</button>
+            </div>
+        </div>
+
+        <div id="boss-hud" class="hidden">
+            <span class="hud-stat">HP: <span id="player-hp-display">5</span></span>
+            <span class="hud-stat">BOSS: <span id="boss-health">3</span></span>
+            <span class="hud-stat">TIME: <span id="swing-time-display">5.0</span></span>
+        </div>
+
         <div id="main-menu" class="overlay">
-            <h2 class="menu-title">MAIN MENU</h2>
-            <div class="leaderboard">
-                <div style="text-align: center; color:#ffcc00; margin-bottom:10px;">ADVENTURE HIGH SCORES</div>
-                <div id="lb-1">1. --- 0000</div>
-                <div id="lb-2">2. --- 0000</div>
-                <div id="lb-3">3. --- 0000</div>
+            <h1 style="color: #ffcc00; font-size: 40px; margin-bottom: 0; text-shadow: 3px 3px 0px #000;">IED RUNNER</h1>
+            <p style="margin-top: 5px; font-size: 14px; color: #ddd;">EOC EDITION</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="menu-btn" onclick="navToLevelSelect('ADVENTURE')">ADVENTURE MODE</button>
+                <button class="menu-btn" style="background: #ff5555; color: white;" onclick="navToLevelSelect('QUIZ_REVIEW')">EOC QUIZ REVIEW</button>
             </div>
-            <div class="menu-buttons">
-                <button onclick="navToLevelSelect('ADVENTURE')" style="background:#8B0000;">ADVENTURE MODE</button>
-                <button onclick="navToLevelSelect('PRACTICE')" style="background:#2E8B57;">PRACTICE MODE</button>
-                <button onclick="navToLevelSelect('BOSS_TEST')" style="background:#b8860b;">BOSS TEST</button>
+            
+            <div id="leaderboard">
+                <h3 style="margin: 0 0 10px 0; color: #ffcc00; text-align: center; font-size: 16px;">ADVENTURE HIGH SCORES</h3>
+                <div id="lb-1">1. LOADING...</div>
+                <div id="lb-2">2. LOADING...</div>
+                <div id="lb-3">3. LOADING...</div>
             </div>
-            <div class="warning">*** DANGER *** NEVER USE A DIAL CALIPER AS A WEAPON!</div>
         </div>
 
         <div id="level-select-screen" class="overlay hidden">
-            <h2 id="level-select-title" style="color: #fff; margin-bottom: 20px;">SELECT UNIT</h2>
-            <div class="grid-container">
-                <button id="btn-prac-1" class="level-btn" data-title="1. Design Proc." onclick="navToCharSelect(1)">1. Design Proc.</button>
-                <button id="btn-prac-2" class="level-btn" data-title="2. Tech Sketch" onclick="navToCharSelect(2)">2. Tech Sketch</button>
-                <button id="btn-prac-3" class="level-btn" data-title="3. Measurement" onclick="navToCharSelect(3)">3. Measurement</button>
-                <button id="btn-prac-4" class="level-btn" data-title="4. Intro to CAD" onclick="navToCharSelect(4)">4. Intro to CAD</button>
-                <button id="btn-prac-5" class="level-btn" data-title="5. Reverse Eng." onclick="navToCharSelect(5)">5. Reverse Eng.</button>
-                <button id="btn-prac-6" class="level-btn" data-title="6. Dimensioning" onclick="navToCharSelect(6)">6. Dimensioning</button>
-                <button id="btn-prac-7" class="level-btn" data-title="7. Properties" onclick="navToCharSelect(7)">7. Properties</button>
-                <button id="btn-prac-8" class="level-btn" data-title="8. Cams & Friction" onclick="navToCharSelect(8)">8. Cams & Friction</button>
-                <button id="btn-prac-9" class="menu-btn" data-title="UNIT 9: EOC FINAL REVIEW" onclick="navToCharSelect(9)">UNIT 9: EOC FINAL REVIEW</button>
+            <h2 id="level-select-title" style="color: #ffcc00; margin-top: 0;">SELECT MODULE</h2>
+            <div id="level-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <button id="btn-prac-1" class="menu-btn" data-title="UNIT 1" onclick="navToCharSelect(1)">UNIT 1</button>
+                <button id="btn-prac-2" class="menu-btn" data-title="UNIT 2" onclick="navToCharSelect(2)">UNIT 2</button>
+                <button id="btn-prac-3" class="menu-btn" data-title="UNIT 3" onclick="navToCharSelect(3)">UNIT 3</button>
+                <button id="btn-prac-4" class="menu-btn" data-title="UNIT 4" onclick="navToCharSelect(4)">UNIT 4</button>
+                <button id="btn-prac-5" class="menu-btn" data-title="UNIT 5" onclick="navToCharSelect(5)">UNIT 5</button>
+                <button id="btn-prac-6" class="menu-btn" data-title="UNIT 6" onclick="navToCharSelect(6)">UNIT 6</button>
+                <button id="btn-prac-7" class="menu-btn" data-title="UNIT 7" onclick="navToCharSelect(7)">UNIT 7</button>
+                <button id="btn-prac-8" class="menu-btn" data-title="UNIT 8" onclick="navToCharSelect(8)">UNIT 8</button>
             </div>
-            <button onclick="navToMainMenu()" style="background:#555; margin-top:30px;">BACK</button>
+            <button id="btn-prac-9" class="menu-btn" style="background: #ff5555; color: white; width: 80%; padding: 15px; font-size: 18px;" data-title="EOC FINAL REVIEW" onclick="navToCharSelect(9)">EOC FINAL REVIEW (50 QS)</button>
+            <button class="menu-btn" style="margin-top: 15px;" onclick="navToMainMenu()">BACK</button>
         </div>
 
         <div id="char-select-screen" class="overlay hidden">
-            <h2 style="color: #fff; margin-bottom: 30px;">CHOOSE ENGINEER</h2>
-            <div style="display: flex; gap: 20px;">
-                <button class="char-btn" onclick="startGame('Mr. V')">
-                    <canvas id="preview-v" width="40" height="60"></canvas>
-                    <div style="margin-top:10px;">MR. V</div>
-                </button>
-                <button class="char-btn" onclick="startGame('Mrs. G')">
-                    <canvas id="preview-g" width="40" height="60"></canvas>
-                    <div style="margin-top:10px;">MRS. G</div>
-                </button>
-            </div>
-            <button onclick="navToMainMenu()" style="background:#555; margin-top:30px;">CANCEL</button>
+            <h2 style="color: #ffcc00; margin-top: 0;">SELECT CHARACTER</h2>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-top: 10px;">
+                </div>
+            
+            <p id="quiz-warning-text" class="hidden">
+                <strong>QUIZ SECURITY ACTIVE:</strong> Navigating away from this tab for more than 5 seconds will automatically reset your quiz and wipe your progress.
+            </p>
+            
+            <button class="menu-btn" style="margin-top: 20px;" onclick="navToMainMenu()">CANCEL</button>
         </div>
 
-        <div id="game-over-screen" class="overlay hidden">
-            <h1 id="game-over-title" style="color: #ff5555; text-shadow: 3px 3px 0 #000;">WORKSHOP HAZARD!</h1>
-            <p id="game-over-desc" style="margin-bottom: 20px;">You ran out of repairs.</p>
-            <p style="color: #fff; margin-bottom: 20px;">Final Score: <span id="final-score-display" style="color:#ffcc00;">0</span></p>
+        <div id="trivia-screen" class="overlay hidden" style="background: rgba(0,0,0,0.95);">
+            <h2 id="trivia-header" style="color: #ffcc00; margin-top: 0;">ASSESSMENT</h2>
             
-            <div id="highscore-entry" class="hidden highscore-box">
-                <h3 style="color:#55ff55; margin:0;">NEW HIGH SCORE!</h3>
-                <input type="text" id="hs-initials" class="arcade-input" maxlength="3" placeholder="AAA" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '')">
-                <button onclick="submitHighScore()" style="background:#2E8B57;">SAVE SCORE</button>
-            </div>
-            
-            <button id="btn-return-menu" onclick="navToMainMenu()">MAIN MENU</button>
-        </div>
+            <div id="quiz-timer-display" class="hidden">15</div>
 
-        <div id="trivia-screen" class="overlay hidden">
-            <div id="trivia-container">
-                <h3 id="trivia-header" style="color: #ffcc00; margin-top: 0;"></h3>
-                <div id="question-text">Question</div>
-                <div id="answers-container"></div>
-                <p id="trivia-status" style="color: #55ff55; font-size: 12px; margin-top: 20px; height: 15px;"></p>
-            </div>
+            <div id="question-text" style="font-size: 16px; margin-bottom: 20px; max-width: 700px; line-height: 1.4;"></div>
+            <div id="answers-container" style="display: flex; flex-direction: column; gap: 8px; width: 80%; max-width: 600px;"></div>
+            <div id="trivia-status" style="margin-top: 20px; font-size: 14px;"></div>
         </div>
 
         <div id="boss-intro-screen" class="overlay hidden">
-            <h1 id="boss-title" style="color: #ffaa00; text-shadow: 3px 3px 0 #550000;">BOSS APPROACHES</h1>
-            <p style="margin-bottom: 30px; font-size: 12px; line-height: 1.5;">Earn swings by answering questions.<br>You have 5 seconds to strike!</p>
-            <button style="background: #8B0000;" onclick="initBossFight()">START ENCOUNTER</button>
+            <h1 id="boss-title" style="color: #ff5555; font-size: 30px;">BOSS APPROACHES</h1>
         </div>
-        
+
         <div id="stage-clear-screen" class="overlay hidden">
-            <h1 style="color: #55ff55; text-shadow: 3px 3px 0 #000;">BOSS DISMANTLED!</h1>
-            <button id="btn-next-level" style="background: #2E8B57;" onclick="nextLevel()">CONTINUE TO NEXT UNIT</button>
+            <h1 style="color: #55ff55; font-size: 30px;">STAGE CLEAR</h1>
+            <button id="btn-next-level" class="menu-btn" onclick="nextLevel()">CONTINUE</button>
+        </div>
+
+        <div id="game-over-screen" class="overlay hidden">
+            <h1 id="game-over-title" style="color: #ff5555; font-size: 40px; margin-bottom: 10px; margin-top: 0;">GAME OVER</h1>
+            <p id="game-over-desc" style="font-size: 16px; margin-bottom: 15px;"></p>
+            <div style="font-size: 24px; margin-bottom: 15px;">FINAL SCORE: <span id="final-score-display" style="color: #ffcc00;">0</span></div>
+            
+            <div id="selfie-verification" class="hidden">
+                <div style="font-size: 12px; color: #aaa; margin-bottom: 5px;">VERIFICATION CODE (TAKE SELFIE NOW)</div>
+                <div id="verification-code" style="font-size: 32px; font-weight: bold; color: #fff; letter-spacing: 5px;">XXXXXX</div>
+                <div id="verification-time" style="font-size: 12px; color: #aaa; margin-top: 5px;">00:00:00</div>
+            </div>
+
+            <div id="highscore-entry" class="hidden">
+                <p style="color: #ff5555; font-size: 9px; margin-bottom: 8px;">NOTICE: USER IP LOGGED. INAPPROPRIATE ENTRIES AUTO-REPORTED.</p>
+                <input type="text" id="hs-initials" maxlength="3" placeholder="AAA" style="font-size: 24px; text-align: center; width: 80px; text-transform: uppercase; font-family: 'Courier New', monospace; font-weight: bold;">
+                <button class="menu-btn" onclick="submitHighScore()">SUBMIT</button>
+            </div>
+            
+            <button id="btn-return-menu" class="menu-btn hidden" onclick="navToMainMenu()">MAIN MENU</button>
         </div>
     </div>
 
