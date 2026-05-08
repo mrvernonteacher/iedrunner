@@ -593,7 +593,6 @@ function navToCharSelect(selectedLevel) {
         }, 10);
     }
     
-    // Toggle the security warning visibility based on mode
     if (pendingMode === 'QUIZ_REVIEW') {
         document.getElementById('quiz-warning-text').classList.remove('hidden');
     } else {
@@ -618,7 +617,6 @@ function startGame(selectedChar) {
     score = 0; gearSpeedBase = 5; 
     repairs = (activeMode === 'ADVENTURE') ? 5 : 10;
     
-    // Reset Anti-Cheat Trackers
     tabStrikeCount = 0;
     isCheating = false;
     
@@ -629,11 +627,10 @@ function startGame(selectedChar) {
         document.getElementById('time-container').classList.add('hidden'); 
         document.getElementById('repairs-container').classList.add('hidden'); 
         
-        // Generate the random bag without replacement
         let bank = [...pltwBanks[level]];
-        bank.sort(() => Math.random() - 0.5); // Shuffle
+        bank.sort(() => Math.random() - 0.5); 
         
-        let numQs = level === 9 ? 50 : 25; // 50 for EOC Final, 25 for standard
+        let numQs = level === 9 ? 50 : 25; 
         quizQuestions = bank.slice(0, Math.min(numQs, bank.length));
         
         quizIndex = 0;
@@ -645,7 +642,6 @@ function startGame(selectedChar) {
         return;
     }
     
-    // Setup for Normal Modes
     document.getElementById('quiz-progress-container').classList.add('hidden');
     document.getElementById('btn-restart-quiz').classList.add('hidden');
     document.getElementById('time-container').classList.remove('hidden');
@@ -665,13 +661,12 @@ function askQuizQuestion() {
     isProcessingAnswer = false;
     const q = quizQuestions[quizIndex];
     
-    // Update Progress UI
     let perc = quizIndex === 0 ? 0 : Math.round((quizCorrect / quizIndex) * 100);
     document.getElementById('quiz-progress').innerText = `${quizCorrect}/${quizTotal} (${perc}%)`;
     
-    // Regex Sniffer to grant 30 seconds for math/calc questions
+    // Updated Regex Sniffer: Grants 60s for math/calc, 30s for standard
     const calcRegex = /\b(calculate|determine|formula|ratio|percentage|radius|diameter|area|volume|density|mass|force|friction|IMA|AMA|efficiency|value|equation)\b|\d+/i;
-    let timeLimit = calcRegex.test(q.q) ? 30 : 15;
+    let timeLimit = calcRegex.test(q.q) ? 60 : 30;
     
     quizTimer = timeLimit;
     const timerDisplay = document.getElementById('quiz-timer-display');
@@ -693,7 +688,7 @@ function askQuizQuestion() {
         
         if (quizTimer <= 0) {
             clearInterval(quizInterval);
-            checkQuizAnswer(null, q.ans); // Time out acts as a wrong answer
+            checkQuizAnswer(null, q.ans); 
         }
     }, 1000);
     
@@ -745,7 +740,6 @@ function checkQuizAnswer(selected, correct) {
             <button id="btn-quiz-continue" class="answer-btn" style="background:#555; color:#888; cursor:not-allowed;" disabled>WAIT (5)...</button>
         `;
         
-        // 5-Second Forced Reading Pause
         let waitTime = 5;
         const continueBtn = document.getElementById('btn-quiz-continue');
         
@@ -773,7 +767,6 @@ function endQuiz() {
     document.getElementById('trivia-screen').classList.add('hidden');
     document.getElementById('quiz-timer-display').classList.add('hidden');
     
-    // Set global score to the percentage for the Google Sheet
     score = Math.round((quizCorrect / quizTotal) * 100) || 0; 
     let finalPerc = `${quizCorrect}/${quizTotal} (${score}%)`;
     document.getElementById('quiz-progress').innerText = finalPerc;
@@ -855,7 +848,6 @@ function triggerGameOver(title, desc) {
     document.getElementById('game-over-title').innerText = title;
     document.getElementById('game-over-desc').innerText = desc;
     
-    // Append the fraction if it's a quiz, otherwise just the score
     if (activeMode === 'QUIZ_REVIEW') {
         document.getElementById('final-score-display').innerText = `${score}% (${quizCorrect}/${quizTotal})`;
     } else {
@@ -872,7 +864,7 @@ function triggerGameOver(title, desc) {
     let isHighScore = false;
     
     if (activeMode === 'QUIZ_REVIEW') {
-        isHighScore = true; // Always save Quiz attempts for the teacher's ledger
+        isHighScore = true; 
     } else if (activeMode === 'ADVENTURE') {
         let advScores = globalScores.filter(s => s.mode === 'ADVENTURE').sort((a,b) => b.score - a.score);
         let lowest = advScores.length < 3 ? -1 : advScores[2].score;
@@ -889,7 +881,6 @@ function triggerGameOver(title, desc) {
         document.getElementById('hs-initials').value = ''; 
     }
     
-    // Generate Selfie Code for Clean Quiz Submissions
     if (activeMode === 'QUIZ_REVIEW' && !isCheating) {
         const code = Math.random().toString(36).substring(2, 8).toUpperCase();
         const timeStr = new Date().toLocaleTimeString();
