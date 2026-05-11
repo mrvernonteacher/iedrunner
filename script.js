@@ -158,28 +158,34 @@ function playSiren() {
 function triggerLockdown(ip) {
     playSiren();
     
-    const forceSiren = () => {
-        playSiren();
-        document.removeEventListener('click', forceSiren);
-        document.removeEventListener('keydown', forceSiren);
-    };
-    document.addEventListener('click', forceSiren);
-    document.addEventListener('keydown', forceSiren);
-    
+    // Clear out the game UI
     document.body.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: flash 0.3s infinite alternate; cursor: crosshair;">
-            <h1 style="color: black; font-size: 10vw; font-family: 'Courier New', Courier, monospace; margin: 0; text-shadow: 4px 4px 0px white;">INAPPROPRIATE!!!</h1>
-            <p style="color: white; font-size: 3vw; font-family: 'Courier New', Courier, monospace; font-weight: bold; background: black; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
-                IP Address ${ip} has been recorded<br>and flagged for review.
+        <div style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #000; color: #ff5555; font-family: 'Courier New', monospace; text-align: center; padding: 20px;">
+            <h1 style="font-size: 5vw; border: 4px solid #ff5555; padding: 20px;">ACCESS DENIED</h1>
+            <p style="font-size: 2vw; margin-top: 20px;">Inappropriate behavior detected from this station.</p>
+            <p style="font-size: 1.5vw; color: #fff; background: #440000; padding: 10px; margin-top: 10px;">
+                Cooldown Active. Please use this time to reflect on Walton Engineering Team Norms.
             </p>
+            <div id="cooldown-timer" style="font-size: 4vw; font-weight: bold; margin-top: 30px; color: #ffff00;">RECALIBRATING...</div>
+            <p style="font-size: 1vw; color: #666; margin-top: 40px;">IP: ${ip}</p>
         </div>
-        <style>
-            @keyframes flash {
-                0% { background-color: #ff0000; }
-                100% { background-color: #ffff00; }
-            }
-        </style>
     `;
+
+    // Simple visual timer (30 mins is 1800 seconds)
+    let timeLeft = 1800;
+    const timerEl = document.getElementById('cooldown-timer');
+    
+    const countdown = setInterval(() => {
+        timeLeft--;
+        let mins = Math.floor(timeLeft / 60);
+        let secs = timeLeft % 60;
+        timerEl.innerText = `Time Remaining: ${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(countdown);
+            location.reload(); // Refresh the page once the 30 mins are up
+        }
+    }, 1000);
 }
 
 // --- GAME SYSTEM STATE ---
